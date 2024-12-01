@@ -1,0 +1,13 @@
+build/
+venv/
+__pycache__
+.python-version
+sim-build*
+*.egg-info
+
+tests/**/*.vcd
+tests/**/*.fst
+tests/**/*.xml
+tests/**/coverage.dat
+
+hw/axi_intercon.sv
