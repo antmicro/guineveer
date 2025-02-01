@@ -1,0 +1,5 @@
+Start Address,End Address,Size,Type
+0x0000_0000,0x1FFF_FFFF,512 MB,VeeR EL2 reserved space
+0x3000_0000,0x3000_1000,4 KB,Uart
+0x3000_1000,0x3000_2000,4 KB,I3c
+0x8000_0000,0x8FFF_FFFF,256 MB,Mem
