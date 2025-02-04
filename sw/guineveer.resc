@@ -1,0 +1,42 @@
+:name: Guineveer
+$name?="Guineveer"
+
+# Setup
+
+$elf?=$ORIGIN/../uart.elf
+
+path add $ORIGIN
+using sysbus
+mach create $name
+machine LoadPlatformDescription $ORIGIN/guineveer.repl
+
+machine CreateVirtualConsole "mem_mailbox"
+python """
+from Antmicro.Renode.Peripherals.Bus import Access, SysbusAccessWidth
+mem_mailbox = monitor.Machine["sysbus.mem_mailbox"]
+bus = monitor.Machine.SystemBus
+
+def handle_char(_, __, ___, value):
+    if(value not in (0x1, 0xFF) and value < 0xFF):
+        mem_mailbox.DisplayChar(value)
+    else:
+        for x in [ord(c) for c in "\n[[mailbox: Finished, requested simulation end]]"]:
+            mem_mailbox.DisplayChar(x)
+        mem_mailbox.DebugLog("FINISHED")
+        monitor.Machine.Pause()
+
+bus.AddWatchpointHook(0x80f80000, SysbusAccessWidth.DoubleWord, Access.Write, handle_char)
+bus.AddWatchpointHook(0x80f80000, SysbusAccessWidth.Byte, Access.Write, handle_char)
+"""
+
+
+sysbus LogPeripheralAccess uart
+showAnalyzer uart
+showAnalyzer mem_mailbox
+
+macro reset
+"""
+    sysbus LoadELF $elf
+"""
+
+runMacro $reset
