@@ -4,11 +4,12 @@ $name?="Guineveer"
 # Setup
 
 $elf?=$ORIGIN/../uart.elf
+$platform?=$ORIGIN/guineveer.repl
 
 path add $ORIGIN
 using sysbus
 mach create $name
-machine LoadPlatformDescription $ORIGIN/guineveer.repl
+machine LoadPlatformDescription $platform
 
 machine CreateVirtualConsole "mem_mailbox"
 python """
