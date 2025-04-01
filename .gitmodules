@@ -14,3 +14,6 @@
 [submodule "third_party/i3c-core"]
 	path = third_party/i3c-core
 	url = https://github.com/antmicro/i3c-core.git
+[submodule "third_party/renode"]
+	path = third_party/renode
+	url = https://github.com/renode/renode
