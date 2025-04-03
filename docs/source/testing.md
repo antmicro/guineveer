@@ -1,5 +1,11 @@
 # Testing
 
+Guineveer SoC support the following targets:
+
+* HDL simulation
+* Renode simulation and cosimulation
+* FPGA
+* ASIC (in progress)
 ## Software tests
 
 Currently two software test samples are available:
@@ -19,3 +25,7 @@ Software test can be run in multiple ways:
 * in Renode with a cosimulated model of the I3C device, generated from the original HDL sources.
 
 Running the test software using each of the available methods is described in the [User guide](user_guide.md#running-example-sw-using-the-testbench)
+
+## FPGA tests
+## Supported FPGA boards
+* [Arty A7-100T](https://store.digilentinc.com/arty-a7-artix-7-fpga-development-board/) is an FPGA development board based on the Xilinx Artix-7 FPGA.
