@@ -24,7 +24,6 @@ def handle_char(_, __, ___, value):
         for x in [ord(c) for c in "\n[[mailbox: Finished, requested simulation end]]"]:
             mem_mailbox.DisplayChar(x)
         mem_mailbox.DebugLog("FINISHED")
-        monitor.Machine.Pause()
 
 bus.AddWatchpointHook(0x80f80000, SysbusAccessWidth.DoubleWord, Access.Write, handle_char)
 bus.AddWatchpointHook(0x80f80000, SysbusAccessWidth.Byte, Access.Write, handle_char)

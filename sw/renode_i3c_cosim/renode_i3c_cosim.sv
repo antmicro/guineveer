@@ -74,7 +74,7 @@ module sim;
       .AxiIdWidth(AXISubIdWidth)
   ) i3c_core (
       .clk_i (clk),
-      .rst_ni(~axi.areset_n),
+      .rst_ni(axi.areset_n),
 
       .araddr_i(axi.araddr),
       .arburst_i(axi.arburst),

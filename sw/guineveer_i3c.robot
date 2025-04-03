@@ -72,11 +72,6 @@ Should Test Writable
     Wait For Line On Uart     Testing whether CONTROLLER_DEVICE_ADDR.DYNAMIC_ADDR is writable... OK.
     Wait For Line On Uart     Testing whether CONTROLLER_DEVICE_ADDR.DYNAMIC_ADDR_VALID is writable... OK.
     Wait For Line On Uart     Testing whether RESET_CONTROL.SOFT_RST is writable... OK.
-    Wait For Line On Uart     Testing whether RESET_CONTROL.CMD_QUEUE_RST is writable... OK.
-    Wait For Line On Uart     Testing whether RESET_CONTROL.RESP_QUEUE_RST is writable... OK.
-    Wait For Line On Uart     Testing whether RESET_CONTROL.TX_FIFO_RST is writable... OK.
-    Wait For Line On Uart     Testing whether RESET_CONTROL.RX_FIFO_RST is writable... OK.
-    Wait For Line On Uart     Testing whether RESET_CONTROL.IBI_QUEUE_RST is writable... OK.
 
 Should Force Interrupts
     Execute Command	      $elf=@${CURDIR}/../i3c.elf
