@@ -15,5 +15,5 @@ parameters:
       size: 0x1000
     mem:
       offset : 0x80000000
-      size: 0xfffffff
+      size: 0x1f400
 vlnv: 'vendor:library:axi_intercon:1.0'

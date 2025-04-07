@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
+.set MAILBOX, 0x80f80000
+
 .section .text.init
 .global _start
 _start:
@@ -21,14 +23,9 @@ _start:
 
 .global _finish
 _finish:
-        la t0, __mailbox
+        la t0, MAILBOX
         sb a0, 0(t0) # Signal testbench termination
         beq x0, x0, _finish
         .rept 10
         nop
         .endr
-
-.section .data.mailbox
-.global __mailbox
-__mailbox:
-	.word 0

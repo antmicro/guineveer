@@ -5,42 +5,36 @@ ENTRY(_start)
 
 MEMORY
 {
-	ram (rwx) : ORIGIN = 0x80000000, LENGTH = 0x1000000
-	mailbox (rw) : ORIGIN = 0x80f80000, LENGTH = 0x8
+	ram (rwx) : ORIGIN = 0x80000000, LENGTH = 0x1f400
 }
 
 STACK_SIZE = 0x1000;
 
 SECTIONS
 {
-	.text :
+	.text : ALIGN(8)
 	{
 		*(.text.init)
 		*(.text*)
 	} > ram
 
-	.bss (NOLOAD) :
+	.bss (NOLOAD) : ALIGN(8)
 	{
 		*(.bss)
 		*(COMMON)
 	} > ram
 
-	.stack (NOLOAD) :
+	.stack (NOLOAD) : ALIGN(8)
 	{
 		__stack_end = .;
 		. += STACK_SIZE;
 		__stack_start = .;
 	} > ram
 
-	.data :
+	.data : ALIGN(8)
 	{
 		*(.*data)
 		*(.rodata*)
 		*(.sbss)
 	} > ram
-
-	.data.mailbox :
-	{
-		*(.data.mailbox)
-	} > mailbox
 }

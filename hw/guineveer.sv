@@ -296,7 +296,7 @@ module guineveer #(
 
   wire                        i3c_irq_unused;
 
-  `AXI_TYPEDEF_ALL(lmem_axi, logic [23:0], logic [3:0], logic [63:0], logic [7:0], logic)
+  `AXI_TYPEDEF_ALL(lmem_axi, logic [16:0], logic [3:0], logic [63:0], logic [7:0], logic)
   lmem_axi_req_t  lmem_axi_req;
   lmem_axi_resp_t lmem_axi_resp;
 
