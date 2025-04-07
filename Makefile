@@ -122,7 +122,7 @@ $(HW_DIR)/axi_intercon.sv: $(HW_DIR)/interconnect_utils/gen_inter_wrapper.sh $(H
 	sed -i 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/axi_intercon.sv
 
 $(BUILD_DIR)/sim.vcd: $(HEX_FILE) testbench | $(BUILD_DIR)
-	HEX_TEMP=$$(mktemp) && sed s/@8/@0/g < $< > $$HEX_TEMP && \
+	HEX_TEMP=$$(mktemp) && sed s/@./@0/g < $< > $$HEX_TEMP && \
 	cd $(BUILD_DIR) && ./obj_dir/Vguineveer_tb +firmware=$$HEX_TEMP ${TB_EXTRA_ARGS};
 
 $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD_DIR)
@@ -135,7 +135,7 @@ $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD
 # Don't build/rebuild if the exec or the hex files were specified by user
 ifneq ($(EXT_HEX),1)
 $(HEX_FILE): $(ELF_FILE)
-	$(GCC_PREFIX)-objcopy -O verilog $^ $@
+	$(GCC_PREFIX)-objcopy -O verilog --verilog-data-width=8 $^ $@
 endif
 
 ifneq ($(EXT_ELF),1)

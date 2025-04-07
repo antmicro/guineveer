@@ -16,7 +16,7 @@ module guineveer_sram #(
 
   logic mem_rvalid;
   logic [DATA_WIDTH-1:0] mem_rdata;
-  bit [7:0] mem[(1 << ADDR_WIDTH)];
+  bit [DATA_WIDTH-1:0] mem[(1 << ADDR_WIDTH) / (DATA_WIDTH / 8)];
 
   axi_to_mem #(
       .axi_req_t(AXI_REQ_T),
@@ -44,26 +44,18 @@ module guineveer_sram #(
   );
 
 
-  always_ff @(posedge clk_i, negedge rst_ni) begin
-    if (!rst_ni || !xaxi_to_mem.mem_req_o) begin
+  always_ff @(posedge clk_i) begin
+    if (!xaxi_to_mem.mem_req_o) begin
       mem_rvalid <= '0;
     end else if (xaxi_to_mem.mem_req_o) begin
+      automatic logic [ADDR_WIDTH-1:0] cell_addr = xaxi_to_mem.mem_addr_o[0] / (DATA_WIDTH / 8);
       mem_rvalid <= '1;
-      mem_rdata <= {
-        mem[xaxi_to_mem.mem_addr_o[0]+7],
-        mem[xaxi_to_mem.mem_addr_o[0]+6],
-        mem[xaxi_to_mem.mem_addr_o[0]+5],
-        mem[xaxi_to_mem.mem_addr_o[0]+4],
-        mem[xaxi_to_mem.mem_addr_o[0]+3],
-        mem[xaxi_to_mem.mem_addr_o[0]+2],
-        mem[xaxi_to_mem.mem_addr_o[0]+1],
-        mem[xaxi_to_mem.mem_addr_o[0]]
-      };
+      mem_rdata  <= mem[cell_addr];
 
       if (xaxi_to_mem.mem_we_o[0])
         for (int i = 0; i < 8; i++)
         if (xaxi_to_mem.mem_strb_o[0][i])
-          mem[xaxi_to_mem.mem_addr_o[0]+i] <= xaxi_to_mem.mem_wdata_o[0][8*i+:8];
+          mem[cell_addr][8*i+:8] <= xaxi_to_mem.mem_wdata_o[0][8*i+:8];
     end
   end
 
