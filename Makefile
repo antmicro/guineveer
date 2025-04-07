@@ -25,7 +25,7 @@ UART_FLIST := $(subst $${CALIPTRA_ROOT},${CALIPTRA_ROOT},\
 I3C_FLIST := $(subst $${CALIPTRA_ROOT},${CALIPTRA_ROOT},\
 	$(subst $${I3C_ROOT_DIR},${I3C_ROOT_DIR},\
     $(file < $(I3C_ROOT_DIR)/src/i3c.f)))
-defines := +define+DIGITAL_IO_I3C=1
+defines := +define+DIGITAL_IO_I3C=1 +define+GUINEVEER_TESTBENCH=1
 
 AXI_SOURCE_DIR = $(abspath $(SCRIPT_DIR)/third_party/axi)
 

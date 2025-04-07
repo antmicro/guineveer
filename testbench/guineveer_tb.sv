@@ -40,11 +40,8 @@ module guineveer_tb #(
   logic                      uart_rx;
   logic                      uart_tx;
 
-  logic                      scl_i;
-  logic                      sda_i;
-  logic                      scl_o;
-  logic                      sda_o;
-  logic                      sel_od_pp;
+  logic                      i3c_scl_io;
+  logic                      i3c_sda_io;
 
   logic                      porst_l;
   logic [pt.PIC_TOTAL_INT:1] extintsrc_req;
@@ -89,7 +86,7 @@ module guineveer_tb #(
   logic [              31:0] wb_csr_data;
 
   logic                      dmi_core_enable;
-  logic [             255*8:0] firmware_path;
+  logic [           255*8:0] firmware_path;
 
   always_comb dmi_core_enable = ~(o_cpu_halt_status);
 
@@ -290,7 +287,7 @@ module guineveer_tb #(
   final if (line_buffer.len() > 0) $display("[UART MONITOR]: %s", line_buffer);
 
   guineveer top_guineveer (
-      .clk_i(core_clk),
+      .clk_i (core_clk),
       .rst_ni(rst_l),
       .cpu_halt_req_i(i_cpu_halt_req),
       .cpu_halt_ack_o(o_cpu_halt_ack),
@@ -315,20 +312,8 @@ module guineveer_tb #(
       .uart_rx_i(uart_rx),
       .uart_tx_o(uart_tx),
 
-      .scl_i(scl_i),
-      .sda_i(sda_i),
-      .scl_o(scl_o),
-      .sda_o(sda_o),
-      .sel_od_pp_o(sel_od_pp),
-
-
-      .trace_rv_i_insn_ip_o(trace_rv_i_insn_ip),
-      .trace_rv_i_address_ip_o(trace_rv_i_address_ip),
-      .trace_rv_i_valid_ip_o(trace_rv_i_valid_ip),
-      .trace_rv_i_exception_ip_o(trace_rv_i_exception_ip),
-      .trace_rv_i_ecause_ip_o(trace_rv_i_ecause_ip),
-      .trace_rv_i_interrupt_ip_o(trace_rv_i_interrupt_ip),
-      .trace_rv_i_tval_ip_o(trace_rv_i_tval_ip)
+      .i3c_scl_io(i3c_scl_io),
+      .i3c_sda_io(i3c_sda_io)
   );
 
   `include "dasm.svi"

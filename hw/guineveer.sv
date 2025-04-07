@@ -8,11 +8,13 @@ module guineveer #(
 ) (
     input  bit clk_i,
     input  bit rst_ni,
-    input  bit cpu_halt_req_i,       // Async halt req to CPU
-    output bit cpu_halt_ack_o,       // core response to halt
-    output bit cpu_halt_status_o,    // 1'b1 indicates core is halted
-    input  bit cpu_run_req_i,        // Async restart req to CPU
-    output bit cpu_run_ack_o,        // Core response to run req
+
+`ifdef GUINEVEER_TESTBENCH
+    input  bit cpu_halt_req_i,        // Async halt req to CPU
+    output bit cpu_halt_ack_o,        // core response to halt
+    output bit cpu_halt_status_o,     // 1'b1 indicates core is halted
+    input  bit cpu_run_req_i,         // Async restart req to CPU
+    output bit cpu_run_ack_o,         // Core response to run req
     input  bit mpc_debug_halt_req_i,
     output bit mpc_debug_halt_ack_o,
     input  bit mpc_debug_run_req_i,
@@ -27,281 +29,272 @@ module guineveer #(
     input logic        nmi_int_i,
     input logic [31:1] nmi_vector_i,
     input logic [31:1] jtag_id_i,
+`endif
 
-    input  logic uart_rx_i,
+    input  wire  uart_rx_i,
     output logic uart_tx_o,
 
-    input  logic scl_i,
-    input  logic sda_i,
-    output logic scl_o,
-    output logic sda_o,
-    output logic sel_od_pp_o,
-
-    output logic [31:0] trace_rv_i_insn_ip_o,
-    output logic [31:0] trace_rv_i_address_ip_o,
-    output logic        trace_rv_i_valid_ip_o,
-    output logic        trace_rv_i_exception_ip_o,
-    output logic [ 4:0] trace_rv_i_ecause_ip_o,
-    output logic        trace_rv_i_interrupt_ip_o,
-    output logic [31:0] trace_rv_i_tval_ip_o
+    // I3C bus IO
+    inout wire i3c_scl_io,
+    inout wire i3c_sda_io
 );
 
   el2_mem_if el2_mem_export ();
 
   //-------------------------- LSU AXI signals--------------------------
   // AXI Write Channels
-  wire                       lsu_axi_awvalid;
-  wire                       lsu_axi_awready;
-  wire [`RV_LSU_BUS_TAG-1:0] lsu_axi_awid;
-  wire [               31:0] lsu_axi_awaddr;
-  wire [                3:0] lsu_axi_awregion;
-  wire [                7:0] lsu_axi_awlen;
-  wire [                2:0] lsu_axi_awsize;
-  wire [                1:0] lsu_axi_awburst;
-  wire                       lsu_axi_awlock;
-  wire [                3:0] lsu_axi_awcache;
-  wire [                2:0] lsu_axi_awprot;
-  wire [                3:0] lsu_axi_awqos;
+  wire                        lsu_axi_awvalid;
+  wire                        lsu_axi_awready;
+  wire  [`RV_LSU_BUS_TAG-1:0] lsu_axi_awid;
+  wire  [               31:0] lsu_axi_awaddr;
+  wire  [                3:0] lsu_axi_awregion;
+  wire  [                7:0] lsu_axi_awlen;
+  wire  [                2:0] lsu_axi_awsize;
+  wire  [                1:0] lsu_axi_awburst;
+  wire                        lsu_axi_awlock;
+  wire  [                3:0] lsu_axi_awcache;
+  wire  [                2:0] lsu_axi_awprot;
+  wire  [                3:0] lsu_axi_awqos;
 
-  wire                       lsu_axi_wvalid;
-  wire                       lsu_axi_wready;
-  wire [               63:0] lsu_axi_wdata;
-  wire [                7:0] lsu_axi_wstrb;
-  wire                       lsu_axi_wlast;
+  wire                        lsu_axi_wvalid;
+  wire                        lsu_axi_wready;
+  wire  [               63:0] lsu_axi_wdata;
+  wire  [                7:0] lsu_axi_wstrb;
+  wire                        lsu_axi_wlast;
 
-  wire                       lsu_axi_bvalid;
-  wire                       lsu_axi_bready;
-  wire [                1:0] lsu_axi_bresp;
-  wire [`RV_LSU_BUS_TAG-1:0] lsu_axi_bid;
+  wire                        lsu_axi_bvalid;
+  wire                        lsu_axi_bready;
+  wire  [                1:0] lsu_axi_bresp;
+  wire  [`RV_LSU_BUS_TAG-1:0] lsu_axi_bid;
 
   // AXI Read Channels
-  wire                       lsu_axi_arvalid;
-  wire                       lsu_axi_arready;
-  wire [`RV_LSU_BUS_TAG-1:0] lsu_axi_arid;
-  wire [               31:0] lsu_axi_araddr;
-  wire [                3:0] lsu_axi_arregion;
-  wire [                7:0] lsu_axi_arlen;
-  wire [                2:0] lsu_axi_arsize;
-  wire [                1:0] lsu_axi_arburst;
-  wire                       lsu_axi_arlock;
-  wire [                3:0] lsu_axi_arcache;
-  wire [                2:0] lsu_axi_arprot;
-  wire [                3:0] lsu_axi_arqos;
+  wire                        lsu_axi_arvalid;
+  wire                        lsu_axi_arready;
+  wire  [`RV_LSU_BUS_TAG-1:0] lsu_axi_arid;
+  wire  [               31:0] lsu_axi_araddr;
+  wire  [                3:0] lsu_axi_arregion;
+  wire  [                7:0] lsu_axi_arlen;
+  wire  [                2:0] lsu_axi_arsize;
+  wire  [                1:0] lsu_axi_arburst;
+  wire                        lsu_axi_arlock;
+  wire  [                3:0] lsu_axi_arcache;
+  wire  [                2:0] lsu_axi_arprot;
+  wire  [                3:0] lsu_axi_arqos;
 
-  wire                       lsu_axi_rvalid;
-  wire                       lsu_axi_rready;
-  wire [`RV_LSU_BUS_TAG-1:0] lsu_axi_rid;
-  wire [               63:0] lsu_axi_rdata;
-  wire [                1:0] lsu_axi_rresp;
-  wire                       lsu_axi_rlast;
-  wire                       lsu_axi_awuser;
-  wire                       lsu_axi_wuser;
-  wire                       lsu_axi_buser;
-  wire                       lsu_axi_aruser;
-  wire                       lsu_axi_ruser;
+  wire                        lsu_axi_rvalid;
+  wire                        lsu_axi_rready;
+  wire  [`RV_LSU_BUS_TAG-1:0] lsu_axi_rid;
+  wire  [               63:0] lsu_axi_rdata;
+  wire  [                1:0] lsu_axi_rresp;
+  wire                        lsu_axi_rlast;
+  wire                        lsu_axi_awuser;
+  wire                        lsu_axi_wuser;
+  wire                        lsu_axi_buser;
+  wire                        lsu_axi_aruser;
+  wire                        lsu_axi_ruser;
 
   //-------------------------- IFU AXI signals--------------------------
   // AXI Write Channels
-  wire                       ifu_axi_awvalid;
-  wire                       ifu_axi_awready;
-  wire [`RV_IFU_BUS_TAG-1:0] ifu_axi_awid;
-  wire [               31:0] ifu_axi_awaddr;
-  wire [                3:0] ifu_axi_awregion;
-  wire [                7:0] ifu_axi_awlen;
-  wire [                2:0] ifu_axi_awsize;
-  wire [                1:0] ifu_axi_awburst;
-  wire                       ifu_axi_awlock;
-  wire [                3:0] ifu_axi_awcache;
-  wire [                2:0] ifu_axi_awprot;
-  wire [                3:0] ifu_axi_awqos;
+  wire                        ifu_axi_awvalid;
+  wire                        ifu_axi_awready;
+  wire  [`RV_IFU_BUS_TAG-1:0] ifu_axi_awid;
+  wire  [               31:0] ifu_axi_awaddr;
+  wire  [                3:0] ifu_axi_awregion;
+  wire  [                7:0] ifu_axi_awlen;
+  wire  [                2:0] ifu_axi_awsize;
+  wire  [                1:0] ifu_axi_awburst;
+  wire                        ifu_axi_awlock;
+  wire  [                3:0] ifu_axi_awcache;
+  wire  [                2:0] ifu_axi_awprot;
+  wire  [                3:0] ifu_axi_awqos;
 
-  wire                       ifu_axi_wvalid;
-  wire                       ifu_axi_wready;
-  wire [               63:0] ifu_axi_wdata;
-  wire [                7:0] ifu_axi_wstrb;
-  wire                       ifu_axi_wlast;
+  wire                        ifu_axi_wvalid;
+  wire                        ifu_axi_wready;
+  wire  [               63:0] ifu_axi_wdata;
+  wire  [                7:0] ifu_axi_wstrb;
+  wire                        ifu_axi_wlast;
 
-  wire                       ifu_axi_bvalid;
-  wire                       ifu_axi_bready;
-  wire [                1:0] ifu_axi_bresp;
-  wire [`RV_IFU_BUS_TAG-1:0] ifu_axi_bid;
+  wire                        ifu_axi_bvalid;
+  wire                        ifu_axi_bready;
+  wire  [                1:0] ifu_axi_bresp;
+  wire  [`RV_IFU_BUS_TAG-1:0] ifu_axi_bid;
 
   // AXI Read Channels
-  wire                       ifu_axi_arvalid;
-  wire                       ifu_axi_arready;
-  wire [`RV_IFU_BUS_TAG-1:0] ifu_axi_arid;
-  wire [               31:0] ifu_axi_araddr;
-  wire [                3:0] ifu_axi_arregion;
-  wire [                7:0] ifu_axi_arlen;
-  wire [                2:0] ifu_axi_arsize;
-  wire [                1:0] ifu_axi_arburst;
-  wire                       ifu_axi_arlock;
-  wire [                3:0] ifu_axi_arcache;
-  wire [                2:0] ifu_axi_arprot;
-  wire [                3:0] ifu_axi_arqos;
+  wire                        ifu_axi_arvalid;
+  wire                        ifu_axi_arready;
+  wire  [`RV_IFU_BUS_TAG-1:0] ifu_axi_arid;
+  wire  [               31:0] ifu_axi_araddr;
+  wire  [                3:0] ifu_axi_arregion;
+  wire  [                7:0] ifu_axi_arlen;
+  wire  [                2:0] ifu_axi_arsize;
+  wire  [                1:0] ifu_axi_arburst;
+  wire                        ifu_axi_arlock;
+  wire  [                3:0] ifu_axi_arcache;
+  wire  [                2:0] ifu_axi_arprot;
+  wire  [                3:0] ifu_axi_arqos;
 
-  wire                       ifu_axi_rvalid;
-  wire                       ifu_axi_rready;
-  wire [`RV_IFU_BUS_TAG-1:0] ifu_axi_rid;
-  wire [               63:0] ifu_axi_rdata;
-  wire [                1:0] ifu_axi_rresp;
-  wire                       ifu_axi_rlast;
+  wire                        ifu_axi_rvalid;
+  wire                        ifu_axi_rready;
+  wire  [`RV_IFU_BUS_TAG-1:0] ifu_axi_rid;
+  wire  [               63:0] ifu_axi_rdata;
+  wire  [                1:0] ifu_axi_rresp;
+  wire                        ifu_axi_rlast;
 
   //-------------------------- DMA AXI signals--------------------------
   // AXI Write Channels
-  wire                       dma_axi_awvalid;
-  wire                       dma_axi_awready;
-  wire [`RV_DMA_BUS_TAG-1:0] dma_axi_awid;
-  wire [               31:0] dma_axi_awaddr;
-  wire [                2:0] dma_axi_awsize;
-  wire [                2:0] dma_axi_awprot;
-  wire [                7:0] dma_axi_awlen;
-  wire [                1:0] dma_axi_awburst;
+  wire                        dma_axi_awvalid;
+  wire                        dma_axi_awready;
+  wire  [`RV_DMA_BUS_TAG-1:0] dma_axi_awid;
+  wire  [               31:0] dma_axi_awaddr;
+  wire  [                2:0] dma_axi_awsize;
+  wire  [                2:0] dma_axi_awprot;
+  wire  [                7:0] dma_axi_awlen;
+  wire  [                1:0] dma_axi_awburst;
 
 
-  wire                       dma_axi_wvalid;
-  wire                       dma_axi_wready;
-  wire [               63:0] dma_axi_wdata;
-  wire [                7:0] dma_axi_wstrb;
-  wire                       dma_axi_wlast;
+  wire                        dma_axi_wvalid;
+  wire                        dma_axi_wready;
+  wire  [               63:0] dma_axi_wdata;
+  wire  [                7:0] dma_axi_wstrb;
+  wire                        dma_axi_wlast;
 
-  wire                       dma_axi_bvalid;
-  wire                       dma_axi_bready;
-  wire [                1:0] dma_axi_bresp;
-  wire [`RV_DMA_BUS_TAG-1:0] dma_axi_bid;
+  wire                        dma_axi_bvalid;
+  wire                        dma_axi_bready;
+  wire  [                1:0] dma_axi_bresp;
+  wire  [`RV_DMA_BUS_TAG-1:0] dma_axi_bid;
 
   // AXI Read Channels
-  wire                       dma_axi_arvalid;
-  wire                       dma_axi_arready;
-  wire [`RV_DMA_BUS_TAG-1:0] dma_axi_arid;
-  wire [               31:0] dma_axi_araddr;
-  wire [                2:0] dma_axi_arsize;
-  wire [                2:0] dma_axi_arprot;
-  wire [                7:0] dma_axi_arlen;
-  wire [                1:0] dma_axi_arburst;
+  wire                        dma_axi_arvalid;
+  wire                        dma_axi_arready;
+  wire  [`RV_DMA_BUS_TAG-1:0] dma_axi_arid;
+  wire  [               31:0] dma_axi_araddr;
+  wire  [                2:0] dma_axi_arsize;
+  wire  [                2:0] dma_axi_arprot;
+  wire  [                7:0] dma_axi_arlen;
+  wire  [                1:0] dma_axi_arburst;
 
-  wire                       dma_axi_rvalid;
-  wire                       dma_axi_rready;
-  wire [`RV_DMA_BUS_TAG-1:0] dma_axi_rid;
-  wire [               63:0] dma_axi_rdata;
-  wire [                1:0] dma_axi_rresp;
-  wire                       dma_axi_rlast;
+  wire                        dma_axi_rvalid;
+  wire                        dma_axi_rready;
+  wire  [`RV_DMA_BUS_TAG-1:0] dma_axi_rid;
+  wire  [               63:0] dma_axi_rdata;
+  wire  [                1:0] dma_axi_rresp;
+  wire                        dma_axi_rlast;
 
   //-------------------------- UART AXI signals--------------------------
 
-  wire [   SUB_ID_WIDTH-1:0] uart_axi_awid;
-  wire [               31:0] uart_axi_awaddr;
-  wire [                7:0] uart_axi_awlen;
-  wire [                2:0] uart_axi_awsize;
-  wire [                1:0] uart_axi_awburst;
-  wire                       uart_axi_awlock;
-  wire [                3:0] uart_axi_awcache;
-  wire [                2:0] uart_axi_awprot;
-  wire [                3:0] uart_axi_awregion;
-  wire [                3:0] uart_axi_awqos;
-  wire                       uart_axi_awvalid;
-  wire                       uart_axi_awready;
+  wire  [   SUB_ID_WIDTH-1:0] uart_axi_awid;
+  wire  [               31:0] uart_axi_awaddr;
+  wire  [                7:0] uart_axi_awlen;
+  wire  [                2:0] uart_axi_awsize;
+  wire  [                1:0] uart_axi_awburst;
+  wire                        uart_axi_awlock;
+  wire  [                3:0] uart_axi_awcache;
+  wire  [                2:0] uart_axi_awprot;
+  wire  [                3:0] uart_axi_awregion;
+  wire  [                3:0] uart_axi_awqos;
+  wire                        uart_axi_awvalid;
+  wire                        uart_axi_awready;
 
-  wire [   SUB_ID_WIDTH-1:0] uart_axi_arid;
-  wire [               31:0] uart_axi_araddr;
-  wire [                7:0] uart_axi_arlen;
-  wire [                2:0] uart_axi_arsize;
-  wire [                1:0] uart_axi_arburst;
-  wire                       uart_axi_arlock;
-  wire [                3:0] uart_axi_arcache;
-  wire [                2:0] uart_axi_arprot;
-  wire [                3:0] uart_axi_arregion;
-  wire [                3:0] uart_axi_arqos;
-  wire                       uart_axi_arvalid;
-  wire                       uart_axi_arready;
+  wire  [   SUB_ID_WIDTH-1:0] uart_axi_arid;
+  wire  [               31:0] uart_axi_araddr;
+  wire  [                7:0] uart_axi_arlen;
+  wire  [                2:0] uart_axi_arsize;
+  wire  [                1:0] uart_axi_arburst;
+  wire                        uart_axi_arlock;
+  wire  [                3:0] uart_axi_arcache;
+  wire  [                2:0] uart_axi_arprot;
+  wire  [                3:0] uart_axi_arregion;
+  wire  [                3:0] uart_axi_arqos;
+  wire                        uart_axi_arvalid;
+  wire                        uart_axi_arready;
 
-  wire [               63:0] uart_axi_wdata;
-  wire [                7:0] uart_axi_wstrb;
-  wire                       uart_axi_wlast;
-  wire                       uart_axi_wvalid;
-  wire                       uart_axi_wready;
+  wire  [               63:0] uart_axi_wdata;
+  wire  [                7:0] uart_axi_wstrb;
+  wire                        uart_axi_wlast;
+  wire                        uart_axi_wvalid;
+  wire                        uart_axi_wready;
 
-  wire [   SUB_ID_WIDTH-1:0] uart_axi_bid;
-  wire [                1:0] uart_axi_bresp;
-  wire                       uart_axi_bvalid;
-  wire                       uart_axi_bready;
+  wire  [   SUB_ID_WIDTH-1:0] uart_axi_bid;
+  wire  [                1:0] uart_axi_bresp;
+  wire                        uart_axi_bvalid;
+  wire                        uart_axi_bready;
 
-  wire [   SUB_ID_WIDTH-1:0] uart_axi_rid;
-  wire [               63:0] uart_axi_rdata;
-  wire [                1:0] uart_axi_rresp;
-  wire                       uart_axi_rlast;
-  wire                       uart_axi_rvalid;
-  wire                       uart_axi_rready;
+  wire  [   SUB_ID_WIDTH-1:0] uart_axi_rid;
+  wire  [               63:0] uart_axi_rdata;
+  wire  [                1:0] uart_axi_rresp;
+  wire                        uart_axi_rlast;
+  wire                        uart_axi_rvalid;
+  wire                        uart_axi_rready;
 
-  logic [              31:0] uart_ahb_haddr;
-  logic [              63:0] uart_ahb_hwdata;
-  logic                      uart_ahb_hsel;
-  logic                      uart_ahb_hwrite;
-  logic                      uart_ahb_hready;
-  logic [               1:0] uart_ahb_htrans;
-  logic [               2:0] uart_ahb_hsize;
-  logic                      uart_ahb_hresp;
-  logic                      uart_ahb_hreadyout;
-  logic [              63:0] uart_ahb_hrdata;
+  logic [               31:0] uart_ahb_haddr;
+  logic [               63:0] uart_ahb_hwdata;
+  logic                       uart_ahb_hsel;
+  logic                       uart_ahb_hwrite;
+  logic                       uart_ahb_hready;
+  logic [                1:0] uart_ahb_htrans;
+  logic [                2:0] uart_ahb_hsize;
+  logic                       uart_ahb_hresp;
+  logic                       uart_ahb_hreadyout;
+  logic [               63:0] uart_ahb_hrdata;
 
-  logic [              31:0] ahb_haddr_bridge_out;
-  logic [               2:0] ahb_hsize_bridge_out;
+  logic [               31:0] ahb_haddr_bridge_out;
+  logic [                2:0] ahb_hsize_bridge_out;
 
   //-------------------------- I3C AXI signals--------------------------
 
-  wire [   SUB_ID_WIDTH-1:0] i3c_axi_awid;
-  wire [               31:0] i3c_axi_awaddr;
-  wire [                7:0] i3c_axi_awlen;
-  wire [                2:0] i3c_axi_awsize;
-  wire [                1:0] i3c_axi_awburst;
-  wire                       i3c_axi_awlock;
-  wire [                3:0] i3c_axi_awcache;
-  wire [                2:0] i3c_axi_awprot;
-  wire [                3:0] i3c_axi_awregion;
-  wire [                3:0] i3c_axi_awqos;
-  wire                       i3c_axi_awvalid;
-  wire                       i3c_axi_awready;
+  wire  [   SUB_ID_WIDTH-1:0] i3c_axi_awid;
+  wire  [               31:0] i3c_axi_awaddr;
+  wire  [                7:0] i3c_axi_awlen;
+  wire  [                2:0] i3c_axi_awsize;
+  wire  [                1:0] i3c_axi_awburst;
+  wire                        i3c_axi_awlock;
+  wire  [                3:0] i3c_axi_awcache;
+  wire  [                2:0] i3c_axi_awprot;
+  wire  [                3:0] i3c_axi_awregion;
+  wire  [                3:0] i3c_axi_awqos;
+  wire                        i3c_axi_awvalid;
+  wire                        i3c_axi_awready;
 
-  wire [   SUB_ID_WIDTH-1:0] i3c_axi_arid;
-  wire [               31:0] i3c_axi_araddr;
-  wire [                7:0] i3c_axi_arlen;
-  wire [                2:0] i3c_axi_arsize;
-  wire [                1:0] i3c_axi_arburst;
-  wire                       i3c_axi_arlock;
-  wire [                3:0] i3c_axi_arcache;
-  wire [                2:0] i3c_axi_arprot;
-  wire [                3:0] i3c_axi_arregion;
-  wire [                3:0] i3c_axi_arqos;
-  wire                       i3c_axi_arvalid;
-  wire                       i3c_axi_arready;
+  wire  [   SUB_ID_WIDTH-1:0] i3c_axi_arid;
+  wire  [               31:0] i3c_axi_araddr;
+  wire  [                7:0] i3c_axi_arlen;
+  wire  [                2:0] i3c_axi_arsize;
+  wire  [                1:0] i3c_axi_arburst;
+  wire                        i3c_axi_arlock;
+  wire  [                3:0] i3c_axi_arcache;
+  wire  [                2:0] i3c_axi_arprot;
+  wire  [                3:0] i3c_axi_arregion;
+  wire  [                3:0] i3c_axi_arqos;
+  wire                        i3c_axi_arvalid;
+  wire                        i3c_axi_arready;
 
-  wire [               63:0] i3c_axi_wdata;
-  wire [                7:0] i3c_axi_wstrb;
-  wire                       i3c_axi_wlast;
-  wire                       i3c_axi_wvalid;
-  wire                       i3c_axi_wready;
+  wire  [               63:0] i3c_axi_wdata;
+  wire  [                7:0] i3c_axi_wstrb;
+  wire                        i3c_axi_wlast;
+  wire                        i3c_axi_wvalid;
+  wire                        i3c_axi_wready;
 
-  wire [   SUB_ID_WIDTH-1:0] i3c_axi_bid;
-  wire [                1:0] i3c_axi_bresp;
-  wire [                0:0] i3c_axi_buser_unused;
-  wire                       i3c_axi_bvalid;
-  wire                       i3c_axi_bready;
+  wire  [   SUB_ID_WIDTH-1:0] i3c_axi_bid;
+  wire  [                1:0] i3c_axi_bresp;
+  wire  [                0:0] i3c_axi_buser_unused;
+  wire                        i3c_axi_bvalid;
+  wire                        i3c_axi_bready;
 
-  wire [   SUB_ID_WIDTH-1:0] i3c_axi_rid;
-  wire [                0:0] i3c_axi_ruser_unused;
-  wire [               63:0] i3c_axi_rdata;
-  wire [                1:0] i3c_axi_rresp;
-  wire                       i3c_axi_rlast;
-  wire                       i3c_axi_rvalid;
-  wire                       i3c_axi_rready;
+  wire  [   SUB_ID_WIDTH-1:0] i3c_axi_rid;
+  wire  [                0:0] i3c_axi_ruser_unused;
+  wire  [               63:0] i3c_axi_rdata;
+  wire  [                1:0] i3c_axi_rresp;
+  wire                        i3c_axi_rlast;
+  wire                        i3c_axi_rvalid;
+  wire                        i3c_axi_rready;
 
-  wire                       i3c_recovery_payload_available_unused;
-  wire                       i3c_recovery_image_activated_unused;
+  wire                        i3c_recovery_payload_available_unused;
+  wire                        i3c_recovery_image_activated_unused;
 
-  wire                       i3c_peripheral_reset_unused;
-  wire                       i3c_escalated_reset_unused;
+  wire                        i3c_peripheral_reset_unused;
+  wire                        i3c_escalated_reset_unused;
 
-  wire                       i3c_irq_unused;
+  wire                        i3c_irq_unused;
 
   `AXI_TYPEDEF_ALL(lmem_axi, logic [23:0], logic [3:0], logic [63:0], logic [7:0], logic)
   lmem_axi_req_t  lmem_axi_req;
@@ -335,7 +328,7 @@ module guineveer #(
   );
 
   axi4_to_ahb #(
-    .TAG(SUB_ID_WIDTH)
+      .TAG(SUB_ID_WIDTH)
   ) axi_bridge (
       .clk(clk_i),
       .free_clk(clk_i),
@@ -428,7 +421,7 @@ module guineveer #(
       .AxiAddrWidth($bits(i3c_axi_awaddr)),
       .AxiDataWidth(64),
       .AxiUserWidth(1),
-      .AxiIdWidth(SUB_ID_WIDTH)
+      .AxiIdWidth  (SUB_ID_WIDTH)
   ) i3c_core (
       .clk_i (clk_i),
       .rst_ni(rst_ni),
@@ -461,10 +454,10 @@ module guineveer #(
       .awvalid_i(i3c_axi_awvalid),
       .awready_o(i3c_axi_awready),
 
-      .wdata_i(i3c_axi_wdata),
-      .wstrb_i(i3c_axi_wstrb),
-      .wuser_i('0),
-      .wlast_i(i3c_axi_wlast),
+      .wdata_i (i3c_axi_wdata),
+      .wstrb_i (i3c_axi_wstrb),
+      .wuser_i ('0),
+      .wlast_i (i3c_axi_wlast),
       .wvalid_i(i3c_axi_wvalid),
       .wready_o(i3c_axi_wready),
 
@@ -474,14 +467,18 @@ module guineveer #(
       .bvalid_o(i3c_axi_bvalid),
       .bready_i(i3c_axi_bready),
 
-      .scl_i(scl_i),
-      .sda_i(sda_i),
-      .scl_o(scl_o),
-      .sda_o(sda_o),
-      .sel_od_pp_o(sel_od_pp_o),
-
+`ifdef DIGITAL_IO_I3C
+      .sda_i(),
+      .sda_o(),
+      .scl_o(),
+      .scl_i(),
+      .sel_od_pp_o(),
+`else
+      .i3c_scl_io(i3c_scl_io),
+      .i3c_sda_io(i3c_sda_io),
+`endif
       .recovery_payload_available_o(i3c_recovery_payload_available_unused),
-      .recovery_image_activated_o(i3c_recovery_image_activated_unused),
+      .recovery_image_activated_o  (i3c_recovery_image_activated_unused),
 
       .peripheral_reset_o(i3c_peripheral_reset_unused),
       .peripheral_reset_done_i('0),
@@ -491,13 +488,20 @@ module guineveer #(
   );
 
   el2_veer_wrapper rvtop_wrapper (
-      .rst_l(rst_ni),
+      .rst_l    (rst_ni),
       .dbg_rst_l(),
       .clk      (clk_i),
+`ifndef GUINEVEER_TESTBENCH
+      .rst_vec  (),
+      .nmi_int  (),
+      .nmi_vec  (),
+      .jtag_id  (),
+`else
       .rst_vec  (reset_vector_i),
       .nmi_int  (nmi_int_i),
       .nmi_vec  (nmi_vector_i),
       .jtag_id  (jtag_id_i),
+`endif
 
       //-------------------------- LSU AXI signals--------------------------
       // AXI Write Channels
@@ -677,21 +681,20 @@ module guineveer #(
       .dma_axi_rresp (dma_axi_rresp),
       .dma_axi_rlast (dma_axi_rlast),
 
-      .timer_int    (timer_int_i),
       .extintsrc_req(),
 
-      .lsu_bus_clk_en(lsu_bus_clk_en_i),  // Clock ratio b/w cpu core clk & AHB master interface
-      .ifu_bus_clk_en(1'b1),            // Clock ratio b/w cpu core clk & AHB master interface
-      .dbg_bus_clk_en(1'b1),            // Clock ratio b/w cpu core clk & AHB Debug master interface
-      .dma_bus_clk_en(1'b1),            // Clock ratio b/w cpu core clk & AHB slave interface
+      .lsu_bus_clk_en(1'b1),  // Clock ratio b/w cpu core clk & AHB master interface
+      .ifu_bus_clk_en(1'b1),  // Clock ratio b/w cpu core clk & AHB master interface
+      .dbg_bus_clk_en(1'b1),  // Clock ratio b/w cpu core clk & AHB Debug master interface
+      .dma_bus_clk_en(1'b1),  // Clock ratio b/w cpu core clk & AHB slave interface
 
-      .trace_rv_i_insn_ip     (trace_rv_i_insn_ip_o),
-      .trace_rv_i_address_ip  (trace_rv_i_address_ip_o),
-      .trace_rv_i_valid_ip    (trace_rv_i_valid_ip_o),
-      .trace_rv_i_exception_ip(trace_rv_i_exception_ip_o),
-      .trace_rv_i_ecause_ip   (trace_rv_i_ecause_ip_o),
-      .trace_rv_i_interrupt_ip(trace_rv_i_interrupt_ip_o),
-      .trace_rv_i_tval_ip     (trace_rv_i_tval_ip_o),
+      .trace_rv_i_insn_ip     (),
+      .trace_rv_i_address_ip  (),
+      .trace_rv_i_valid_ip    (),
+      .trace_rv_i_exception_ip(),
+      .trace_rv_i_ecause_ip   (),
+      .trace_rv_i_interrupt_ip(),
+      .trace_rv_i_tval_ip     (),
 
       .jtag_tck   (),
       .jtag_tms   (),
@@ -700,12 +703,30 @@ module guineveer #(
       .jtag_tdo   (),
       .jtag_tdoEn (),
 
-      .mpc_debug_halt_ack(mpc_debug_halt_ack_o),
-      .mpc_debug_halt_req(mpc_debug_halt_req_i),
-      .mpc_debug_run_ack (mpc_debug_run_ack_o),
-      .mpc_debug_run_req (mpc_debug_run_req_i),
-      .mpc_reset_run_req (1'b1),                // Start running after reset
+`ifndef GUINEVEER_TESTBENCH
+      .timer_int         (),
+      .mpc_debug_halt_ack(),
+      .mpc_debug_halt_req(0),
+      .mpc_debug_run_ack (),
+      .mpc_debug_run_req (0),
+      .mpc_reset_run_req (1'b1),  // Start running after reset
       .debug_brkpt_status(),
+
+      .i_cpu_halt_req     (0),                     // Async halt req to CPU
+      .o_cpu_halt_ack     (),                      // core response to halt
+      .o_cpu_halt_status  (),                      // 1'b1 indicates core is halted
+      .i_cpu_run_req      (0),                     // Async restart req to CPU
+      .o_debug_mode_status(),
+      .o_cpu_run_ack      (),                      // Core response to run req
+      .soft_int           (0),
+`else
+      .timer_int          (timer_int_i),
+      .mpc_debug_halt_ack (mpc_debug_halt_ack_o),
+      .mpc_debug_halt_req (mpc_debug_halt_req_i),
+      .mpc_debug_run_ack  (mpc_debug_run_ack_o),
+      .mpc_debug_run_req  (mpc_debug_run_req_i),
+      .mpc_reset_run_req  (1'b1),                  // Start running after reset
+      .debug_brkpt_status (),
 
       .i_cpu_halt_req     (cpu_halt_req_i),       // Async halt req to CPU
       .o_cpu_halt_ack     (cpu_halt_ack_o),       // core response to halt
@@ -713,6 +734,8 @@ module guineveer #(
       .i_cpu_run_req      (cpu_run_req_i),        // Async restart req to CPU
       .o_debug_mode_status(debug_mode_status_o),
       .o_cpu_run_ack      (cpu_run_ack_o),        // Core response to run req
+      .soft_int           (soft_int_i),
+`endif
 
       .dec_tlu_perfcnt0(),
       .dec_tlu_perfcnt1(),
@@ -727,10 +750,9 @@ module guineveer #(
       .dccm_ecc_single_error(),
       .dccm_ecc_double_error(),
 
-      .soft_int  (soft_int_i),
       .core_id   ('0),
-      .scan_mode (1'b0),      // To enable scan mode
-      .mbist_mode(1'b0),      // to enable mbist
+      .scan_mode (1'b0),  // To enable scan mode
+      .mbist_mode(1'b0),  // to enable mbist
 
       .dmi_core_enable  (),
       .dmi_uncore_enable(),
@@ -744,7 +766,7 @@ module guineveer #(
   );
 
   axi_intercon #() axi_interconnect (
-      .clk_i(clk_i),
+      .clk_i (clk_i),
       .rst_ni(rst_ni),
 
       .i_veer_lsu_awid(lsu_axi_awid),
