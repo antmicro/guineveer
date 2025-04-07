@@ -102,8 +102,8 @@ renode_test: $(BUILD_DIR)/report.html
 $(VEER_SNAPSHOT): $(VEER_SNAPSHOT)/common_defines.vh
 $(VEER_SNAPSHOT)/%: | $(BUILD_DIR)
 	export RV_ROOT=$(RV_ROOT) && \
-	cd build && \
-	$(RV_ROOT)/configs/veer.config
+	cd $(BUILD_DIR) && \
+	$(RV_ROOT)/configs/veer.config $(VEER_CONFIGURATION_FLAGS)
 
 $(AXI_INCLUDE_PATH): $(BUILD_DIR)/axi.f
 $(COMMON_CELLS_INCLUDE_PATH): $(BUILD_DIR)/axi.f

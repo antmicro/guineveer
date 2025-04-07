@@ -9,5 +9,8 @@ tests/**/*.vcd
 tests/**/*.fst
 tests/**/*.xml
 tests/**/coverage.dat
+tests/**/guineveer.tcl
 
 hw/axi_intercon.sv
+tests/fpga/vivado*
+tests/fpga/guineveer/

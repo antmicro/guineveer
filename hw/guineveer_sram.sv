@@ -59,4 +59,8 @@ module guineveer_sram #(
     end
   end
 
+`ifdef GUINEVEER_MEMORY_FILE
+  initial $readmemh(`GUINEVEER_MEMORY_FILE, mem);
+`endif
+
 endmodule
