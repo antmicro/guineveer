@@ -1,7 +1,6 @@
 FPGA_SCRIPT_DIR := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 include $(FPGA_SCRIPT_DIR)/../../Makefile
 TCL_FILE := $(FPGA_SCRIPT_DIR)/guineveer.tcl
-VEER_CONFIGURATION_FLAGS := -fpga_optimize=1
 
 generate_block_design: $(TCL_FILE)
 

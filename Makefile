@@ -1,6 +1,23 @@
 # Copyright (c) 2025 Antmicro <www.antmicro.com>
 # SPDX-License-Identifier: Apache-2.0
 
+VEER_CONFIGURATION_FLAGS ?= \
+    -fpga_optimize=1 \
+    -unset=assert_on \
+    -set=reset_vec=0x80000000 \
+    -set=ret_stack_size=2 \
+    -set=btb_enable=0 \
+    -set=btb_size=8 \
+    -set=bht_size=32 \
+    -set=dccm_size=16 \
+    -set=dccm_num_banks=2 \
+    -set=iccm_enable=0 \
+    -set=icache_enable=0 \
+    -set=dccm_enable=0 \
+    -set=dma_buf_depth=2 \
+    -set=div_bit=1 \
+    -set=pic_total_int=8 \
+
 SCRIPT_DIR := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 HW_DIR := $(SCRIPT_DIR)/hw
 TB_DIR := $(SCRIPT_DIR)/testbench

@@ -8,7 +8,7 @@
 PROJECT_NAME="guineveer"
 PART_NAME="xc7a100t"
 DEFAULT_LANG="Verilog"
-TOP_LEVEL="guineveer"
+TOP_LEVEL="top"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # The full directory name of the script no matter where it is being called from
 PROJECT_ROOT="$(realpath "${SCRIPT_DIR}")"
 GUINEVEER_ROOT="$(realpath "${SCRIPT_DIR}/../..")"
@@ -37,6 +37,10 @@ do
     echo "import_files -fileset sources_1 ${f}"
   fi
 done
+
+# Top-level wrapper
+# TODO: Make this target-specific
+echo "import_files -fileset sources_1 ${PROJECT_ROOT}/src/guineveer_arty100.sv"
 
 # Manually import el2_mem_if because it's not loaded (all files from the el2_mem_if are imported though)
 echo "import_files -fileset sources_1 ${RV_ROOT}/design/lib/el2_mem_if.sv"
@@ -72,5 +76,6 @@ echo "set_property top ${TOP_LEVEL} [current_fileset]"
 echo
 echo "launch_runs synth_1 -jobs $(nproc)"
 echo "wait_on_run synth_1"
+
 echo "launch_runs impl_1 -to_step write_bitstream -jobs $(nproc)"
 echo "wait_on_run impl_1"

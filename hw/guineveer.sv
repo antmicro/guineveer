@@ -8,6 +8,7 @@ module guineveer #(
 ) (
     input  bit clk_i,
     input  bit rst_ni,
+    input  bit cpu_rst_ni,
 
 `ifdef GUINEVEER_TESTBENCH
     input  bit cpu_halt_req_i,        // Async halt req to CPU
@@ -487,12 +488,23 @@ module guineveer #(
       .irq_o(i3c_irq_unused)
   );
 
+  localparam unsigned [31:0] reset_vector = `RV_RESET_VEC;
+
+  // Keep VeeR trace interface nets for debugging use.
+  (* keep, dont_touch, mark_debug = "true" *)logic [31:0] trace_rv_i_insn;
+  (* keep, dont_touch, mark_debug = "true" *)logic [31:0] trace_rv_i_address;
+  (* keep, dont_touch, mark_debug = "true" *)logic        trace_rv_i_valid;
+  (* keep, dont_touch, mark_debug = "true" *)logic        trace_rv_i_exception;
+  (* keep, dont_touch, mark_debug = "true" *)logic [4:0]  trace_rv_i_ecause;
+  (* keep, dont_touch, mark_debug = "true" *)logic        trace_rv_i_interrupt;
+  (* keep, dont_touch, mark_debug = "true" *)logic [31:0] trace_rv_i_tval;
+
   el2_veer_wrapper rvtop_wrapper (
-      .rst_l    (rst_ni),
+      .rst_l    (cpu_rst_ni),
       .dbg_rst_l(),
       .clk      (clk_i),
 `ifndef GUINEVEER_TESTBENCH
-      .rst_vec  (),
+      .rst_vec  (reset_vector[31:1]),
       .nmi_int  (),
       .nmi_vec  (),
       .jtag_id  (),
@@ -688,13 +700,13 @@ module guineveer #(
       .dbg_bus_clk_en(1'b1),  // Clock ratio b/w cpu core clk & AHB Debug master interface
       .dma_bus_clk_en(1'b1),  // Clock ratio b/w cpu core clk & AHB slave interface
 
-      .trace_rv_i_insn_ip     (),
-      .trace_rv_i_address_ip  (),
-      .trace_rv_i_valid_ip    (),
-      .trace_rv_i_exception_ip(),
-      .trace_rv_i_ecause_ip   (),
-      .trace_rv_i_interrupt_ip(),
-      .trace_rv_i_tval_ip     (),
+      .trace_rv_i_insn_ip     (trace_rv_i_insn),
+      .trace_rv_i_address_ip  (trace_rv_i_address),
+      .trace_rv_i_valid_ip    (trace_rv_i_valid),
+      .trace_rv_i_exception_ip(trace_rv_i_exception),
+      .trace_rv_i_ecause_ip   (trace_rv_i_ecause),
+      .trace_rv_i_interrupt_ip(trace_rv_i_interrupt),
+      .trace_rv_i_tval_ip     (trace_rv_i_tval),
 
       .jtag_tck   (),
       .jtag_tms   (),

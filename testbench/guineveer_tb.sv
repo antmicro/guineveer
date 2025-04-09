@@ -289,6 +289,7 @@ module guineveer_tb #(
   guineveer top_guineveer (
       .clk_i (core_clk),
       .rst_ni(rst_l),
+      .cpu_rst_ni(rst_l),
       .cpu_halt_req_i(i_cpu_halt_req),
       .cpu_halt_ack_o(o_cpu_halt_ack),
       .cpu_halt_status_o(o_cpu_halt_status),
