@@ -2,9 +2,9 @@
 #include "printf.h"
 #include "i3c_registers.h"
 
-#define SOC_CLOCK_HZ	(100000000L)
+#define SOC_CLOCK_HZ	(32000000L)
 #define UART_BASE_ADDR	(0x30000000)
-#define UART_BAUD_RATE  (921600)
+#define UART_BAUD_RATE  (115200)
 #define I3C_BASE_ADDR	(0x30001000)
 
 #define UART_INTR_STATE_REG      (0x0  / 4)
@@ -135,10 +135,10 @@ int reg_field_expect_value(const char *reg_name, const char *field_name,
 	printf("Testing the value of %s.%s... ", reg_name, field_name);
 
 	if (val == reset) {
-		printf("OK. (0x%x == 0x%x)\n", val, reset);
+		printf("OK. (0x%x == 0x%x)\r\n", val, reset);
 		return 0;
 	} else {
-		printf("Error! (expected %d; got %d)\n", reset, val);
+		printf("Error! (expected %d; got %d)\r\n", reset, val);
 		return 1;
 	}
 }
@@ -151,10 +151,10 @@ int reg_field_test_read_only(const char *reg_name, const char *field_name, uint3
 	
 	*reg = ~reg_val & bm;
 	if (*reg == reg_val) {
-		printf("OK.\n");
+		printf("OK.\r\n");
 		return 0;
 	} else {
-		printf("Error! (expected %d; got %d)\n", reg_val, *reg);
+		printf("Error! (expected %d; got %d)\r\n", reg_val, *reg);
 		return 1;
 	}
 }
@@ -171,10 +171,10 @@ int reg_field_test_writable(const char *reg_name, const char *field_name,
 
 	val = (*reg & bm) >> bp;
 	if (val != reset) {
-		printf("OK.\n");
+		printf("OK.\r\n");
 		return 0;
 	} else {
-		printf("Error! (register value didn't change)\n");
+		printf("Error! (register value didn't change)\r\n");
 		return 1;
 	}
 }
@@ -183,9 +183,9 @@ int test_reset_values(void)
 {
 	int ret = 0;
 
-	printf("====================\n");
-	printf("%s\n", __func__);
-	printf("====================\n");
+	printf("====================\r\n");
+	printf("%s\r\n", __func__);
+	printf("====================\r\n");
 
 	ret += REG_FIELD_RESET_EXPECT(HCI_VERSION, VERSION);
 
@@ -231,9 +231,9 @@ int test_read_only(void)
 {
 	int ret = 0;
 
-	printf("====================\n");
-	printf("%s\n", __func__);
-	printf("====================\n");
+	printf("====================\r\n");
+	printf("%s\r\n", __func__);
+	printf("====================\r\n");
 
 	ret += REG_FIELD_TEST_READ_ONLY(HCI_VERSION, VERSION);
 
@@ -267,9 +267,9 @@ int test_writable(void)
 {
 	int ret = 0;
 
-	printf("====================\n");
-	printf("%s\n", __func__);
-	printf("====================\n");
+	printf("====================\r\n");
+	printf("%s\r\n", __func__);
+	printf("====================\r\n");
 
 	ret += REG_FIELD_TEST_WRITABLE(HC_CONTROL, I2C_DEV_PRESENT);
 	ret += REG_FIELD_TEST_WRITABLE(HC_CONTROL, HOT_JOIN_CTRL);
@@ -291,11 +291,11 @@ int test_intr_force(void)
 {
 	int ret = 0;
 
-	printf("====================\n");
-	printf("%s\n", __func__);
-	printf("====================\n");
+	printf("====================\r\n");
+	printf("%s\r\n", __func__);
+	printf("====================\r\n");
 
-	printf("Enabling status and signal...\n");
+	printf("Enabling status and signal...\r\n");
 	*(uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_ENABLE) = 0x82003f0f;
 
 	ret += TTI_REG_FIELD_EXPECT(INTERRUPT_ENABLE, TRANSFER_ERR_STAT_EN, 0x1);
@@ -311,10 +311,10 @@ int test_intr_force(void)
 	ret += TTI_REG_FIELD_EXPECT(INTERRUPT_ENABLE, TX_DESC_STAT_EN, 0x1);
 	ret += TTI_REG_FIELD_EXPECT(INTERRUPT_ENABLE, RX_DESC_STAT_EN, 0x1);
 
-	printf("Checking status...\n");
+	printf("Checking status...\r\n");
 	ret += reg_field_expect_value("INTR_STATUS", "ALL", *(uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_STATUS), 0xffffffff, 0, 32, 0x0);
 
-	printf("Forcing interrupts and verifying status...\n");
+	printf("Forcing interrupts and verifying status...\r\n");
 	*(uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_FORCE) = 0x82003f0f;
 	// Only a subset of TTI interrupts are supported
 	ret += reg_field_expect_value("INTR_STATUS", "ALL", *(uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_STATUS), 0xffffffff, 0, 32, 0x00002a03);
@@ -327,16 +327,17 @@ int main(void)
 	int ret = 0;
 
 	uart_init(UART_BAUD_RATE);
+    printf("Hello I3C core test\r\n");
 
-        ret += test_reset_values();
+    ret += test_reset_values();
 	ret += test_read_only();
 	ret += test_writable();
 	ret += test_intr_force();
 
 	if (ret > 0)
-		printf("Some test cases have failed: %d!\n", ret);
+		printf("Some test cases have failed: %d!\r\n", ret);
 
-	printf("\n");
+	printf("\r\n");
 
 	return ret;
 }

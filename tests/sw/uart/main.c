@@ -1,8 +1,8 @@
 #include <stdint.h>
 
-#define SOC_CLOCK_HZ	(100000000L)
+#define SOC_CLOCK_HZ	(32000000L)
 #define UART_BASE_ADDR	(0x30000000)
-#define UART_BAUD_RATE  (921600)
+#define UART_BAUD_RATE  (115200)
 
 #define UART_INTR_STATE_REG      (0x0  / 4)
 #define UART_INTR_ENABLE_REG     (0x4  / 4)
@@ -50,7 +50,7 @@ int uart_rx_empty(void)
 	return (uart_regs[UART_FIFO_STATUS_REG] & UART_FIFO_STATUS_RXLVL_MASK) == 0;
 }
 
-void putc(char chr)
+void uart_putc(char chr)
 {
 	while (!uart_tx_rdy())
 		;
@@ -58,18 +58,16 @@ void putc(char chr)
 	uart_regs[UART_WDATA_REG] = chr;
 }
 
-void puts(const char* str)
+void uart_puts(const char* str)
 {
 	while (*str)
-		putc(*str++);
-
-	putc('\n');
+		uart_putc(*str++);
 }
 
 int main(void)
 {
 	uart_init(UART_BAUD_RATE);
-	puts("Hello UART");
+	uart_puts("Hello UART\r\n");
 
 	return 0;
 }

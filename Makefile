@@ -78,7 +78,7 @@ VERILOG_INCLUDE_DIRS_RAW=\
 VERILOG_INCLUDE_DIRS=$(strip $(call uniq,$(VERILOG_INCLUDE_DIRS_RAW)))
 
 LD_ABI := -mabi=ilp32 -march=rv32imac
-CC_ABI := -mabi=ilp32 -march=rv32imc_zicsr_zifencei_zba_zbb_zbc_zbs
+CC_ABI := -mabi=ilp32 -march=rv32imc_zicsr_zifencei
 GCC_PREFIX := riscv64-unknown-elf
 
 EXT_HEX := $(if $(HEX_FILE),1,)
@@ -153,6 +153,7 @@ $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD
 ifneq ($(EXT_HEX),1)
 $(HEX_FILE): $(ELF_FILE)
 	$(GCC_PREFIX)-objcopy -O verilog --verilog-data-width=8 $^ $@
+	sed -i s/@./@0/g $@ # Remove offset
 endif
 
 ifneq ($(EXT_ELF),1)
