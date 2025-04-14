@@ -1,3 +1,4 @@
 include:
   - project: guineveer-ci-scripts
     file: ci.yml
+    ref: 75956-nexys-video

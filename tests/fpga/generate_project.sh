@@ -6,13 +6,22 @@
 
 # 1. Set important project information (adjust)
 PROJECT_NAME="guineveer"
-PART_NAME="xc7a100t"
 DEFAULT_LANG="Verilog"
 TOP_LEVEL="top"
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # The full directory name of the script no matter where it is being called from
-PROJECT_ROOT="$(realpath "${SCRIPT_DIR}")"
-GUINEVEER_ROOT="$(realpath "${SCRIPT_DIR}/../..")"
-CONFIG_DIR="$(realpath "${GUINEVEER_ROOT}/build/snapshots/default/")"
+SCRIPT_DIR=$(realpath $(cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd)) # The full directory name of the script no matter where it is being called from
+BOARD="${BOARD:="Arty-A7-100T"}"
+CONSTR="$BOARD.xdc"
+
+# Select customized options and sources for a specific board
+case "$BOARD" in
+  "Arty-A7-100T")
+    PART_NAME="xc7a100t" ;;
+  "NexysVideo-A7-200T")
+    PART_NAME="xc7a200t" ;;
+  *)
+    echo "Unknown board: $BOARD" 1>&2
+    exit 1 ;;
+esac
 
 # 2. Save last project regeneration time
 echo
@@ -23,13 +32,14 @@ echo "#"
 echo
 
 # 3. Create a new project
-echo "create_project ${PROJECT_NAME} ./${PROJECT_NAME} -part ${PART_NAME} -force"
+mkdir -p $SCRIPT_DIR/build
+echo "create_project ${PROJECT_NAME} ${SCRIPT_DIR}/build/${PROJECT_NAME}_${BOARD} -part ${PART_NAME} -force"
 echo "set_property target_language ${DEFAULT_LANG} [current_project]"
 
 # 4. Include directories
 echo "set_property include_dirs \"${INCLUDE_DIRS}\" [get_filesets sources_1]"
 
-# 5. Import VHDL and Verilog filef
+# 5. Import VHDL and Verilog files
 for f in $HDL_SOURCES
 do
   if [ -f $f ];
@@ -39,20 +49,13 @@ do
 done
 
 # Top-level wrapper
-# TODO: Make this target-specific
-echo "import_files -fileset sources_1 ${PROJECT_ROOT}/src/guineveer_arty100.sv"
+echo "import_files -fileset sources_1 $SCRIPT_DIR/top.sv"
 
 # Manually import el2_mem_if because it's not loaded (all files from the el2_mem_if are imported though)
 echo "import_files -fileset sources_1 ${RV_ROOT}/design/lib/el2_mem_if.sv"
 
 # 6. Import constraints
-for f in ${PROJECT_ROOT}/constrs/*.xdc
-do
-  if [ -f $f ];
-  then
-    echo "import_files -fileset constrs_1 ${f}"
-  fi
-done
+echo "import_files -fileset constrs_1 $SCRIPT_DIR/constrs/$CONSTR"
 
 # 7. Custom rules for the project, i.e. header imports (adjust)
 echo "set_property is_global_include true [get_files -filter {NAME =~ *common_defines.vh}]"
