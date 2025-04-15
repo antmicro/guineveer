@@ -26,6 +26,9 @@ module top (
     logic clk_soc;
     logic rstn_soc;
 
+    logic clk_i3c;
+    logic rstn_i3c;
+
     logic pll_clkfb;
     logic pll_clkout0;
     logic pll_locked;
@@ -33,7 +36,8 @@ module top (
     PLLE2_BASE # (
         .CLKIN1_PERIOD  (10.0), // 100MHz
         .CLKFBOUT_MULT  (16),
-        .CLKOUT0_DIVIDE (50)
+        .CLKOUT0_DIVIDE (50),
+        .CLKOUT1_DIVIDE (8)
 
     ) u_pll (
         .RST            (btn_i[0]),
@@ -43,10 +47,11 @@ module top (
         .CLKFBOUT       (pll_clkfb),
 
         .LOCKED         (pll_locked),
-        .CLKOUT0        (pll_clkout0)   // 32MHz
+        .CLKOUT0        (pll_clkout0),  // 32MHz
+        .CLKOUT1        (pll_clkout1)   // 200MHz
     );
 
-    BUFG u_bufg (.I(pll_clkout0), .O(clk_soc));
+    BUFG u_bufg0 (.I(pll_clkout0), .O(clk_soc));
 
     // Reset synchronizer
     always_ff @(posedge clk_soc or negedge pll_locked)
@@ -66,11 +71,21 @@ module top (
 
     assign rstn_cpu = rstn_cpu_sr[3];
 
+    BUFG u_bufg1 (.I(pll_clkout1), .O(clk_i3c));
+
+    // Reset synchronizer
+    always_ff @(posedge clk_i3c or negedge pll_locked)
+        if (!pll_locked) rstn_i3c <= '0;
+        else             rstn_i3c <= '1;
+
     // Guineveer SoC
     guineveer u_guineveer (
         .clk_i      (clk_soc),
         .rst_ni     (rstn_soc),
         .cpu_rst_ni (rstn_cpu),
+
+        .i3c_clk_i  (clk_i3c),
+        .i3c_rst_ni (rstn_i3c),
 
         .uart_rx_i  (uart_rx_i),
         .uart_tx_o  (uart_tx_o),
@@ -92,7 +107,7 @@ module top (
         led_o[0]    = rstn_soc;
         led_o[1]    = blinky_cnt[20];
         led_o[2]    = rstn_cpu;
-        led_o[3]    = '0;
+        led_o[3]    = rstn_i3c;
     end
 
 endmodule

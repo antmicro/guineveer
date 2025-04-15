@@ -15,6 +15,8 @@
 // limitations under the License.
 //
 
+`timescale 1ns / 1ps
+
 `define COMMON_CELLS_ASSERTS_OFF
 
 module guineveer_tb #(
@@ -22,7 +24,9 @@ module guineveer_tb #(
     `include "el2_param.vh"
 ) ();
   bit                        core_clk;
+  bit                        i3c_clk;
   bit                        rst_l;
+
   bit   [              31:0] mem_signature_begin;
   bit   [              31:0] mem_signature_end;
   bit   [              31:0] mem_mailbox;
@@ -94,8 +98,8 @@ module guineveer_tb #(
 
   `define DEC top_guineveer.rvtop_wrapper.veer.dec
 
-  assign mailbox_write = top_guineveer.lsu_axi_awvalid && top_guineveer.lsu_axi_awaddr == mem_mailbox && rst_l;
-  assign mailbox_data = top_guineveer.lsu_axi_wdata;
+  assign mailbox_write = top_guineveer.lsu_axi_req.aw_valid && top_guineveer.lsu_axi_req.aw.addr == mem_mailbox && rst_l;
+  assign mailbox_data = top_guineveer.lsu_axi_req.w.data;
 
   assign mailbox_data_val = mailbox_data[7:0] > 8'h5 && mailbox_data[7:0] < 8'h7f;
 
@@ -178,7 +182,8 @@ module guineveer_tb #(
     end
   end
 
-  always #(5) core_clk = ~core_clk;
+  always #(15) core_clk = ~core_clk; // 33.33MHz
+  always #(2) i3c_clk = ~i3c_clk; // 250MHz
   always @(posedge core_clk) $dumpvars();
 
   // startup
@@ -287,9 +292,11 @@ module guineveer_tb #(
   final if (line_buffer.len() > 0) $display("[UART MONITOR]: %s", line_buffer);
 
   guineveer top_guineveer (
-      .clk_i (core_clk),
+      .clk_i(core_clk),
       .rst_ni(rst_l),
       .cpu_rst_ni(rst_l),
+      .i3c_clk_i(i3c_clk),
+      .i3c_rst_ni(rst_l),
       .cpu_halt_req_i(i_cpu_halt_req),
       .cpu_halt_ack_o(o_cpu_halt_ack),
       .cpu_halt_status_o(o_cpu_halt_status),
