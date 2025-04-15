@@ -1,0 +1,3 @@
+repositories:
+  repo: file:repo
+  builtin: file:repo

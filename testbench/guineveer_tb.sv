@@ -98,8 +98,9 @@ module guineveer_tb #(
 
   `define DEC top_guineveer.rvtop_wrapper.veer.dec
 
-  assign mailbox_write = top_guineveer.lsu_axi_req.aw_valid && top_guineveer.lsu_axi_req.aw.addr == mem_mailbox && rst_l;
-  assign mailbox_data = top_guineveer.lsu_axi_req.w.data;
+  assign mailbox_write = top_guineveer.rvtop_wrapper.lsu_axi_awvalid
+    && top_guineveer.rvtop_wrapper.lsu_axi_awaddr == mem_mailbox && rst_l;
+  assign mailbox_data = top_guineveer.rvtop_wrapper.lsu_axi_wdata;
 
   assign mailbox_data_val = mailbox_data[7:0] > 8'h5 && mailbox_data[7:0] < 8'h7f;
 
@@ -264,10 +265,10 @@ module guineveer_tb #(
   uart_rx uart_monitor (
       .clk_i(core_clk),
       .rst_ni(rst_l),
-      .rx_enable(top_guineveer.uart_core.uart_core.rx_enable),
-      .tick_baud_x16(top_guineveer.uart_core.uart_core.uart_rx.tick_baud_x16),
-      .parity_enable(top_guineveer.uart_core.reg2hw.ctrl.parity_en.q),
-      .parity_odd(top_guineveer.uart_core.reg2hw.ctrl.parity_odd.q),
+      .rx_enable(top_guineveer.uart_core.uart_core.uart_core.rx_enable),
+      .tick_baud_x16(top_guineveer.uart_core.uart_core.uart_core.uart_rx.tick_baud_x16),
+      .parity_enable(top_guineveer.uart_core.uart_core.reg2hw.ctrl.parity_en.q),
+      .parity_odd(top_guineveer.uart_core.uart_core.reg2hw.ctrl.parity_odd.q),
       .tick_baud(),
       .rx_valid,
       .rx_data,
@@ -295,33 +296,14 @@ module guineveer_tb #(
       .clk_i(core_clk),
       .rst_ni(rst_l),
       .cpu_rst_ni(rst_l),
+
       .i3c_clk_i(i3c_clk),
       .i3c_rst_ni(rst_l),
-      .cpu_halt_req_i(i_cpu_halt_req),
-      .cpu_halt_ack_o(o_cpu_halt_ack),
-      .cpu_halt_status_o(o_cpu_halt_status),
-      .cpu_run_req_i(i_cpu_run_req),
-      .cpu_run_ack_o(o_cpu_run_ack),
-      .mpc_debug_halt_req_i(mpc_debug_halt_req),
-      .mpc_debug_halt_ack_o(mpc_debug_halt_ack),
-      .mpc_debug_run_req_i(mpc_debug_run_req),
-      .mpc_debug_run_ack_o(mpc_debug_run_ack),
-      .debug_mode_status_o(o_debug_mode_status),
-      .lsu_bus_clk_en_i(lsu_bus_clk_en),
-
-      .timer_int_i(timer_int),
-      .soft_int_i (soft_int),
-
-      .reset_vector_i(reset_vector[31:1]),
-      .nmi_int_i(nmi_int),
-      .nmi_vector_i(nmi_vector[31:1]),
-      .jtag_id_i(jtag_id[31:1]),
+      .i3c_scl_io(i3c_scl_io),
+      .i3c_sda_io(i3c_sda_io),
 
       .uart_rx_i(uart_rx),
-      .uart_tx_o(uart_tx),
-
-      .i3c_scl_io(i3c_scl_io),
-      .i3c_sda_io(i3c_sda_io)
+      .uart_tx_o(uart_tx)
   );
 
   `include "dasm.svi"

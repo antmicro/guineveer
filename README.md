@@ -10,7 +10,7 @@ Copyright (c) 2024-2025 [Antmicro](https://www.antmicro.com)
 
 ## Introduction
 
-Guineveer is a RISC-V VeeR EL2 SoC generator.
+Guineveer is a configurable RISC-V VeeR EL2 SoC.
 It provides a simple SoC design that can be modified and expanded with new peripherals.
 
 ### Architecture
@@ -33,6 +33,7 @@ The table below summarizes the SoC's default memory address map:
 ## Requirements
 
 System packages:
+
 * `meson`
 * `ninja-build`
 * `gcc-riscv64-unknown-elf`
@@ -43,9 +44,11 @@ System packages:
 * `verilator`
 
 `python3` packages:
+
 * `pyyaml`
 
 Extra Python requirements to run Renode tests:
+
 * `psutil`
 * `robotframework==6.1`
 * `robotframework-retryfailed`
@@ -53,3 +56,4 @@ Extra Python requirements to run Renode tests:
 ## Usage
 
 For detailed information about system architecture, testing and usage, refer to the documentation.
+

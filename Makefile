@@ -21,6 +21,7 @@ VEER_CONFIGURATION_FLAGS ?= \
 SCRIPT_DIR := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 HW_DIR := $(SCRIPT_DIR)/hw
 TB_DIR := $(SCRIPT_DIR)/testbench
+TW_DIR := $(SCRIPT_DIR)/topwrap
 BUILD_DIR := $(SCRIPT_DIR)/build
 RV_ROOT := $(SCRIPT_DIR)/third_party/Cores-VeeR-EL2
 CALIPTRA_ROOT := $(SCRIPT_DIR)/third_party/caliptra-rtl
@@ -42,7 +43,6 @@ UART_FLIST := $(subst $${CALIPTRA_ROOT},${CALIPTRA_ROOT},\
 I3C_FLIST := $(subst $${CALIPTRA_ROOT},${CALIPTRA_ROOT},\
 	$(subst $${I3C_ROOT_DIR},${I3C_ROOT_DIR},\
     $(file < $(I3C_ROOT_DIR)/src/i3c.f)))
-defines := +define+DIGITAL_IO_I3C=1 +define+GUINEVEER_TESTBENCH=1
 
 AXI_SOURCE_DIR = $(abspath $(SCRIPT_DIR)/third_party/axi)
 
@@ -65,6 +65,7 @@ VERILOG_SOURCES_RAW=\
 	$(AXI_INTERCON_FLIST) \
 	$(HW_DIR)/axi_intercon.sv \
 	$(HW_DIR)/guineveer_sram.sv \
+	$(HW_DIR)/wrapped_uart.sv \
 	$(HW_DIR)/guineveer.sv
 
 VERILOG_SOURCES=$(strip $(call uniq,$(VERILOG_SOURCES_RAW)))
@@ -101,12 +102,20 @@ VERILATOR_SKIP_WARNINGS := $(VERILATOR_NOIMPLICIT) -Wno-TIMESCALEMOD -Wno-SELRAN
 
 VERILATOR_DEBUG := --trace-fst --trace-structs
 
+SOC_WRAPPER_DEPS := \
+	$(wildcard $(TW_DIR)/ipcores/*) \
+	$(wildcard $(TW_DIR)/repo/interfaces/*) \
+	$(TW_DIR)/design.yaml \
+	$(TW_DIR)/topwrap.yaml \
+	$(TW_DIR)/topwrap_script.py
+
+
 all: testbench
 
 clean: | $(BUILD_DIR)
-	rm -rf $(BUILD_DIR) $(HW_DIR)/axi_intercon.sv
+	rm -rf $(BUILD_DIR) $(HW_DIR)/axi_intercon.sv $(HW_DIR)/guineveer.sv
 
-hw: $(HW_DIR)/axi_intercon.sv $(VEER_SNAPSHOT) $(BUILD_DIR)/axi.f
+hw: $(HW_DIR)/axi_intercon.sv $(VEER_SNAPSHOT) $(BUILD_DIR)/axi.f $(HW_DIR)/guineveer.sv
 
 testbench: $(BUILD_DIR)/obj_dir/Vguineveer_tb | $(BUILD_DIR)
 
@@ -115,6 +124,10 @@ sim: $(BUILD_DIR)/sim.vcd
 build_test: $(HEX_FILE)
 
 renode_test: $(BUILD_DIR)/report.html
+
+$(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS)
+	mkdir -p $(TW_DIR)/repo/cores
+	cd $(TW_DIR) && python3 topwrap_script.py
 
 $(VEER_SNAPSHOT): $(VEER_SNAPSHOT)/common_defines.vh
 $(VEER_SNAPSHOT)/%: | $(BUILD_DIR)

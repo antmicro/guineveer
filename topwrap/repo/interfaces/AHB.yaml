@@ -1,0 +1,20 @@
+name: AHBguin
+port_prefix: AHB
+signals:
+    optional:
+        out:
+            HADDR: haddr
+            HBURST: hburst
+            HMASTLOCK: hmastlock
+            HPROT: hprot
+            HSIZE: hsize
+            HTRANS: htrans
+            HWDATA: hwdata
+            HWSTRB: hwstrb
+            HWRITE: hwrite
+            HSEL: hsel
+            HREADY: hready
+        in:
+            HRDATA: hrdata
+            HREADYOUT: hreadyout
+            HRESP: hresp

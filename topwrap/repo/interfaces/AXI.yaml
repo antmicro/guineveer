@@ -1,0 +1,56 @@
+name: AXIguin
+port_prefix: AXIL
+signals:
+    required:
+        out:
+            AWVALID: awvalid
+            AWADDR: awaddr
+            WVALID: wvalid
+            WDATA: wdata
+            BREADY: bready
+            ARVALID: arvalid
+            ARADDR: araddr
+            RREADY: rready
+        in:
+            AWREADY: awready
+            WREADY: wready
+            BVALID: bvalid
+            ARREADY: arready
+            RVALID: rvalid
+            RDATA: rdata
+    optional:
+        out:
+            AWID: awid
+            ARID: arid
+            WSTRB: wstrb
+            AWPROT: awprot
+            ARPROT: arprot
+            AWREGION: awregion
+            AWLEN: awlen
+            AWSIZE: awsize
+            AWBURST: awburst
+            AWLOCK: awlock
+            AWCACHE: awcache
+            AWQOS: awqos
+            AWUSER: awuser
+            AWDOMAIN: awdomain
+            AWATOP: awatop
+            WLAST: wlast
+            WUSER: wuser
+            ARREGION: arregion
+            ARLEN: arlen
+            ARSIZE: arsize
+            ARBURST: arburst
+            ARLOCK: arlock
+            ARCACHE: arcache
+            ARQOS: arqos
+            ARUSER: aruser
+            ARDOMAIN: ardomain
+        in:
+            BID: bid
+            RID: rid
+            BRESP: bresp
+            RRESP: rresp
+            BUSER: buser
+            RLAST: rlast
+            RUSER: ruser

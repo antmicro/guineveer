@@ -1,0 +1,22 @@
+interfaces:
+  ahb:
+    mode: subordinate
+    signals:
+      in:
+        HADDR: [haddr_i, 31, 0]
+        HSIZE: [hsize_i, 2, 0]
+        HTRANS: [htrans_i, 1, 0]
+        HWDATA: [hwdata_i, 63, 0]
+        HWRITE: hwrite_i
+      out:
+        HRDATA: [hrdata_o, 63, 0]
+        HRESP: hresp_o
+    type: AHBguin
+name: wrapped_uart
+signals:
+  in:
+  - clk_i
+  - rst_ni
+  - uart_rx_i
+  out:
+  - uart_tx_o

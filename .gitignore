@@ -12,5 +12,6 @@ tests/**/coverage.dat
 tests/**/guineveer.tcl
 
 hw/axi_intercon.sv
+hw/guineveer.sv
 tests/fpga/vivado*
 tests/fpga/guineveer/

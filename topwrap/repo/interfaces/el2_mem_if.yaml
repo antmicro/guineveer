@@ -1,0 +1,6 @@
+name: el2_mem_if
+port_prefix: emi
+signals:
+  required:
+    in:
+      a_signal: a_signal

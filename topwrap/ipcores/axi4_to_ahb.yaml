@@ -1,0 +1,63 @@
+interfaces:
+  ahb:
+    mode: manager
+    signals:
+      in:
+        HRDATA: [ahb_hrdata, 63, 0]
+        HREADY: ahb_hready
+        HRESP: ahb_hresp
+      out:
+        HADDR: [ahb_haddr, 31, 0]
+        HBURST: [ahb_hburst, 2, 0]
+        HMASTLOCK: ahb_hmastlock
+        HPROT: [ahb_hprot, 3, 0]
+        HSIZE: [ahb_hsize, 2, 0]
+        HTRANS: [ahb_htrans, 1, 0]
+        HWDATA: [ahb_hwdata, 63, 0]
+        HWRITE: ahb_hwrite
+    type: AHBguin
+  axi:
+    mode: subordinate
+    signals:
+      in:
+        ARADDR: [axi_araddr, 31, 0]
+        ARID: axi_arid
+        ARPROT: [axi_arprot, 2, 0]
+        ARSIZE: [axi_arsize, 2, 0]
+        ARVALID: axi_arvalid
+        AWADDR: [axi_awaddr, 31, 0]
+        AWID: axi_awid
+        AWPROT: [axi_awprot, 2, 0]
+        AWSIZE: [axi_awsize, 2, 0]
+        AWVALID: axi_awvalid
+        BREADY: axi_bready
+        RREADY: axi_rready
+        WDATA: [axi_wdata, 63, 0]
+        WLAST: axi_wlast
+        WSTRB: [axi_wstrb, 7, 0]
+        WVALID: axi_wvalid
+      out:
+        ARREADY: axi_arready
+        AWREADY: axi_awready
+        BID: axi_bid
+        BRESP: [axi_bresp, 1, 0]
+        BVALID: axi_bvalid
+        RDATA: [axi_rdata, 63, 0]
+        RID: axi_rid
+        RLAST: axi_rlast
+        RRESP: [axi_rresp, 1, 0]
+        RVALID: axi_rvalid
+        WREADY: axi_wready
+    type: AXIguin
+name: axi4_to_ahb
+signals:
+  in:
+  - rst_l
+  - bus_clk_en
+  - clk_override
+  - dec_tlu_force_halt
+  - clk
+  - scan_mode
+  - free_clk
+parameters:
+  TAG: 1
