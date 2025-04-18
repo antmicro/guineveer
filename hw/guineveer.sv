@@ -45,51 +45,37 @@ module guineveer #(
 
   el2_mem_if el2_mem_export ();
 
-  //-------------------------- UART AXI signals--------------------------
+  // AXI Slaves
 
-  wire  [   SUB_ID_WIDTH-1:0] uart_axi_awid;
-  wire  [               31:0] uart_axi_awaddr;
-  wire  [                7:0] uart_axi_awlen;
-  wire  [                2:0] uart_axi_awsize;
-  wire  [                1:0] uart_axi_awburst;
-  wire                        uart_axi_awlock;
-  wire  [                3:0] uart_axi_awcache;
-  wire  [                2:0] uart_axi_awprot;
-  wire  [                3:0] uart_axi_awregion;
-  wire  [                3:0] uart_axi_awqos;
-  wire                        uart_axi_awvalid;
-  wire                        uart_axi_awready;
+  `AXI_TYPEDEF_ALL(s_axi, logic [31:0], logic [SUB_ID_WIDTH-1:0], logic [63:0], logic [7:0], logic [0:0]);
 
-  wire  [   SUB_ID_WIDTH-1:0] uart_axi_arid;
-  wire  [               31:0] uart_axi_araddr;
-  wire  [                7:0] uart_axi_arlen;
-  wire  [                2:0] uart_axi_arsize;
-  wire  [                1:0] uart_axi_arburst;
-  wire                        uart_axi_arlock;
-  wire  [                3:0] uart_axi_arcache;
-  wire  [                2:0] uart_axi_arprot;
-  wire  [                3:0] uart_axi_arregion;
-  wire  [                3:0] uart_axi_arqos;
-  wire                        uart_axi_arvalid;
-  wire                        uart_axi_arready;
+  s_axi_req_t  i3c_axi_req_slow, i3c_axi_req_fast;
+  s_axi_resp_t i3c_axi_resp_slow, i3c_axi_resp_fast;
 
-  wire  [               63:0] uart_axi_wdata;
-  wire  [                7:0] uart_axi_wstrb;
-  wire                        uart_axi_wlast;
-  wire                        uart_axi_wvalid;
-  wire                        uart_axi_wready;
+  logic i3c_recovery_payload_available_unused;
+  logic i3c_recovery_image_activated_unused;
+  logic i3c_peripheral_reset_unused;
+  logic i3c_escalated_reset_unused;
+  logic i3c_irq_unused;
 
-  wire  [   SUB_ID_WIDTH-1:0] uart_axi_bid;
-  wire  [                1:0] uart_axi_bresp;
-  wire                        uart_axi_bvalid;
-  wire                        uart_axi_bready;
+  s_axi_req_t  uart_axi_req;
+  s_axi_resp_t uart_axi_resp;
 
-  wire  [   SUB_ID_WIDTH-1:0] uart_axi_rid;
-  wire  [               63:0] uart_axi_rdata;
-  wire  [                1:0] uart_axi_rresp;
-  wire                        uart_axi_rlast;
-  wire                        uart_axi_rvalid;
-  wire                        uart_axi_rready;
+  // AXI Masters
+
+  `AXI_TYPEDEF_ALL(lmem_axi, logic [16:0], logic [3:0], logic [63:0], logic [7:0], logic)
+  lmem_axi_req_t  lmem_axi_req;
+  lmem_axi_resp_t lmem_axi_resp;
+
+  `AXI_TYPEDEF_ALL(ifu_axi, logic [31:0], logic [`RV_IFU_BUS_TAG-1:0], logic [63:0], logic [7:0], logic [0:0])
+  ifu_axi_req_t  ifu_axi_req;
+  ifu_axi_resp_t ifu_axi_resp;
+
+  `AXI_TYPEDEF_ALL(lsu_axi, logic [31:0], logic [`RV_LSU_BUS_TAG-1:0], logic [63:0], logic [7:0], logic [0:0])
+  lsu_axi_req_t  lsu_axi_req;
+  lsu_axi_resp_t lsu_axi_resp;
+
+  // AHB (uart)
 
   logic [               31:0] uart_ahb_haddr;
   logic [               63:0] uart_ahb_hwdata;
@@ -105,31 +91,6 @@ module guineveer #(
   logic [               31:0] ahb_haddr_bridge_out;
   logic [                2:0] ahb_hsize_bridge_out;
 
-  //-------------------------- I3C AXI signals--------------------------
-
-  `AXI_TYPEDEF_ALL(i3c_axi, logic [31:0], logic [SUB_ID_WIDTH-1:0], logic [63:0], logic [7:0], logic [0:0]);
-  i3c_axi_req_t  i3c_axi_req_slow, i3c_axi_req_fast;
-  i3c_axi_resp_t i3c_axi_resp_slow, i3c_axi_resp_fast;
-
-  logic i3c_recovery_payload_available_unused;
-  logic i3c_recovery_image_activated_unused;
-  logic i3c_peripheral_reset_unused;
-  logic i3c_escalated_reset_unused;
-  logic i3c_irq_unused;
-
-  `AXI_TYPEDEF_ALL(lmem_axi, logic [16:0], logic [3:0], logic [63:0], logic [7:0], logic)
-  lmem_axi_req_t  lmem_axi_req;
-  lmem_axi_resp_t lmem_axi_resp;
-
-  `AXI_TYPEDEF_ALL(ifu_axi, logic [31:0], logic [`RV_IFU_BUS_TAG-1:0], logic [63:0], logic [7:0], logic [0:0])
-  ifu_axi_req_t  ifu_axi_req;
-  ifu_axi_resp_t ifu_axi_resp;
-
-  `AXI_TYPEDEF_ALL(lsu_axi, logic [31:0], logic [`RV_LSU_BUS_TAG-1:0], logic [63:0], logic [7:0], logic [0:0])
-  lsu_axi_req_t  lsu_axi_req;
-  lsu_axi_resp_t lsu_axi_resp;
-
-  // AHB loopback
   assign uart_ahb_hready = uart_ahb_hreadyout;
   assign uart_ahb_hsel   = '1;
 
@@ -555,45 +516,45 @@ module guineveer #(
       .i_mem_rvalid(lmem_axi_resp.r_valid),
       .o_mem_rready(lmem_axi_req.r_ready),
 
-      .o_uart_awid(uart_axi_awid),
-      .o_uart_awaddr(uart_axi_awaddr),
-      .o_uart_awlen(uart_axi_awlen),
-      .o_uart_awsize(uart_axi_awsize),
-      .o_uart_awburst(uart_axi_awburst),
-      .o_uart_awlock(uart_axi_awlock),
-      .o_uart_awcache(uart_axi_awcache),
-      .o_uart_awprot(uart_axi_awprot),
-      .o_uart_awregion(uart_axi_awregion),
-      .o_uart_awqos(uart_axi_awqos),
-      .o_uart_awvalid(uart_axi_awvalid),
-      .i_uart_awready(uart_axi_awready),
-      .o_uart_arid(uart_axi_arid),
-      .o_uart_araddr(uart_axi_araddr),
-      .o_uart_arlen(uart_axi_arlen),
-      .o_uart_arsize(uart_axi_arsize),
-      .o_uart_arburst(uart_axi_arburst),
-      .o_uart_arlock(uart_axi_arlock),
-      .o_uart_arcache(uart_axi_arcache),
-      .o_uart_arprot(uart_axi_arprot),
-      .o_uart_arregion(uart_axi_arregion),
-      .o_uart_arqos(uart_axi_arqos),
-      .o_uart_arvalid(uart_axi_arvalid),
-      .i_uart_arready(uart_axi_arready),
-      .o_uart_wdata(uart_axi_wdata),
-      .o_uart_wstrb(uart_axi_wstrb),
-      .o_uart_wlast(uart_axi_wlast),
-      .o_uart_wvalid(uart_axi_wvalid),
-      .i_uart_wready(uart_axi_wready),
-      .i_uart_bid(uart_axi_bid),
-      .i_uart_bresp(uart_axi_bresp),
-      .i_uart_bvalid(uart_axi_bvalid),
-      .o_uart_bready(uart_axi_bready),
-      .i_uart_rid(uart_axi_rid),
-      .i_uart_rdata(uart_axi_rdata),
-      .i_uart_rresp(uart_axi_rresp),
-      .i_uart_rlast(uart_axi_rlast),
-      .i_uart_rvalid(uart_axi_rvalid),
-      .o_uart_rready(uart_axi_rready),
+      .o_uart_awid(uart_axi_req.aw.id),
+      .o_uart_awaddr(uart_axi_req.aw.addr),
+      .o_uart_awlen(uart_axi_req.aw.len),
+      .o_uart_awsize(uart_axi_req.aw.size),
+      .o_uart_awburst(uart_axi_req.aw.burst),
+      .o_uart_awlock(uart_axi_req.aw.lock),
+      .o_uart_awcache(uart_axi_req.aw.cache),
+      .o_uart_awprot(uart_axi_req.aw.prot),
+      .o_uart_awregion(uart_axi_req.aw.region),
+      .o_uart_awqos(uart_axi_req.aw.qos),
+      .o_uart_awvalid(uart_axi_req.aw_valid),
+      .i_uart_awready(uart_axi_resp.aw_ready),
+      .o_uart_arid(uart_axi_req.ar.id),
+      .o_uart_araddr(uart_axi_req.ar.addr),
+      .o_uart_arlen(uart_axi_req.ar.len),
+      .o_uart_arsize(uart_axi_req.ar.size),
+      .o_uart_arburst(uart_axi_req.ar.burst),
+      .o_uart_arlock(uart_axi_req.ar.lock),
+      .o_uart_arcache(uart_axi_req.ar.cache),
+      .o_uart_arprot(uart_axi_req.ar.prot),
+      .o_uart_arregion(uart_axi_req.ar.region),
+      .o_uart_arqos(uart_axi_req.ar.qos),
+      .o_uart_arvalid(uart_axi_req.ar_valid),
+      .i_uart_arready(uart_axi_resp.ar_ready),
+      .o_uart_wdata(uart_axi_req.w.data),
+      .o_uart_wstrb(uart_axi_req.w.strb),
+      .o_uart_wlast(uart_axi_req.w.last),
+      .o_uart_wvalid(uart_axi_req.w_valid),
+      .i_uart_wready(uart_axi_resp.w_ready),
+      .i_uart_bid(uart_axi_resp.b.id),
+      .i_uart_bresp(uart_axi_resp.b.resp),
+      .i_uart_bvalid(uart_axi_resp.b_valid),
+      .o_uart_bready(uart_axi_req.b_ready),
+      .i_uart_rid(uart_axi_resp.r.id),
+      .i_uart_rdata(uart_axi_resp.r.data),
+      .i_uart_rresp(uart_axi_resp.r.resp),
+      .i_uart_rlast(uart_axi_resp.r.last),
+      .i_uart_rvalid(uart_axi_resp.r_valid),
+      .o_uart_rready(uart_axi_req.r_ready),
 
       .o_i3c_awid(i3c_axi_req_slow.aw.id),
       .o_i3c_awaddr(i3c_axi_req_slow.aw.addr),
@@ -662,33 +623,33 @@ module guineveer #(
       .clk_override(0),
       .dec_tlu_force_halt(0),
 
-      .axi_awvalid(uart_axi_awvalid),
-      .axi_awready(uart_axi_awready),
-      .axi_awid(uart_axi_awid),
-      .axi_awaddr(uart_axi_awaddr),
-      .axi_awsize(uart_axi_awsize),
-      .axi_awprot(uart_axi_awprot),
-      .axi_wvalid(uart_axi_wvalid),
-      .axi_wready(uart_axi_wready),
-      .axi_wdata(uart_axi_wdata),
-      .axi_wstrb(uart_axi_wstrb),
-      .axi_wlast(uart_axi_wlast),
-      .axi_bvalid(uart_axi_bvalid),
-      .axi_bready(uart_axi_bready),
-      .axi_bresp(uart_axi_bresp),
-      .axi_bid(uart_axi_bid),
-      .axi_arvalid(uart_axi_arvalid),
-      .axi_arready(uart_axi_arready),
-      .axi_arid(uart_axi_arid),
-      .axi_araddr(uart_axi_araddr),
-      .axi_arsize(uart_axi_arsize),
-      .axi_arprot(uart_axi_arprot),
-      .axi_rvalid(uart_axi_rvalid),
-      .axi_rready(uart_axi_rready),
-      .axi_rid(uart_axi_rid),
-      .axi_rdata(uart_axi_rdata),
-      .axi_rresp(uart_axi_rresp),
-      .axi_rlast(uart_axi_rlast),
+      .axi_awvalid(uart_axi_req.aw_valid),
+      .axi_awready(uart_axi_resp.aw_ready),
+      .axi_awid(uart_axi_req.aw.id),
+      .axi_awaddr(uart_axi_req.aw.addr),
+      .axi_awsize(uart_axi_req.aw.size),
+      .axi_awprot(uart_axi_req.aw.prot),
+      .axi_wvalid(uart_axi_req.w_valid),
+      .axi_wready(uart_axi_resp.w_ready),
+      .axi_wdata(uart_axi_req.w.data),
+      .axi_wstrb(uart_axi_req.w.strb),
+      .axi_wlast(uart_axi_req.w.last),
+      .axi_bvalid(uart_axi_resp.b_valid),
+      .axi_bready(uart_axi_req.b_ready),
+      .axi_bresp(uart_axi_resp.b.resp),
+      .axi_bid(uart_axi_resp.b.id),
+      .axi_arvalid(uart_axi_req.ar_valid),
+      .axi_arready(uart_axi_resp.ar_ready),
+      .axi_arid(uart_axi_req.ar.id),
+      .axi_araddr(uart_axi_req.ar.addr),
+      .axi_arsize(uart_axi_req.ar.size),
+      .axi_arprot(uart_axi_req.ar.prot),
+      .axi_rvalid(uart_axi_resp.r_valid),
+      .axi_rready(uart_axi_req.r_ready),
+      .axi_rid(uart_axi_resp.r.id),
+      .axi_rdata(uart_axi_resp.r.data),
+      .axi_rresp(uart_axi_resp.r.resp),
+      .axi_rlast(uart_axi_resp.r.last),
 
       .ahb_haddr(ahb_haddr_bridge_out),
       .ahb_hburst(),
@@ -740,13 +701,13 @@ module guineveer #(
   );
 
   axi_cdc #(
-    .aw_chan_t  (i3c_axi_aw_chan_t),
-    .w_chan_t   (i3c_axi_w_chan_t),
-    .b_chan_t   (i3c_axi_b_chan_t),
-    .ar_chan_t  (i3c_axi_ar_chan_t),
-    .r_chan_t   (i3c_axi_r_chan_t),
-    .axi_req_t  (i3c_axi_req_t),
-    .axi_resp_t (i3c_axi_resp_t)
+    .aw_chan_t  (s_axi_aw_chan_t),
+    .w_chan_t   (s_axi_w_chan_t),
+    .b_chan_t   (s_axi_b_chan_t),
+    .ar_chan_t  (s_axi_ar_chan_t),
+    .r_chan_t   (s_axi_r_chan_t),
+    .axi_req_t  (s_axi_req_t),
+    .axi_resp_t (s_axi_resp_t)
   ) i_axi_cdc_lsu (
     .src_clk_i  (clk_i),
     .src_rst_ni (rst_ni),
