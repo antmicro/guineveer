@@ -1,3 +1,1 @@
-include:
-  - project: guineveer-ci-scripts
-    file: ci.yml
+include: guineveer-ci-scripts@main:ci.yml
