@@ -50,7 +50,6 @@ VERILOG_CORE_SOURCES_RAW=\
 	$(filter-out +incdir+%,$(VEER_FLIST)) \
 	$(AXI_INTERCON_FLIST) \
 	$(HW_DIR)/waivers.vlt \
-	$(HW_DIR)/axi_intercon.sv \
 	$(HW_DIR)/guineveer_sram.sv \
 	$(HW_DIR)/sram_wrapper.sv \
 	$(HW_DIR)/uart_wrapper.sv \

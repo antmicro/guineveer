@@ -15,15 +15,6 @@ design:
       AxiUserWidth: 1
       AxiIdWidth: 5
   interfaces:
-    i_axi_cdc_lsu:
-      s_axi_src: [axi_interconnect, i3c]
-    axi_bridge:
-      axi: [axi_interconnect, uart]
-    axi_interconnect:
-      veer_ifu0: [rvtop_wrapper0, ifu_axi]
-      veer_lsu0: [rvtop_wrapper0, lsu_axi]
-      veer_ifu1: [rvtop_wrapper1, ifu_axi]
-      veer_lsu1: [rvtop_wrapper1, lsu_axi]
     i3c_core:
       axi: [i_axi_cdc_lsu, m_axi_dst]
     uart_core:
@@ -51,9 +42,6 @@ design:
       rst_l: rst_ni
       scan_mode: 0
       ahb_hready: 1
-    axi_interconnect:
-      clk_i: clk_i
-      rst_ni: rst_ni
     rvtop_wrapper0:
       clk: clk_i
       core_id: 0
@@ -111,6 +99,41 @@ design:
       uart_tx_o: uart_tx_o
       clk_i: clk_i
       rst_ni: rst_ni
+  interconnects:
+    axi_interconnect1:
+      clock: clk_i
+      reset: rst_ni
+      type: AXI
+      params:
+        atop: False
+      subordinates:
+        i_axi_cdc_lsu:
+          s_axi_src:
+            address: 0x30001000
+            size: 0x1000
+        lmem0:
+          s_axi_sram:
+            address: 0x80000000
+            size: 0x1f400
+        lmem1:
+          s_axi_sram:
+            address: 0x90000000
+            size: 0x1f400
+        axi_bridge:
+          axi:
+            address: 0x30000000
+            size: 0x1000
+      managers:
+        rvtop_wrapper0:
+          ifu_axi:
+            id_width: 3
+          lsu_axi:
+            id_width: 3
+        rvtop_wrapper1:
+          ifu_axi:
+            id_width: 3
+          lsu_axi:
+            id_width: 3
 external:
   ports:
     in:
@@ -138,8 +161,6 @@ ips:
     file: repo[repo_guin]:sram_wrapper
   axi_bridge:
     file: repo[repo_guin]:axi4_to_ahb
-  axi_interconnect:
-    file: repo[repo_guin]:axi_intercon
   rvtop_wrapper0:
     file: repo[repo_guin]:el2_veer_wrapper
   rvtop_wrapper1:

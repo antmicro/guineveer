@@ -65,11 +65,11 @@ TW_AXI_PREREQ_SRCS = $(BUILD_DIR)/axi/src/axi_pkg.sv $(wildcard $(AXI_INCLUDE_PA
 all: testbench
 
 clean: | $(BUILD_DIR)
-	rm -rf $(BUILD_DIR) $(HW_DIR)/axi_intercon.sv $(HW_DIR)/guineveer.sv
+	rm -rf $(BUILD_DIR) $(HW_DIR)/guineveer.sv
 	$(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile clean
 
 
-hw: $(HW_DIR)/axi_intercon.sv $(VEER_SNAPSHOT) $(BUILD_DIR)/axi.f $(HW_DIR)/guineveer.sv
+hw: $(VEER_SNAPSHOT) $(BUILD_DIR)/axi.f $(HW_DIR)/guineveer.sv
 
 testbench: $(BUILD_DIR)/obj_dir/Vguineveer_tb | $(BUILD_DIR)
 
@@ -99,13 +99,14 @@ $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_IN
 		$(RV_ROOT)/design/el2_veer_wrapper.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/axi_cdc_wrapper.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/sram_wrapper.sv $(TW_PARSE_FLAGS)
-	topwrap repo parse $(TW_REPO) $(HW_DIR)/axi_intercon.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(HW_DIR)/uart_wrapper.sv $(TW_PARSE_FLAGS) --grouping-hint=AHBguin=ahb
 	topwrap repo parse $(TW_REPO) $(RV_ROOT)/design/lib/axi4_to_ahb.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(I3C_ROOT_DIR)/src/i3c_defines.svh $(I3C_ROOT_DIR)/src/i3c_wrapper.sv $(TW_PARSE_FLAGS) \
 		--grouping-hint=AXIguin=axi
 
 	topwrap build -d $(TW_DIR)/design.yaml --build-dir $(HW_DIR)
+
+	sed -i 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/guineveer.sv
 
 $(VEER_SNAPSHOT): $(VEER_SNAPSHOT)/common_defines.vh
 $(VEER_SNAPSHOT)/%: | $(BUILD_DIR)
@@ -124,10 +125,6 @@ $(BUILD_DIR)/axi.f: $(HW_DIR)/gen_flist.sh | $(BUILD_DIR)
 # Replace axi_pkg with axi_axi_pkg in axi submodule due to package collision with caliptra-rtl
 	find $(BUILD_DIR) -type f -name "*.sv" -exec sed -i 's/axi_pkg/axi_axi_pkg/g' {} +
 	find $(BUILD_DIR) -type f -name "*.svh" -exec sed -i 's/axi_pkg/axi_axi_pkg/g' {} +
-
-$(HW_DIR)/axi_intercon.sv: $(HW_DIR)/interconnect_utils/gen_inter_wrapper.sh $(HW_DIR)/interconnect_utils/intercon_config.yaml $(BUILD_DIR)/axi.f
-	$<
-	sed -i 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/axi_intercon.sv
 
 $(BUILD_DIR)/sim.vcd: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1) $(BUILD_DIR)/obj_dir/Vguineveer_tb | $(BUILD_DIR)
 	cd $(BUILD_DIR) && ./obj_dir/Vguineveer_tb +firmware0=$(HEX_FILE_CORE0) +firmware1=$(HEX_FILE_CORE1) ${TB_EXTRA_ARGS}

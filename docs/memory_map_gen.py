@@ -34,7 +34,7 @@ def format_hex(val: int) -> str:
 
 
 if __name__ == "__main__":
-    interconnect_config_location = "../design/src/interconnect_utils/intercon_config.yaml"
+    interconnect_config_location = "../topwrap/design.yaml"
     map_object = {}
     with open(interconnect_config_location, "r") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
@@ -43,19 +43,20 @@ if __name__ == "__main__":
             table_columns = ["Start Address", "End Address", "Size", "Type"]
             writer = csv.DictWriter(memory_map_csv, fieldnames=table_columns)
             writer.writeheader()
-            slaves = {
-                "VeeR EL2 reserved space": {"offset": 0x0, "size": 0x1FFF_FFFF}
-            } | data["parameters"]["slaves"]
-            for peripheral, map_location in slaves.items():
-                start_address = format_hex(map_location["offset"])
-                end_address = format_hex(map_location["offset"] + map_location["size"])
+            subordinates_topwrap = data["design"]["interconnects"]["axi_interconnect1"]["subordinates"]
+            subordinates = {
+                "VeeR EL2 reserved space": {"address": 0x0, "size": 0x1FFF_FFFF}
+            } | {name: list(params.values())[0] for (name, params) in subordinates_topwrap.items()}
+            for peripheral, map_location in subordinates.items():
+                start_address = format_hex(map_location["address"])
+                end_address = format_hex(map_location["address"] + map_location["size"])
                 size = format_hex(map_location["size"])
                 writer.writerow(
                     {
                         table_columns[0]: start_address,
                         table_columns[1]: end_address,
                         table_columns[2]: size,
-                        table_columns[3]: peripheral[0].upper() + peripheral[1:],
+                        table_columns[3]: peripheral,
                     }
                 )
             print("Memory map generated successfully")
