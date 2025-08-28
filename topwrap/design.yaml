@@ -4,27 +4,9 @@ design:
   name: guineveer
   parameters:
     lmem0:
-      ADDR_WIDTH: 17
-      DATA_WIDTH: 64
-      ID_WIDTH: 5
-      AXI_REQ_T: axi_req_t
-      AXI_RESP_T: axi_resp_t
       GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
     lmem1:
-      ADDR_WIDTH: 17
-      DATA_WIDTH: 64
-      ID_WIDTH: 5
-      AXI_REQ_T: axi_req_t
-      AXI_RESP_T: axi_resp_t
       GUINEVEER_MEMORY_FILE: "`HEX_FILE1"
-    i_axi_cdc_lsu:
-      aw_chan_t:  axi_addr_chan_t
-      w_chan_t:   axi_w_chan_t
-      b_chan_t:   axi_b_chan_t
-      ar_chan_t:  axi_addr_chan_t
-      r_chan_t:   axi_r_chan_t
-      axi_req_t:  axi_req_t
-      axi_resp_t: axi_resp_t
     axi_bridge:
       TAG: 5
     i3c_core:
@@ -149,20 +131,20 @@ external:
     - uart_tx_o
 ips:
   i_axi_cdc_lsu:
-    file: file:./ipcores/axi_cdc_stub.yaml
+    file: repo[repo_guin]:axi_cdc_wrapper
   lmem0:
-    file: file:./ipcores/guineveer_sram_stub.yaml
+    file: repo[repo_guin]:sram_wrapper
   lmem1:
-    file: file:./ipcores/guineveer_sram_stub.yaml
+    file: repo[repo_guin]:sram_wrapper
   axi_bridge:
-    file: file:./ipcores/axi4_to_ahb.yaml
+    file: repo[repo_guin]:axi4_to_ahb
   axi_interconnect:
-    file: file:./ipcores/axi_intercon.yaml
+    file: repo[repo_guin]:axi_intercon
   rvtop_wrapper0:
-    file: file:./ipcores/el2_veer_wrapper.yaml
+    file: repo[repo_guin]:el2_veer_wrapper
   rvtop_wrapper1:
-    file: file:./ipcores/el2_veer_wrapper.yaml
+    file: repo[repo_guin]:el2_veer_wrapper
   i3c_core:
-    file: file:./ipcores/i3c_wrapper.yaml
+    file: repo[repo_guin]:i3c_wrapper
   uart_core:
-    file: file:./ipcores/wrapped_uart.yaml
+    file: repo[repo_guin]:wrapped_uart

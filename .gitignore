@@ -15,3 +15,6 @@ hw/axi_intercon.sv
 hw/guineveer.sv
 tests/fpga/vivado*
 tests/fpga/guineveer/
+
+topwrap.yaml
+topwrap/repo_guin

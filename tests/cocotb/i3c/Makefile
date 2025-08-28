@@ -37,7 +37,7 @@ define uniq =
 	$(seen)
 endef
 
-VERILOG_SOURCES_RAW=\
+VERILOG_CORE_SOURCES_RAW=\
 	$(CALIPTRA_ROOT)/src/caliptra_prim/rtl/caliptra_prim_count_pkg.sv \
 	$(filter-out +incdir+%,$(I3C_FLIST)) \
 	$(filter-out +incdir+%,$(UART_FLIST)) \
@@ -46,11 +46,12 @@ VERILOG_SOURCES_RAW=\
 	$(HW_DIR)/waivers.vlt \
 	$(HW_DIR)/axi_intercon.sv \
 	$(HW_DIR)/guineveer_sram.sv \
+	$(HW_DIR)/sram_wrapper.sv \
 	$(HW_DIR)/wrapped_uart.sv \
-	$(HW_DIR)/guineveer.sv \
-	$(CURDIR)/i3c/guineveer_i3c_dut.sv
+	$(HW_DIR)/axi_cdc_wrapper.sv
 
-VERILOG_SOURCES=$(strip $(call uniq,$(VERILOG_SOURCES_RAW)))
+VERILOG_CORE_SOURCES=$(strip $(call uniq,$(VERILOG_CORE_SOURCES_RAW)))
+VERILOG_SOURCES=$(VERILOG_CORE_SOURCES) $(HW_DIR)/guineveer.sv $(CURDIR)/i3c/guineveer_i3c_dut.sv
 
 VERILOG_INCLUDE_DIRS_RAW=\
 	$(subst +incdir+,,$(filter +incdir+%,$(UART_FLIST))) \

@@ -58,7 +58,7 @@ define uniq =
 	$(seen)
 endef
 
-VERILOG_SOURCES_RAW=\
+VERILOG_CORE_SOURCES_RAW=\
     $(CALIPTRA_ROOT)/src/caliptra_prim/rtl/caliptra_prim_count_pkg.sv \
 	$(filter-out +incdir+%,$(I3C_FLIST)) \
 	$(filter-out +incdir+%,$(UART_FLIST)) \
@@ -67,10 +67,12 @@ VERILOG_SOURCES_RAW=\
 	$(HW_DIR)/waivers.vlt \
 	$(HW_DIR)/axi_intercon.sv \
 	$(HW_DIR)/guineveer_sram.sv \
+	$(HW_DIR)/sram_wrapper.sv \
 	$(HW_DIR)/wrapped_uart.sv \
-	$(HW_DIR)/guineveer.sv
+	$(HW_DIR)/axi_cdc_wrapper.sv
 
-VERILOG_SOURCES=$(strip $(call uniq,$(VERILOG_SOURCES_RAW)))
+VERILOG_CORE_SOURCES=$(strip $(call uniq,$(VERILOG_CORE_SOURCES_RAW)))
+VERILOG_SOURCES=$(VERILOG_CORE_SOURCES) $(HW_DIR)/guineveer.sv
 
 VERILOG_INCLUDE_DIRS_RAW=\
     $(subst +incdir+,,$(filter +incdir+%,$(UART_FLIST))) \
@@ -103,12 +105,22 @@ VERILATOR_SKIP_WARNINGS = -Wno-REDEFMACRO
 VERILATOR_DEBUG := --trace-fst --trace-structs
 
 SOC_WRAPPER_DEPS := \
-	$(wildcard $(TW_DIR)/ipcores/*) \
-	$(wildcard $(TW_DIR)/repo/interfaces/*) \
-	$(TW_DIR)/design.yaml \
-	$(TW_DIR)/topwrap.yaml \
-	$(TW_DIR)/topwrap_script.py
+	$(wildcard $(TW_DIR)/interfaces/*) \
+	$(TW_DIR)/design.yaml
 
+TW_REPO = repo_guin
+TW_REPO_DIR = $(TW_DIR)/$(TW_REPO)
+
+# `--all-sources` is needed so that header files listed as arguments to `topwrap repo parse` are
+# included in the core source sets, which is necessary for cores such as sram_wrapper due to macro
+# usage.
+TW_PARSE_FLAGS = \
+	--inference \
+	--inference-interface AXIguin \
+	--inference-interface AHBguin \
+	--all-sources
+
+TW_AXI_PREREQ_SRCS = $(BUILD_DIR)/axi/src/axi_pkg.sv $(wildcard $(AXI_INCLUDE_PATH)/axi/*.svh)
 
 all: testbench
 
@@ -133,11 +145,27 @@ $(HEX_FILE_CORE0) $(ELF_FILE_CORE0):
 $(HEX_FILE_CORE1) $(ELF_FILE_CORE1):
 	TEST=$(TEST) CORE=core1 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
 
-$(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS)
+$(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUDE_DIRS)
 # Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
 	sed -i "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
-	mkdir -p $(TW_DIR)/repo/cores
-	cd $(TW_DIR) && python3 topwrap_script.py
+
+	-rm -r $(TW_REPO_DIR)
+	-rm $(SCRIPT_DIR)/topwrap.yaml
+	topwrap repo init $(TW_REPO) $(TW_REPO_DIR)
+#	TODO: Ideally the interfaces in topwrap's built-in repo would be improved instead.
+	cp -r $(TW_DIR)/interfaces $(TW_REPO_DIR)
+
+	topwrap repo parse $(TW_REPO) $(VEER_SNAPSHOT)/common_defines.vh $(RV_ROOT)/design/lib/el2_mem_if.sv \
+		$(RV_ROOT)/design/el2_veer_wrapper.sv $(TW_PARSE_FLAGS)
+	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/axi_cdc_wrapper.sv $(TW_PARSE_FLAGS)
+	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/sram_wrapper.sv $(TW_PARSE_FLAGS)
+	topwrap repo parse $(TW_REPO) $(HW_DIR)/axi_intercon.sv $(TW_PARSE_FLAGS)
+	topwrap repo parse $(TW_REPO) $(HW_DIR)/wrapped_uart.sv $(TW_PARSE_FLAGS) --grouping-hint=AHBguin=ahb
+	topwrap repo parse $(TW_REPO) $(RV_ROOT)/design/lib/axi4_to_ahb.sv $(TW_PARSE_FLAGS)
+	topwrap repo parse $(TW_REPO) $(I3C_ROOT_DIR)/src/i3c_defines.svh $(I3C_ROOT_DIR)/src/i3c_wrapper.sv $(TW_PARSE_FLAGS) \
+		--grouping-hint=AXIguin=axi
+
+	topwrap build -d $(TW_DIR)/design.yaml --build-dir $(HW_DIR)
 
 $(VEER_SNAPSHOT): $(VEER_SNAPSHOT)/common_defines.vh
 $(VEER_SNAPSHOT)/%: | $(BUILD_DIR)

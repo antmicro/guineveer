@@ -254,11 +254,11 @@ module guineveer_tb #(
     lsu_bus_clk_en = 1;
 
     if ($value$plusargs("firmware0=%s", firmware0)) begin
-      $readmemh(firmware0, top_guineveer.lmem0.mem);
+      $readmemh(firmware0, top_guineveer.lmem0.xguineveer_sram.mem);
     end
 
     if ($value$plusargs("firmware1=%s", firmware1)) begin
-      $readmemh(firmware1, top_guineveer.lmem1.mem);
+      $readmemh(firmware1, top_guineveer.lmem1.xguineveer_sram.mem);
     end
 
     tp = $fopen("trace_port.csv", "w");

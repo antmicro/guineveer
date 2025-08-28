@@ -87,14 +87,14 @@ external:
 
 ips:
   axi4_to_ahb:
-    file: file:../build/ipcores/axi4_to_ahb.yaml
+    file: repo[repo_guin]:axi4_to_ahb
   el2_veer_wrapper:
-    file: file:../build/ipcores/el2_veer_wrapper.yaml
+    file: repo[repo_guin]:el2_veer_wrapper
   guineveer_sram:
-    file: file:../build/ipcores/wrapped_sram.yaml
+    file: repo[repo_guin]:sram_wrapper
   i3c_cdc:
-    file: file:../build/ipcores/wrapped_axi_cdc.yaml
+    file: repo[repo_guin]:axi_cdc_wrapper
   i3c_wrapper:
-    file: file:../build/ipcores/i3c_wrapper.yaml
+    file: repo[repo_guin]:i3c_wrapper
   uart:
-    file: file:../build/ipcores/uart.yaml
+    file: repo[repo_guin]:wrapped_uart

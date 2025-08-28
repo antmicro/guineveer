@@ -1,0 +1,24 @@
+name: AHBguin
+port_prefix: AHB
+signals:
+    optional:
+        out:
+            HADDR: haddr
+            HBURST: hburst
+            HMASTLOCK: hmastlock
+            HPROT: hprot
+            HSIZE: hsize
+            HTRANS: htrans
+            HWDATA: hwdata
+            HWSTRB: hwstrb
+            HWRITE: hwrite
+            HSEL: hsel
+            # TODO: HREADY needs to be marked as an input in for the manager and subordinate, but
+            # the current interface description YAML format currently does not support that.
+            # For this use case, it's fine to not include the HREADY input, as wrapped_uart does not
+            # use it (instead wiring uart_core.hready_i to uart_core.hreadyout_o directly).
+            # HREADY: hready
+        in:
+            HRDATA: hrdata
+            HREADYOUT: hreadyout
+            HRESP: hresp
