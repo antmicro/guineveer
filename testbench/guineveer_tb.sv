@@ -108,6 +108,10 @@ module guineveer_tb #(
   logic next_dbus_error;
   logic next_ibus_error;
 
+  always @(negedge core_clk) begin
+    cycleCnt <= cycleCnt + 1;
+  end
+
   always @(negedge core_clk or negedge rst_l) begin
     if (rst_l == 0) begin
       next_dbus_error <= '0;
@@ -117,7 +121,6 @@ module guineveer_tb #(
       soft_int <= 0;
       timer_int <= 0;
       extintsrc_req[1] <= 0;
-      cycleCnt <= cycleCnt + 1;
       // timeout monitor
       if (cycleCnt == MAX_CYCLES) begin
         $display("Hit max cycle count (%0d) .. stopping", cycleCnt);
@@ -242,7 +245,6 @@ module guineveer_tb #(
     reset_vector   = `RV_RESET_VEC;
     nmi_assert_int = 0;
     nmi_vector     = 32'hee000000;
-    rst_l          = 1;
     lsu_bus_clk_en = 1;
 
     $value$plusargs("firmware=%s", firmware_path);
@@ -255,7 +257,7 @@ module guineveer_tb #(
     fd = $fopen("console.log", "w");
     commit_count = 0;
   end
-  assign porst_l = cycleCnt > 2;
+  assign rst_l = cycleCnt > 2;
 
   // UART monitor
   string line_buffer;
