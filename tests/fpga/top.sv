@@ -78,21 +78,41 @@ module top (
         if (!pll_locked) rstn_i3c <= '0;
         else             rstn_i3c <= '1;
 
+    logic i3c_sda_i;
+    logic i3c_scl_i;
+    logic i3c_sda_o;
+    logic i3c_scl_o;
+    logic i3c_sda_oe;
+    logic i3c_scl_oe;
+    logic i3c_sel_od_pp_o;
+
     // Guineveer SoC
     guineveer u_guineveer (
-        .clk_i      (clk_soc),
-        .rst_ni     (rstn_soc),
-        .cpu_rst_ni (rstn_cpu),
+        .clk_i           (clk_soc),
+        .rst_ni          (rstn_soc),
+        .cpu_rst_ni      (rstn_cpu),
 
-        .i3c_clk_i  (clk_i3c),
-        .i3c_rst_ni (rstn_i3c),
+        .i3c_clk_i       (clk_i3c),
+        .i3c_rst_ni      (rstn_i3c),
 
-        .uart_rx_i  (uart_rx_i),
-        .uart_tx_o  (uart_tx_o),
+        .uart_rx_i       (uart_rx_i),
+        .uart_tx_o       (uart_tx_o),
 
-        .i3c_scl_io (i3c_scl_io),
-        .i3c_sda_io (i3c_sda_io)
+        .i3c_sda_i       (i3c_sda_i),
+        .i3c_scl_i       (i3c_scl_i),
+        .i3c_sda_o       (i3c_sda_o),
+        .i3c_scl_o       (i3c_scl_o),
+        .i3c_sda_oe      (i3c_sda_oe),
+        .i3c_scl_oe      (i3c_scl_oe),
+        .i3c_sel_od_pp_o (i3c_sel_od_pp_o)
     );
+
+    // I3C I/Os
+
+    assign i3c_scl_io = i3c_scl_oe ? i3c_scl_o : 'z;
+    assign i3c_sda_io = i3c_sda_oe ? i3c_sda_o : 'z;
+    assign i3c_sda_i = i3c_sda_io;
+    assign i3c_scl_i = i3c_scl_io;
 
     // LEDs (debugging)
 

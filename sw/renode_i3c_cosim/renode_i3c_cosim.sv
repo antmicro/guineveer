@@ -65,6 +65,8 @@ module sim;
   wire sda_i;
   wire scl_o;
   wire sda_o;
+  wire scl_oe;
+  wire sda_oe;
   wire sel_od_pp_o;
 
   i3c_wrapper #(
@@ -117,10 +119,15 @@ module sim;
       .bvalid_o(axi.bvalid),
       .bready_i(axi.bready),
 
+      .disable_id_filtering_i('1),
+      .priv_ids_i(),
+
       .scl_i(scl_i),
       .sda_i(sda_i),
       .scl_o(scl_o),
       .sda_o(sda_o),
+      .scl_oe(scl_oe),
+      .sda_oe(sda_oe),
       .sel_od_pp_o(sel_od_pp_o),
 
       .recovery_payload_available_o(renode_inputs[0]),

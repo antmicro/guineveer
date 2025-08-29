@@ -46,11 +46,17 @@ signals:
   in:
   - rst_ni
   - peripheral_reset_done_i
+  - disable_id_filtering_i
+  - priv_ids_i
   - clk_i
-  inout:
-  - i3c_scl_io
-  - i3c_sda_io
+  - sda_i
+  - scl_i
   out:
+  - sda_o
+  - scl_o
+  - sda_oe
+  - scl_oe
+  - sel_od_pp_o
   - recovery_image_activated_o
   - escalated_reset_o
   - recovery_payload_available_o

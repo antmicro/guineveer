@@ -44,8 +44,13 @@ module guineveer_tb #(
   logic                      uart_rx;
   logic                      uart_tx;
 
-  logic                      i3c_scl_io;
-  logic                      i3c_sda_io;
+  logic                      i3c_scl_i;
+  logic                      i3c_sda_i;
+  logic                      i3c_scl_o;
+  logic                      i3c_sda_o;
+  logic                      i3c_scl_oe;
+  logic                      i3c_sda_oe;
+  logic                      i3c_sel_od_pp_o;
 
   logic                      porst_l;
   logic [pt.PIC_TOTAL_INT:1] extintsrc_req;
@@ -301,8 +306,13 @@ module guineveer_tb #(
 
       .i3c_clk_i(i3c_clk),
       .i3c_rst_ni(rst_l),
-      .i3c_scl_io(i3c_scl_io),
-      .i3c_sda_io(i3c_sda_io),
+      .i3c_scl_i,
+      .i3c_sda_i,
+      .i3c_scl_o,
+      .i3c_sda_o,
+      .i3c_scl_oe,
+      .i3c_sda_oe,
+      .i3c_sel_od_pp_o,
 
       .uart_rx_i(uart_rx),
       .uart_tx_o(uart_tx)
