@@ -25,3 +25,4 @@ set_property -dict { PACKAGE_PIN AB21   IOSTANDARD LVCMOS33 } [get_ports { i3c_s
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets { u_guineveer/axi_bridge/buf_state_ff/genblock.dffs/genblock.dffs/dout[0]_i_2__0_n_0 }];
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets { u_guineveer/axi_bridge/buf_state_ff/genblock.dffs/genblock.dffs/dout[0]_i_2__5_n_0 }];
 set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets { u_guineveer/axi_bridge/buf_state_ff/genblock.dffs/genblock.dffs/dout_reg[0]_10 }];
+set_property ALLOW_COMBINATORIAL_LOOPS TRUE [get_nets { u_guineveer/axi_bridge/buf_cmd_doneff/genblock.dffs/genblock.dffs/dout_reg[0]_1 }];
