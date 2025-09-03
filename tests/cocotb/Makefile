@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Antmicro <www.antmicro.com>
 # SPDX-License-Identifier: Apache-2.0
 
-TEST_DIRS = uart_core_ahb
+TEST_DIRS = uart_core_ahb i3c
 TEST_RESULTS = $(addsuffix /results.xml,${TEST_DIRS})
 
 verify: venv $(TEST_RESULTS)
@@ -10,7 +10,7 @@ verify: venv $(TEST_RESULTS)
 
 $(TEST_RESULTS): venv
 	. venv/bin/activate;\
-	make -C $(@D) all \
+	$(MAKE) -C $(@D) all \
 		COVERAGE_TYPE=branch \
 		COCOTB_RESULTS_FILE="results.xml";
 

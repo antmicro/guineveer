@@ -8,6 +8,7 @@ dependencies = [
   "cocotb==1.9.2",
   "cocotbext-ahb==0.4.9",
   "cocotbext-uart==0.1.2",
+  "cocotbext-i3c @ git+https://github.com/antmicro/cocotbext-i3c@dfe72c4fb3dee668011432046b961b8c488027e9",
   "junitparser==3.2.0"
 ]
 
