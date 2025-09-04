@@ -23,4 +23,7 @@ venv/touchfile: pyproject.toml
 	. venv/bin/activate; pip install .
 	touch venv/touchfile
 
+dirs:
+	echo $(TEST_DIRS)
+
 .PHONY: all test venv clean dirs verify
