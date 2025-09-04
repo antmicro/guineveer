@@ -8,12 +8,15 @@ Guineveer SoC support the following targets:
 * ASIC (in progress)
 ## Software tests
 
-Currently two software test samples are available:
+Currently, three software test samples are available:
 * `uart` - example initializes and transmits `Hello UART` over UART
 * `i3c` - example verifies the correctness of some basic operations on the `i3c` device, including:
     * verifying if registers contain expected values after reset
     * verifying if read-only registers are not writeable and if read-write registers are writable
     * verifying if status bits change values after an interrupt condition in forced
+* `i3c-cocotb` - test application dedicated for use with the Cocotb I3C tests, which cover:
+    * waiting for dynamic address assignment and observing the register changes,
+    * performing I3C private writes and reads to the device.
 
 Building software examples is described in the [User guide](user_guide.md#building-software-examples).
 

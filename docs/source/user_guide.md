@@ -11,6 +11,7 @@ Run `TEST=software_example_name make build_test` to compile one of the provided 
 Right now, the available software examples are:
 * `uart` - this example initializes and transfers a "Hello UART" string over UART,
 * `i3c` - this example checks I3C register values after reset and initializes the peripheral in device mode.
+* `i3c-cocotb` - this example checks communication over I3C and is intended to be used with the I3C Cocotb tests.
 
 ## Building testbench simulation
 
