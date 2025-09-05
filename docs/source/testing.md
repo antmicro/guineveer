@@ -16,7 +16,8 @@ Currently, three software test samples are available:
     * verifying if status bits change values after an interrupt condition in forced
 * `i3c-cocotb` - test application dedicated for use with the Cocotb I3C tests, which cover:
     * waiting for dynamic address assignment and observing the register changes,
-    * performing I3C private writes and reads to the device.
+    * performing I3C private writes and reads to the device,
+    * performing various directed CCC transactions.
 
 Building software examples is described in the [User guide](user_guide.md#building-software-examples).
 

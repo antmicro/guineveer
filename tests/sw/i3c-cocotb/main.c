@@ -95,9 +95,17 @@ int getchar()
 #define  I3C_STBY_CR_DEVICE_ADDR_STATIC_VALID	(1 << 15)
 #define  I3C_STBY_CR_DEVICE_ADDR_DYNAMIC_SHIFT	(16)
 #define  I3C_STBY_CR_DEVICE_ADDR_DYNAMIC_VALID	(1 << 31)
+#define I3C_STBY_CR_DEVICE_CHAR			(0x198)
+#define  I3C_STBY_CR_DEVICE_CHAR_PID_HI_MASK	(0xfffe)
+#define  I3C_STBY_CR_DEVICE_CHAR_DCR_SHIFT	(16)
+#define  I3C_STBY_CR_DEVICE_CHAR_DCR_MASK	(0xff)
+#define  I3C_STBY_CR_DEVICE_CHAR_BCR_SHIFT	(24)
+#define  I3C_STBY_CR_DEVICE_CHAR_BCR_MASK	(0xff)
+#define I3C_STBY_CR_DEVICE_PID_LO		(0x19c)
 
 #define I3C_TTI_INTERRUPT_STATUS		(0x1d0)
 #define I3C_TTI_INTERRUPT_ENABLE		(0x1d4)
+#define I3C_TTI_INTERRUPT_FORCE			(0x1d8)
 #define  I3C_TTI_INTERRUPT_RX_DESC_STAT		(1 << 0)
 #define  I3C_TTI_INTERRUPT_TX_DESC_STAT		(1 << 1)
 #define I3C_TTI_RX_DESC_QUEUE_PORT		(0x1dc)
@@ -271,6 +279,46 @@ void test_i3c_read_write()
 	i3c_push_tx_desc(len);
 }
 
+void test_i3c_getpid()
+{
+	(void)getchar();
+
+	/* Write PID abccef012345. */
+
+	uint32_t val = read32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR);
+	val &= ~ I3C_STBY_CR_DEVICE_CHAR_PID_HI_MASK;
+	val |= 0xabcc;
+	write32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR, val);
+
+	write32(I3C_BASE + I3C_STBY_CR_DEVICE_PID_LO, 0xef012345);
+
+	printf("ok\r\n");
+}
+
+void test_i3c_getbcr()
+{
+	(void)getchar();
+
+	uint32_t val = read32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR);
+	val &= ~(I3C_STBY_CR_DEVICE_CHAR_BCR_MASK << I3C_STBY_CR_DEVICE_CHAR_BCR_SHIFT);
+	val |= 0xd9 << I3C_STBY_CR_DEVICE_CHAR_BCR_SHIFT; /* Bitwise inverse of reset value. */
+	write32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR, val);
+
+	printf("ok\r\n");
+}
+
+void test_i3c_getdcr()
+{
+	(void)getchar();
+
+	uint32_t val = read32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR);
+	val &= ~(I3C_STBY_CR_DEVICE_CHAR_DCR_MASK << I3C_STBY_CR_DEVICE_CHAR_DCR_SHIFT);
+	val |= 0x42 << I3C_STBY_CR_DEVICE_CHAR_DCR_SHIFT; /* Bitwise inverse of reset value. */
+	write32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR, val);
+
+	printf("ok\r\n");
+}
+
 
 int main(void)
 {
@@ -284,6 +332,9 @@ int main(void)
 	switch (test) {
 	case '1': test_i3c_setdasa(); break;
 	case '2': test_i3c_read_write(); break;
+	case 'p': test_i3c_getpid(); break;
+	case 'b': test_i3c_getbcr(); break;
+	case 'd': test_i3c_getdcr(); break;
 	default: printf("?\r\n"); break;
 	}
 
