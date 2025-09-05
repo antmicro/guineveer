@@ -193,7 +193,7 @@ $(BUILD_DIR)/sim.vcd: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1) $(BUILD_DIR)/obj_dir/V
 	cd $(BUILD_DIR) && ./obj_dir/Vguineveer_tb +firmware0=$(HEX_FILE_CORE0) +firmware1=$(HEX_FILE_CORE1) ${TB_EXTRA_ARGS}
 
 $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD_DIR)
-	verilator --cc -CFLAGS "-std=c++14" -coverage-max-width 20000 $(defines) \
+	verilator --cc -CFLAGS "-std=c++14 -O3" -coverage-max-width 20000 $(defines) \
 	  $(addprefix -I,$(TB_INCLS)) -Mdir $(BUILD_DIR)/obj_dir \
 	  $(VERILATOR_SKIP_WARNINGS) $(VERILATOR_EXTRA_ARGS) ${TB_FILES} --top-module guineveer_tb \
 	  --main --exe --build --autoflush --timing $(VERILATOR_DEBUG) $(VERILATOR_COVERAGE) -fno-table
