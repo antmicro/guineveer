@@ -90,6 +90,7 @@ int getchar()
 #define  I3C_STBY_CR_CONTROL_ENABLE_INIT_SHIFT	(30)
 #define  I3C_STBY_CR_CONTROL_ENABLE_INIT_RUN	(2)
 #define I3C_STBY_CR_DEVICE_ADDR			(0x188)
+#define I3C_STBY_CR_VIRT_DEVICE_ADDR		(0x1b8)
 #define  I3C_STBY_CR_DEVICE_ADDR_ADDR_MASK	(0x0000007f)
 #define  I3C_STBY_CR_DEVICE_ADDR_STATIC_SHIFT	(0)
 #define  I3C_STBY_CR_DEVICE_ADDR_STATIC_VALID	(1 << 15)
@@ -120,7 +121,39 @@ int getchar()
 #define  I3C_TTI_BUFFER_THLD_CTRL_RX_DATA_SHIFT	(8)
 #define  I3C_TTI_BUFFER_THLD_CTRL_RX_DATA_MASK	(0x700)
 
+#define I3C_SECFW_PROT_CAP_2			(0x10c)
+#define  I3C_SECFW_PROT_CAP_VERSION_1p1		(0x0101)
+#define  I3C_SECFW_PROT_CAP_DEVICE_ID		(1 << 16)
+#define  I3C_SECFW_PROT_CAP_FORCED_RECOVERY	(1 << 17)
+#define  I3C_SECFW_PROT_CAP_MGMT_RESET		(1 << 18)
+#define  I3C_SECFW_PROT_CAP_DEVICE_STATUS	(1 << 20)
+#define  I3C_SECFW_PROT_CAP_INDIRECT_CTRL	(1 << 21)
+#define  I3C_SECFW_PROT_CAP_PUSH_CIMAGE_SUPPORT	(1 << 23)
+#define  I3C_SECFW_PROT_CAP_FLASHLESS_BOOT	(1 << 27)
+#define I3C_SECFW_DEVICE_STATUS_0		(0x130)
+#define  I3C_SECFW_DEV_STATUS_RECOVERY_READY	(0x03)
+#define  I3C_SECFW_REC_REASON_STREAMING_BOOT	(0x0012 << 16)
+#define I3C_SECFW_DEVICE_RESET			(0x138)
+#define  I3C_SECFW_DEVICE_RESET_CTRL_MASK	(0xff)
+#define  I3C_SECFW_DEVICE_RESET_CTRL_SHIFT	(0)
+#define  I3C_SECFW_DEVICE_RESET_FORCED_MASK	(0xff)
+#define  I3C_SECFW_DEVICE_RESET_FORCED_SHIFT	(8)
+#define  I3C_SECFW_DEVICE_RESET_FORCED_STREAMING_BOOT	(0x0e)
+#define I3C_SECFW_RECOVERY_CONTROL		(0x13c)
+#define  I3C_SECFW_RECOVERY_CONTROL_ACTIVATE	(0x0f << 16)
+#define I3C_SECFW_RECOVERY_STATUS		(0x140)
+#define  I3C_SECFW_RECOVERY_STATUS_AWAITING	(0x01)
+#define  I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL	(0x03)
+#define  I3C_SECFW_RECOVERY_STATUS_FAILED	(0x0c)
+#define I3C_SECFW_INDIRECT_FIFO_CTRL_1		(0x14c)
+#define I3C_SECFW_INDIRECT_FIFO_STATUS_0	(0x150)
+#define  I3C_SECFW_INDIRECT_FIFO_EMPTY		(1 << 0)
+#define  I3C_SECFW_INDIRECT_FIFO_FULL		(1 << 1)
+#define I3C_SECFW_INDIRECT_FIFO_DATA		(0x168)
+
+
 #define STATIC_ADDR (0x5A)
+#define VIRT_STATIC_ADDR (0x6A)
 
 
 void i3c_init()
@@ -140,6 +173,13 @@ void i3c_init()
 	val |= STATIC_ADDR << I3C_STBY_CR_DEVICE_ADDR_STATIC_SHIFT;
 	val |= I3C_STBY_CR_DEVICE_ADDR_STATIC_VALID;
 	write32(I3C_BASE + I3C_STBY_CR_DEVICE_ADDR, val);
+
+	/* Set virtual static address. */
+	val = read32(I3C_BASE + I3C_STBY_CR_VIRT_DEVICE_ADDR);
+	val &= ~(I3C_STBY_CR_DEVICE_ADDR_ADDR_MASK << I3C_STBY_CR_DEVICE_ADDR_STATIC_SHIFT);
+	val |= VIRT_STATIC_ADDR << I3C_STBY_CR_DEVICE_ADDR_STATIC_SHIFT;
+	val |= I3C_STBY_CR_DEVICE_ADDR_STATIC_VALID;
+	write32(I3C_BASE + I3C_STBY_CR_VIRT_DEVICE_ADDR, val);
 
 	/* Enable target interface and SETDASA for address assignment. */
 	val = read32(I3C_BASE + I3C_STBY_CR_CONTROL);
@@ -162,6 +202,18 @@ void i3c_init()
 	val |= I3C_TTI_INTERRUPT_RX_DESC_STAT;
 	val |= I3C_TTI_INTERRUPT_TX_DESC_STAT;
 	write32(I3C_BASE + I3C_TTI_INTERRUPT_ENABLE, val);
+
+	/* Program recovery interface capabilities. */
+	val = 0;
+	val |= I3C_SECFW_PROT_CAP_VERSION_1p1;
+	val |= I3C_SECFW_PROT_CAP_DEVICE_ID;
+	val |= I3C_SECFW_PROT_CAP_FORCED_RECOVERY;
+	val |= I3C_SECFW_PROT_CAP_MGMT_RESET;
+	val |= I3C_SECFW_PROT_CAP_DEVICE_STATUS;
+	val |= I3C_SECFW_PROT_CAP_INDIRECT_CTRL;
+	val |= I3C_SECFW_PROT_CAP_PUSH_CIMAGE_SUPPORT;
+	val |= I3C_SECFW_PROT_CAP_FLASHLESS_BOOT;
+	write32(I3C_BASE + I3C_SECFW_PROT_CAP_2, val);
 }
 
 void i3c_clear_dynamic_addr()
@@ -319,6 +371,90 @@ void test_i3c_getdcr()
 	printf("ok\r\n");
 }
 
+#define MAX_STREAMING_BOOT_SIZE 0x1000
+uint8_t streaming_boot_buffer[MAX_STREAMING_BOOT_SIZE] __attribute__((aligned(0x1000)));
+
+void i3c_wait_for_payload_available()
+{
+	/* We don't have access to the out-of-band recovery_payload_available_o signal, so
+	   synthesize it out of the events that cause it to be set. */
+	while (1) {
+		uint32_t val = read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_STATUS_0);
+		if (val & I3C_SECFW_INDIRECT_FIFO_FULL)
+			return;
+
+		val = read32(I3C_BASE + I3C_SECFW_RECOVERY_CONTROL);
+		if (val & I3C_SECFW_RECOVERY_CONTROL_ACTIVATE)
+			return;
+	}
+}
+
+void test_i3c_streaming_boot()
+{
+	/* Wait for RA to request management interface reset. */
+	while (1) {
+		uint32_t val = read32(I3C_BASE + I3C_SECFW_DEVICE_RESET);
+		uint32_t reset = val & I3C_SECFW_DEVICE_RESET_CTRL_MASK;
+
+		if (reset)
+			break;
+	}
+
+	uint32_t val = read32(I3C_BASE + I3C_SECFW_DEVICE_RESET);
+	uint32_t reset = val & I3C_SECFW_DEVICE_RESET_CTRL_MASK;
+	uint32_t forced = (val >> I3C_SECFW_DEVICE_RESET_FORCED_SHIFT) & I3C_SECFW_DEVICE_RESET_FORCED_MASK;
+
+	/* Enter streaming boot mode if requested. */
+	if (forced == I3C_SECFW_DEVICE_RESET_FORCED_STREAMING_BOOT) {
+		write32(I3C_BASE + I3C_SECFW_DEVICE_STATUS_0,
+			I3C_SECFW_DEV_STATUS_RECOVERY_READY | I3C_SECFW_REC_REASON_STREAMING_BOOT);
+
+		write32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_AWAITING);
+	}
+
+	/* Clear reset. */
+	write32(I3C_BASE + I3C_SECFW_DEVICE_RESET, val);
+
+	/* Wait for image size to be set. */
+	size_t image_size = 0;
+	while (!(image_size = read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_CTRL_1)))
+		;
+	image_size *= 4;  /* INDIRECT_FIFO_CTRL_1 is in 4B word units. */
+
+	/* Bail out if the image is too large. */
+	if (image_size > MAX_STREAMING_BOOT_SIZE) {
+		write32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_FAILED);
+		return;
+	}
+
+	/* Receive recovery image. */
+	size_t progress = 0;
+	while (progress < image_size) {
+		i3c_wait_for_payload_available();
+
+		while (!(read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_STATUS_0)
+			& I3C_SECFW_INDIRECT_FIFO_EMPTY)) {
+			uint32_t data = read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_DATA);
+
+			for (size_t i = 0; i < 4; i++) {
+				streaming_boot_buffer[progress++] = data & 0xFF;
+				data >>= 8;
+			}
+		}
+	}
+
+	/* Wait for boot request. */
+	while (1) {
+		uint32_t val = read32(I3C_BASE + I3C_SECFW_RECOVERY_CONTROL);
+		if (val & I3C_SECFW_RECOVERY_CONTROL_ACTIVATE)
+			break;
+	}
+
+	write32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL);
+
+	((void(*)(void))streaming_boot_buffer)();
+}
+
 
 int main(void)
 {
@@ -335,6 +471,7 @@ int main(void)
 	case 'p': test_i3c_getpid(); break;
 	case 'b': test_i3c_getbcr(); break;
 	case 'd': test_i3c_getdcr(); break;
+	case 'B': test_i3c_streaming_boot(); break;
 	default: printf("?\r\n"); break;
 	}
 
