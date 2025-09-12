@@ -18,6 +18,7 @@ Currently, three software test samples are available:
     * waiting for dynamic address assignment and observing the register changes,
     * performing I3C private writes and reads to the device,
     * performing various directed CCC transactions.
+    * performing a streaming boot via the recovery I3C target.
 
 Building software examples is described in the [User guide](user_guide.md#building-software-examples).
 
