@@ -95,7 +95,7 @@ module guineveer_tb #(
   logic [              31:0] wb_csr_data;
 
   logic                      dmi_core_enable;
-  logic [           255*8:0] firmware_path;
+  string                     firmware_path;
 
   always_comb dmi_core_enable = ~(o_cpu_halt_status);
 
@@ -239,7 +239,7 @@ module guineveer_tb #(
     abi_reg[30]    = "t5";
     abi_reg[31]    = "t6";
 
-    extintsrc_req  = {pt.PIC_TOTAL_INT - 1{1'b0}};
+    extintsrc_req  = {pt.PIC_TOTAL_INT{1'b0}};
     timer_int      = 0;
     soft_int       = 0;
 
@@ -253,7 +253,7 @@ module guineveer_tb #(
     lsu_bus_clk_en = 1;
 
     $value$plusargs("firmware=%s", firmware_path);
-    if (!firmware_path) firmware_path = "program.hex";
+    if (firmware_path.len() == 0) firmware_path = "program.hex";
     $readmemh(firmware_path, top_guineveer.lmem.mem);
     tp = $fopen("trace_port.csv", "w");
     el = $fopen("exec.log", "w");
