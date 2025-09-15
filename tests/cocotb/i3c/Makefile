@@ -15,6 +15,7 @@ VEER_FLIST = \
 	$(VEER_SNAPSHOT)/common_defines.vh \
 	$(RV_ROOT)/design/include/el2_def.sv \
 	$(VEER_SNAPSHOT)/el2_pdef.vh \
+	$(RV_ROOT)/verification/block/config.vlt \
 	$(subst -v,,$(subst $$RV_ROOT,${RV_ROOT},$(file < $(RV_ROOT)/design/flist))) \
 	+incdir+$(RV_ROOT)/design/lib \
 	+incdir+$(RV_ROOT)/design/include \
@@ -42,6 +43,7 @@ VERILOG_SOURCES_RAW=\
 	$(filter-out +incdir+%,$(UART_FLIST)) \
 	$(filter-out +incdir+%,$(VEER_FLIST)) \
 	$(AXI_INTERCON_FLIST) \
+	$(HW_DIR)/waivers.vlt \
 	$(HW_DIR)/axi_intercon.sv \
 	$(HW_DIR)/guineveer_sram.sv \
 	$(HW_DIR)/wrapped_uart.sv \
@@ -59,5 +61,7 @@ VERILOG_INCLUDE_DIRS_RAW=\
 VERILOG_INCLUDE_DIRS=$(strip $(call uniq,$(VERILOG_INCLUDE_DIRS_RAW)))
 
 COMPILE_ARGS += +define+GUINEVEER_MEMORY_FILE='"'$(abspath ${CURDIR}/../../build/i3c-cocotb.hex)'"'
+
+VERILATOR_SKIP_WARNINGS = -Wno-TIMESCALEMOD -Wno-UNOPTFLAT -Wno-REDEFMACRO
 
 include $(CURDIR)/../common.mk

@@ -37,7 +37,7 @@ endif
 ifeq ($(SIM), verilator)
     COMPILE_ARGS += --coverage-max-width 20000
     COMPILE_ARGS += --timing
-    COMPILE_ARGS += -Wall -Wno-fatal -CFLAGS -O3
+    COMPILE_ARGS += $(VERILATOR_SKIP_WARNINGS) -CFLAGS -O3
 
     EXTRA_ARGS   += --trace --trace-fst --trace-structs
     EXTRA_ARGS   += $(VERILATOR_COVERAGE) --no-public-flat-rw --public-depth 1
