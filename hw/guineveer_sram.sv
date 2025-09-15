@@ -13,10 +13,13 @@ module guineveer_sram #(
     input AXI_REQ_T axi_req_i,
     output AXI_RESP_T axi_resp_o
 );
+  localparam int WORD_BYTE_WIDTH = $clog2(DATA_WIDTH) - 3;
+  localparam int WORD_ADDR_COUNT = (1 << ADDR_WIDTH) >> WORD_BYTE_WIDTH;
+  localparam int WORD_ADDR_WIDTH = $clog2(WORD_ADDR_COUNT);
 
   logic mem_rvalid;
   logic [DATA_WIDTH-1:0] mem_rdata;
-  bit [DATA_WIDTH-1:0] mem[(1 << ADDR_WIDTH) / (DATA_WIDTH / 8)];
+  bit [DATA_WIDTH-1:0] mem[WORD_ADDR_COUNT];
 
   axi_to_mem #(
       .axi_req_t(AXI_REQ_T),
@@ -48,7 +51,8 @@ module guineveer_sram #(
     if (!xaxi_to_mem.mem_req_o) begin
       mem_rvalid <= '0;
     end else if (xaxi_to_mem.mem_req_o) begin
-      automatic logic [ADDR_WIDTH-1:0] cell_addr = xaxi_to_mem.mem_addr_o[0] / (DATA_WIDTH / 8);
+      automatic logic [WORD_ADDR_WIDTH-1:0] cell_addr = {xaxi_to_mem.mem_addr_o[0] >> WORD_BYTE_WIDTH}[WORD_ADDR_WIDTH-1:0];
+
       mem_rvalid <= '1;
       mem_rdata  <= mem[cell_addr];
 
