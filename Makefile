@@ -34,6 +34,7 @@ VEER_FLIST := \
 	$(VEER_SNAPSHOT)/common_defines.vh \
 	$(RV_ROOT)/design/include/el2_def.sv \
 	$(VEER_SNAPSHOT)/el2_pdef.vh \
+	$(RV_ROOT)/verification/block/config.vlt \
 	$(subst -v,,$(subst $$RV_ROOT,${RV_ROOT},$(file < $(RV_ROOT)/design/flist))) \
 	+incdir+$(RV_ROOT)/design/lib \
 	+incdir+$(RV_ROOT)/design/include \
@@ -63,6 +64,7 @@ VERILOG_SOURCES_RAW=\
 	$(filter-out +incdir+%,$(UART_FLIST)) \
 	$(filter-out +incdir+%,$(VEER_FLIST)) \
 	$(AXI_INTERCON_FLIST) \
+	$(HW_DIR)/waivers.vlt \
 	$(HW_DIR)/axi_intercon.sv \
 	$(HW_DIR)/guineveer_sram.sv \
 	$(HW_DIR)/wrapped_uart.sv \
@@ -96,9 +98,7 @@ ELF_FILE := $(BUILD_DIR)/$(TEST).elf
 TB_FILES = $(VERILOG_SOURCES) $(TB_DIR)/guineveer_tb.sv
 TB_INCLS = $(VERILOG_INCLUDE_DIRS) $(TB_DIR) $(RV_ROOT)/testbench
 
-VERILATOR_SKIP_WARNINGS := $(VERILATOR_NOIMPLICIT) -Wno-TIMESCALEMOD -Wno-SELRANGE \
-	-Wno-CASEINCOMPLETE -Wno-INITIALDLY -Wno-WIDTH -Wno-UNOPTFLAT -Wno-REDEFMACRO \
-	-Wno-LATCH -Wno-MULTIDRIVEN -Wno-UNSIGNED -Wno-CMPCONST -Wno-SIDEEFFECT
+VERILATOR_SKIP_WARNINGS = -Wno-TIMESCALEMOD -Wno-UNOPTFLAT -Wno-REDEFMACRO
 
 VERILATOR_DEBUG := --trace-fst --trace-structs
 
