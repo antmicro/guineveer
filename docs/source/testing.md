@@ -17,8 +17,9 @@ Currently, three software test samples are available:
 * `i3c-cocotb` - test application dedicated for use with the Cocotb I3C tests, which cover:
     * waiting for dynamic address assignment and observing the register changes,
     * performing I3C private writes and reads to the device,
-    * performing various directed CCC transactions.
-    * performing a streaming boot via the recovery I3C target.
+    * performing various directed CCC transactions,
+    * performing a streaming boot via the recovery I3C target,
+    * performing a streaming boot using the AXI bypass functionality.
 
 Building software examples is described in the [User guide](user_guide.md#building-software-examples).
 
