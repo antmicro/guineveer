@@ -128,6 +128,8 @@ build_test: $(HEX_FILE)
 renode_test: $(BUILD_DIR)/report.html
 
 $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS)
+# Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
+	sed -i "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
 	mkdir -p $(TW_DIR)/repo/cores
 	cd $(TW_DIR) && python3 topwrap_script.py
 
