@@ -31,6 +31,7 @@ module top (
 
     logic pll_clkfb;
     logic pll_clkout0;
+    logic pll_clkout1;
     logic pll_locked;
 
     PLLE2_BASE # (
