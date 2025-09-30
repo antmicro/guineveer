@@ -28,6 +28,8 @@ The SoC is split into two clock domains: one for the I3C core, and one for the r
   - <https://github.com/antmicro/Cores-VeeR-EL2/blob/main/design/lib/axi4_to_ahb.sv>
 * - AXI_to_mem
   - <https://github.com/pulp-platform/axi/blob/master/src/axi_to_mem.sv>
+* - AXI_cdc
+  - <https://github.com/pulp-platform/axi/blob/master/src/axi_cdc.sv>
 * - UART OpenTitan
   - <https://github.com/lowRISC/opentitan/tree/master/hw/ip/uart>
 * - I3C core
