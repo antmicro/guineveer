@@ -1,11 +1,17 @@
 parameters:
   masters:
-    veer_lsu:
+    veer_lsu0:
       id_width: 3
-      slaves: [mem, uart, i3c]
-    veer_ifu:
+      slaves: [mem0, uart, i3c]
+    veer_ifu0:
       id_width: 3
-      slaves: [mem]
+      slaves: [mem0]
+    veer_lsu1:
+      id_width: 3
+      slaves: [mem1, uart, i3c]
+    veer_ifu1:
+      id_width: 3
+      slaves: [mem1]
   slaves:
     uart:
       offset: 0x30000000
@@ -13,7 +19,10 @@ parameters:
     i3c:
       offset: 0x30001000
       size: 0x1000
-    mem:
+    mem0:
       offset : 0x80000000
+      size: 0x1f400
+    mem1:
+      offset : 0x90000000
       size: 0x1f400
 vlnv: 'vendor:library:axi_intercon:1.0'

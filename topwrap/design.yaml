@@ -3,13 +3,20 @@
 design:
   name: guineveer
   parameters:
-    lmem:
+    lmem0:
       ADDR_WIDTH: 17
       DATA_WIDTH: 64
-      ID_WIDTH: 4
+      ID_WIDTH: 5
       AXI_REQ_T: axi_req_t
       AXI_RESP_T: axi_resp_t
       GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
+    lmem1:
+      ADDR_WIDTH: 17
+      DATA_WIDTH: 64
+      ID_WIDTH: 5
+      AXI_REQ_T: axi_req_t
+      AXI_RESP_T: axi_resp_t
+      GUINEVEER_MEMORY_FILE: "`HEX_FILE1"
     i_axi_cdc_lsu:
       aw_chan_t:  axi_addr_chan_t
       w_chan_t:   axi_w_chan_t
@@ -19,28 +26,34 @@ design:
       axi_req_t:  axi_req_t
       axi_resp_t: axi_resp_t
     axi_bridge:
-      TAG: 4
+      TAG: 5
     i3c_core:
       AxiAddrWidth: 32
       AxiDataWidth: 64
       AxiUserWidth: 1
-      AxiIdWidth: 4
+      AxiIdWidth: 5
   interfaces:
     i_axi_cdc_lsu:
       s_axi_src: [axi_interconnect, i3c]
     axi_bridge:
       axi: [axi_interconnect, uart]
     axi_interconnect:
-      veer_ifu: [rvtop_wrapper, ifu_axi]
-      veer_lsu: [rvtop_wrapper, lsu_axi]
+      veer_ifu0: [rvtop_wrapper0, ifu_axi]
+      veer_lsu0: [rvtop_wrapper0, lsu_axi]
+      veer_ifu1: [rvtop_wrapper1, ifu_axi]
+      veer_lsu1: [rvtop_wrapper1, lsu_axi]
     i3c_core:
       axi: [i_axi_cdc_lsu, m_axi_dst]
     uart_core:
       ahb: [axi_bridge, ahb]
-    lmem:
-      s_axi_sram: [axi_interconnect, mem]
-    rvtop_wrapper:
-      el2_mem_export: [rvtop_wrapper, el2_icache_export]
+    lmem0:
+      s_axi_sram: [axi_interconnect, mem0]
+    lmem1:
+      s_axi_sram: [axi_interconnect, mem1]
+    rvtop_wrapper0:
+      el2_mem_export: [rvtop_wrapper0, el2_icache_export]
+    rvtop_wrapper1:
+      el2_mem_export: [rvtop_wrapper1, el2_icache_export]
   ports:
     i_axi_cdc_lsu:
       src_clk_i: clk_i
@@ -59,7 +72,7 @@ design:
     axi_interconnect:
       clk_i: clk_i
       rst_ni: rst_ni
-    rvtop_wrapper:
+    rvtop_wrapper0:
       clk: clk_i
       core_id: 0
       i_cpu_halt_req: 0
@@ -76,7 +89,27 @@ design:
       scan_mode: 0
       soft_int: 0
       rst_vec: 0x40000000
-    lmem:
+    rvtop_wrapper1:
+      clk: clk_i
+      core_id: 3
+      i_cpu_halt_req: 0
+      i_cpu_run_req: 0
+      dbg_bus_clk_en: 1
+      dma_bus_clk_en: 1
+      ifu_bus_clk_en: 1
+      lsu_bus_clk_en: 1
+      mbist_mode: 0
+      mpc_debug_halt_req: 0
+      mpc_debug_run_req: 0
+      mpc_reset_run_req: 1
+      rst_l: cpu_rst_ni
+      scan_mode: 0
+      soft_int: 0
+      rst_vec: 0x48000000
+    lmem0:
+      clk_i: clk_i
+      rst_ni: rst_ni
+    lmem1:
       clk_i: clk_i
       rst_ni: rst_ni
     i3c_core:
@@ -117,13 +150,17 @@ external:
 ips:
   i_axi_cdc_lsu:
     file: file:./ipcores/axi_cdc_stub.yaml
-  lmem:
+  lmem0:
+    file: file:./ipcores/guineveer_sram_stub.yaml
+  lmem1:
     file: file:./ipcores/guineveer_sram_stub.yaml
   axi_bridge:
     file: file:./ipcores/axi4_to_ahb.yaml
   axi_interconnect:
     file: file:./ipcores/axi_intercon.yaml
-  rvtop_wrapper:
+  rvtop_wrapper0:
+    file: file:./ipcores/el2_veer_wrapper.yaml
+  rvtop_wrapper1:
     file: file:./ipcores/el2_veer_wrapper.yaml
   i3c_core:
     file: file:./ipcores/i3c_wrapper.yaml

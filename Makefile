@@ -87,8 +87,6 @@ GCC_PREFIX := riscv64-unknown-elf
 EXT_HEX := $(if $(HEX_FILE),1,)
 EXT_ELF := $(if $(ELF_FILE),1,)
 TEST ?= uart
-EXT_HEX_CORE0 := $(if $(HEX_FILE_CORE0),1,)
-EXT_HEX_CORE1 := $(if $(HEX_FILE_CROE1),1,)
 HEX_FILE_CORE0 ?= $(SCRIPT_DIR)/tests/sw/build/core0/$(TEST).hex
 HEX_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).hex
 -include $(TEST_DIR)/$(TEST).mki
@@ -125,19 +123,11 @@ build_test: $(HEX_FILE)
 
 renode_test: $(BUILD_DIR)/report.html
 
-ifneq ($(EXT_HEX_CORE0),1)
 $(HEX_FILE_CORE0):
 	TEST=$(TEST) CORE=core0 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
-else
-$(HEX_FILE_CORE0):
-endif
 
-ifneq ($(EXT_HEX_CORE1),1)
 $(HEX_FILE_CORE1):
 	TEST=$(TEST) CORE=core1 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
-else
-$(HEX_FILE_CORE1):
-endif
 
 $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS)
 # Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
@@ -207,7 +197,7 @@ $(PICOLIBC_SPECS): | $(BUILD_DIR)
 $(BUILD_DIR):
 	mkdir -p $@
 
-$(BUILD_DIR)/report.html: build_test
+$(BUILD_DIR)/report.html: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1)
 	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/sw/guineveer_$(TEST).robot
 
 .PHONY: all clean hw testbench sim build_test renode_test

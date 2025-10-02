@@ -20,7 +20,7 @@ def s(sf: StructField) -> LogicFieldSelect:
 addr_chan = BitStruct(
     name="axi_addr_chan_t",
     fields=[
-        (achan_id := StructField(name="id", type=b2(3, 0))),
+        (achan_id := StructField(name="id", type=b2(4, 0))),
         (achan_addr := StructField(name="addr", type=b2(31, 0))),
         (achan_len := StructField(name="len", type=b2(7, 0))),
         (achan_size := StructField(name="size", type=b2(2, 0))),
@@ -76,7 +76,7 @@ axi_resp = BitStruct(
                 type=BitStruct(
                     name="axi_b_chan_t",
                     fields=[
-                        (b_id := StructField(name="id", type=b2(3, 0))),
+                        (b_id := StructField(name="id", type=b2(4, 0))),
                         (b_resp := StructField(name="resp", type=b2(1, 0))),
                         (b_user := StructField(name="user", type=Bit())),
                     ]
@@ -89,7 +89,7 @@ axi_resp = BitStruct(
                 type=BitStruct(
                     name="axi_r_chan_t",
                     fields=[
-                        (r_id := StructField(name="id", type=b2(3, 0))),
+                        (r_id := StructField(name="id", type=b2(4, 0))),
                         (r_data := StructField(name="data", type=b2(63, 0))),
                         (r_resp := StructField(name="resp", type=b2(1, 0))),
                         (r_last := StructField(name="last", type=Bit())),
@@ -115,6 +115,7 @@ eps = [
 mod = Module(
     id=Identifier(name="guineveer_sram", vendor="antmicro.com", library="guineveer"),
     parameters=[
+        Parameter(name="GUINEVEER_MEMORY_FILE", default_value=ElaboratableValue("")),
         Parameter(name="ADDR_WIDTH", default_value=ElaboratableValue(32)),
         Parameter(name="DATA_WIDTH", default_value=ElaboratableValue(64)),
         Parameter(name="ID_WIDTH", default_value=ElaboratableValue(1)),
