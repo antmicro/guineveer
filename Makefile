@@ -84,8 +84,6 @@ LD_ABI := -mabi=ilp32 -march=rv32imac
 CC_ABI := -mabi=ilp32 -march=rv32imc_zicsr_zifencei
 GCC_PREFIX := riscv64-unknown-elf
 
-EXT_HEX := $(if $(HEX_FILE),1,)
-EXT_ELF := $(if $(ELF_FILE),1,)
 TEST ?= uart
 HEX_FILE_CORE0 ?= $(SCRIPT_DIR)/tests/sw/build/core0/$(TEST).hex
 HEX_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).hex
@@ -112,6 +110,8 @@ all: testbench
 
 clean: | $(BUILD_DIR)
 	rm -rf $(BUILD_DIR) $(HW_DIR)/axi_intercon.sv $(HW_DIR)/guineveer.sv
+	$(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile clean
+
 
 hw: $(HW_DIR)/axi_intercon.sv $(VEER_SNAPSHOT) $(BUILD_DIR)/axi.f $(HW_DIR)/guineveer.sv
 
@@ -119,7 +119,7 @@ testbench: $(BUILD_DIR)/obj_dir/Vguineveer_tb | $(BUILD_DIR)
 
 sim: $(BUILD_DIR)/sim.vcd
 
-build_test: $(HEX_FILE)
+build_test: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1)
 
 renode_test: $(BUILD_DIR)/report.html
 
@@ -166,33 +166,6 @@ $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD
 	  $(VERILATOR_SKIP_WARNINGS) $(VERILATOR_EXTRA_ARGS) ${TB_FILES} --top-module guineveer_tb \
 	  --main --exe --build --autoflush --timing $(VERILATOR_DEBUG) $(VERILATOR_COVERAGE) -fno-table
 	$(MAKE) -e -C $(BUILD_DIR)/obj_dir/ -f Vguineveer_tb.mk $(VERILATOR_MAKE_FLAGS)
-
-# Don't build/rebuild if the exec or the hex files were specified by user
-ifneq ($(EXT_HEX),1)
-$(HEX_FILE): $(ELF_FILE)
-	$(GCC_PREFIX)-objcopy -O verilog --verilog-data-width=8 $^ $@
-	sed -i s/@./@0/g $@ # Remove offset
-endif
-
-ifneq ($(EXT_ELF),1)
-$(ELF_FILE): $(PICOLIBC_SPECS) $(TEST_OBJS)
-	$(GCC_PREFIX)-gcc $(LD_ABI) --verbose -Wl,-Map=$(BUILD_DIR)/$(TEST).map -T$(LINK) \
-			--specs=$(PICOLIBC_SPECS) $(TEST_LIBS) -nostartfiles $(TEST_OBJS) -o $@
-	$(GCC_PREFIX)-objdump -S $@ > $(BUILD_DIR)/$(TEST).dis
-	$(GCC_PREFIX)-nm -B -n $@ > $(BUILD_DIR)/$(TEST).sym
-else
-$(if $(wildcard $(ELF_FILE)),$(shell touch $(ELF_FILE)),)
-endif
-
-$(BUILD_DIR)/%.o: $(TEST_DIR)/%.c $(PICOLIBC_SPECS) | $(BUILD_DIR)
-	$(GCC_PREFIX)-gcc --specs=$(PICOLIBC_SPECS) ${CC_ABI} -c $< -o $@
-
-$(BUILD_DIR)/%.o: $(TEST_DIR)/%.s $(PICOLIBC_SPECS) | $(BUILD_DIR)
-	$(GCC_PREFIX)-gcc --specs=$(PICOLIBC_SPECS) ${CC_ABI} -c $< -o $@
-
-$(PICOLIBC_SPECS): | $(BUILD_DIR)
-	mkdir -p $(PICOLIBC_DIR)
-	$(MAKE) -f ${RV_ROOT}/tools/picolibc.mk all BUILD_PATH=$(PICOLIBC_DIR)/build INSTALL_PATH=$(PICOLIBC_DIR)/install
 
 $(BUILD_DIR):
 	mkdir -p $@

@@ -66,8 +66,12 @@ void uart_puts(const char* str)
 
 int main(void)
 {
+	int i = 0;
+	while(i <= 5000) {
+		i++;
+	} //Wait for second core to print
 	uart_init(UART_BAUD_RATE);
-	uart_puts("Hello UART\r\n");
+	uart_puts("Hello from core 0\r\n");
 
 	return 0;
 }
