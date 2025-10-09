@@ -67,11 +67,12 @@ echo "set_property file_type SystemVerilog [get_files dmi_jtag_to_core_sync.v]"
 echo "set_property file_type SystemVerilog [get_files rvjtag_tap.v]"
 echo "set_property file_type SystemVerilog [get_files dmi_mux.v]"
 
-if [ -n "$HEX_FILE" ];
+if [ -n "$HEX_FILE0" ] && [ -n "$HEX_FILE1" ];
 then
   echo "# Initialize memory with a provided file"
-  echo "set_property verilog_define {GUINEVEER_MEMORY_FILE=\"$HEX_FILE\"} [current_fileset]"
-  echo "if { ![file exists \"$HEX_FILE\"] } { error \"Could not find the provided memory file: '$HEX_FILE'\" }"
+  echo "set_property verilog_define {HEX_FILE0=\"$HEX_FILE0\" HEX_FILE1=\"$HEX_FILE1\"} [current_fileset]"
+  echo "if { ![file exists \"$HEX_FILE0\"] } { error \"Could not find the provided memory file: '$HEX_FILE0'\" }"
+  echo "if { ![file exists \"$HEX_FILE1\"] } { error \"Could not find the provided memory file: '$HEX_FILE1'\" }"
 fi
 
 echo "set_property top ${TOP_LEVEL} [current_fileset]"
