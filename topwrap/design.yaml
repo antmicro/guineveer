@@ -9,6 +9,7 @@ design:
       ID_WIDTH: 4
       AXI_REQ_T: axi_req_t
       AXI_RESP_T: axi_resp_t
+      GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
     i_axi_cdc_lsu:
       aw_chan_t:  axi_addr_chan_t
       w_chan_t:   axi_w_chan_t

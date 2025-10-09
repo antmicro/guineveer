@@ -23,89 +23,90 @@ module guineveer_tb #(
     parameter int MAX_CYCLES = 99_000_000,
     `include "el2_param.vh"
 ) ();
-  bit                        core_clk;
-  bit                        i3c_clk;
-  bit                        rst_l;
+  bit                         core_clk;
+  bit                         i3c_clk;
+  bit                         rst_l;
 
-  bit   [              31:0] mem_signature_begin;
-  bit   [              31:0] mem_signature_end;
-  bit   [              31:0] mem_mailbox;
-  bit                        i_cpu_halt_req;
-  bit                        o_cpu_halt_ack;
-  bit                        o_cpu_halt_status;
-  bit                        i_cpu_run_req;
-  bit                        o_cpu_run_ack;
-  bit                        mpc_debug_halt_req;
-  bit                        mpc_debug_halt_ack;
-  bit                        mpc_debug_run_req;
-  bit                        mpc_debug_run_ack;
-  bit                        o_debug_mode_status;
-  bit                        lsu_bus_clk_en;
-  logic                      uart_rx;
-  logic                      uart_tx;
+  bit    [              31:0] mem_signature_begin;
+  bit    [              31:0] mem_signature_end;
+  bit    [              31:0] mem_mailbox;
+  bit                         i_cpu_halt_req;
+  bit                         o_cpu_halt_ack;
+  bit                         o_cpu_halt_status;
+  bit                         i_cpu_run_req;
+  bit                         o_cpu_run_ack;
+  bit                         mpc_debug_halt_req;
+  bit                         mpc_debug_halt_ack;
+  bit                         mpc_debug_run_req;
+  bit                         mpc_debug_run_ack;
+  bit                         o_debug_mode_status;
+  bit                         lsu_bus_clk_en;
+  logic                       uart_rx;
+  logic                       uart_tx;
 
-  logic                      i3c_scl_i;
-  logic                      i3c_sda_i;
-  logic                      i3c_scl_o;
-  logic                      i3c_sda_o;
-  logic                      i3c_scl_oe;
-  logic                      i3c_sda_oe;
-  logic                      i3c_sel_od_pp_o;
+  logic                       i3c_scl_i;
+  logic                       i3c_sda_i;
+  logic                       i3c_scl_o;
+  logic                       i3c_sda_o;
+  logic                       i3c_scl_oe;
+  logic                       i3c_sda_oe;
+  logic                       i3c_sel_od_pp_o;
 
-  logic                      porst_l;
-  logic [pt.PIC_TOTAL_INT:1] extintsrc_req;
-  logic                      nmi_int;
-  logic                      timer_int;
-  logic                      soft_int;
+  logic                       porst_l;
+  logic  [pt.PIC_TOTAL_INT:1] extintsrc_req;
+  logic                       nmi_int;
+  logic                       timer_int;
+  logic                       soft_int;
 
-  logic [              31:0] reset_vector;
-  logic [              31:0] nmi_vector;
-  logic [              31:1] jtag_id;
+  logic  [              31:0] reset_vector;
+  logic  [              31:0] nmi_vector;
+  logic  [              31:1] jtag_id;
 
-  logic [              31:0] trace_rv_i_insn_ip;
-  logic [              31:0] trace_rv_i_address_ip;
-  logic                      trace_rv_i_valid_ip;
-  logic                      trace_rv_i_exception_ip;
-  logic [               4:0] trace_rv_i_ecause_ip;
-  logic                      trace_rv_i_interrupt_ip;
-  logic [              31:0] trace_rv_i_tval_ip;
+  logic  [              31:0] trace_rv_i_insn_ip;
+  logic  [              31:0] trace_rv_i_address_ip;
+  logic                       trace_rv_i_valid_ip;
+  logic                       trace_rv_i_exception_ip;
+  logic  [               4:0] trace_rv_i_ecause_ip;
+  logic                       trace_rv_i_interrupt_ip;
+  logic  [              31:0] trace_rv_i_tval_ip;
 
-  logic                      jtag_tdo;
-  logic                      jtag_tck;
-  logic                      jtag_tms;
-  logic                      jtag_tdi;
-  logic                      jtag_trst_n;
+  logic                       jtag_tdo;
+  logic                       jtag_tck;
+  logic                       jtag_tms;
+  logic                       jtag_tdi;
+  logic                       jtag_trst_n;
 
-  logic                      mailbox_write;
-  logic [              63:0] mailbox_data;
+  logic                       mailbox_write;
+  logic  [              63:0] mailbox_data;
 
-  int                        cycleCnt;
-  logic                      mailbox_data_val;
+  int                         cycleCnt;
+  logic                       mailbox_data_val;
 
-  int                        commit_count;
+  int                         commit_count;
 
-  logic [               3:0] nmi_assert_int;
+  logic  [               3:0] nmi_assert_int;
 
-  logic                      wb_valid;
-  logic [               4:0] wb_dest;
-  logic [              31:0] wb_data;
+  logic                       wb_valid;
+  logic  [               4:0] wb_dest;
+  logic  [              31:0] wb_data;
 
-  logic                      wb_csr_valid;
-  logic [              11:0] wb_csr_dest;
-  logic [              31:0] wb_csr_data;
+  logic                       wb_csr_valid;
+  logic  [              11:0] wb_csr_dest;
+  logic  [              31:0] wb_csr_data;
 
-  logic                      dmi_core_enable;
-  string                     firmware_path;
+  logic                       dmi_core_enable;
+  string                      firmware0;
+  string                      firmware1;
 
   always_comb dmi_core_enable = ~(o_cpu_halt_status);
 
   string abi_reg[32];  // ABI register names
 
-  `define DEC top_guineveer.rvtop_wrapper.veer.dec
+  `define DEC top_guineveer.rvtop_wrapper0.veer.dec
 
-  assign mailbox_write = top_guineveer.rvtop_wrapper.lsu_axi_awvalid
-    && top_guineveer.rvtop_wrapper.lsu_axi_awaddr == mem_mailbox && rst_l;
-  assign mailbox_data = top_guineveer.rvtop_wrapper.lsu_axi_wdata;
+  assign mailbox_write = top_guineveer.rvtop_wrapper0.lsu_axi_awvalid
+    && top_guineveer.rvtop_wrapper0.lsu_axi_awaddr == mem_mailbox && rst_l;
+  assign mailbox_data = top_guineveer.rvtop_wrapper0.lsu_axi_wdata;
 
   assign mailbox_data_val = mailbox_data[7:0] > 8'h5 && mailbox_data[7:0] < 8'h7f;
 
@@ -191,8 +192,8 @@ module guineveer_tb #(
     end
   end
 
-  always #(15) core_clk = ~core_clk; // 33.33MHz
-  always #(2) i3c_clk = ~i3c_clk; // 250MHz
+  always #(15) core_clk = ~core_clk;  // 33.33MHz
+  always #(2) i3c_clk = ~i3c_clk;  // 250MHz
   always @(posedge core_clk) $dumpvars();
 
   // startup
@@ -252,9 +253,14 @@ module guineveer_tb #(
     nmi_vector     = 32'hee000000;
     lsu_bus_clk_en = 1;
 
-    $value$plusargs("firmware=%s", firmware_path);
-    if (firmware_path.len() == 0) firmware_path = "program.hex";
-    $readmemh(firmware_path, top_guineveer.lmem.mem);
+    if ($value$plusargs("firmware0=%s", firmware0)) begin
+      $readmemh(firmware0, top_guineveer.lmem0.mem);
+    end
+
+    if ($value$plusargs("firmware1=%s", firmware1)) begin
+      $readmemh(firmware1, top_guineveer.lmem1.mem);
+    end
+
     tp = $fopen("trace_port.csv", "w");
     el = $fopen("exec.log", "w");
     $fwrite(el,
@@ -304,7 +310,7 @@ module guineveer_tb #(
       .rst_ni(rst_l),
       .cpu_rst_ni(rst_l),
 
-      .i3c_clk_i(i3c_clk),
+      .i3c_clk_i (i3c_clk),
       .i3c_rst_ni(rst_l),
       .i3c_scl_i,
       .i3c_sda_i,

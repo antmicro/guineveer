@@ -2,10 +2,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
 module guineveer_sram #(
-    parameter int  ADDR_WIDTH = 32,
-    parameter int  DATA_WIDTH = 64,
-    parameter int  ID_WIDTH   = 1,
-    parameter type AXI_REQ_T  = logic,
+    parameter string GUINEVEER_MEMORY_FILE = "",
+    parameter int ADDR_WIDTH = 32,
+    parameter int DATA_WIDTH = 64,
+    parameter int ID_WIDTH = 1,
+    parameter type AXI_REQ_T = logic,
     parameter type AXI_RESP_T = logic
 ) (
     input clk_i,
@@ -63,8 +64,10 @@ module guineveer_sram #(
     end
   end
 
-`ifdef GUINEVEER_MEMORY_FILE
-  initial $readmemh(`GUINEVEER_MEMORY_FILE, mem);
-`endif
+  initial begin
+    if (GUINEVEER_MEMORY_FILE != "") begin
+      $readmemh(GUINEVEER_MEMORY_FILE, mem);
+    end
+  end
 
 endmodule

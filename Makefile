@@ -87,15 +87,13 @@ GCC_PREFIX := riscv64-unknown-elf
 EXT_HEX := $(if $(HEX_FILE),1,)
 EXT_ELF := $(if $(ELF_FILE),1,)
 TEST ?= uart
-TEST_DIR := $(SCRIPT_DIR)/tests/sw/$(TEST)
-TEST_SRCS := $(wildcard $(TEST_DIR)/*.c $(TEST_DIR)/*.s)
-TEST_OBJS := $(addprefix $(BUILD_DIR)/,$(addsuffix .o,$(notdir $(basename $(TEST_SRCS)))))
-LINK := $(TEST_DIR)/$(TEST).ld
-HEX_FILE := $(BUILD_DIR)/$(TEST).hex
-ELF_FILE := $(BUILD_DIR)/$(TEST).elf
+EXT_HEX_CORE0 := $(if $(HEX_FILE_CORE0),1,)
+EXT_HEX_CORE1 := $(if $(HEX_FILE_CROE1),1,)
+HEX_FILE_CORE0 ?= $(SCRIPT_DIR)/tests/sw/build/core0/$(TEST).hex
+HEX_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).hex
 -include $(TEST_DIR)/$(TEST).mki
 
-TB_FILES = $(VERILOG_SOURCES) $(TB_DIR)/guineveer_tb.sv
+TB_FILES = $(TB_DIR)/defines.sv $(VERILOG_SOURCES) $(TB_DIR)/guineveer_tb.sv 
 TB_INCLS = $(VERILOG_INCLUDE_DIRS) $(TB_DIR) $(RV_ROOT)/testbench
 
 # -Wno-REDEFMACRO is needed because RV_TOP is first defined in some header in caliptra-rtl,
@@ -127,6 +125,20 @@ build_test: $(HEX_FILE)
 
 renode_test: $(BUILD_DIR)/report.html
 
+ifneq ($(EXT_HEX_CORE0),1)
+$(HEX_FILE_CORE0):
+	TEST=$(TEST) CORE=core0 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
+else
+$(HEX_FILE_CORE0):
+endif
+
+ifneq ($(EXT_HEX_CORE1),1)
+$(HEX_FILE_CORE1):
+	TEST=$(TEST) CORE=core1 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
+else
+$(HEX_FILE_CORE1):
+endif
+
 $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS)
 # Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
 	sed -i "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
@@ -155,9 +167,8 @@ $(HW_DIR)/axi_intercon.sv: $(HW_DIR)/interconnect_utils/gen_inter_wrapper.sh $(H
 	$<
 	sed -i 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/axi_intercon.sv
 
-$(BUILD_DIR)/sim.vcd: $(HEX_FILE) testbench | $(BUILD_DIR)
-	HEX_TEMP=$$(mktemp) && sed s/@./@0/g < $< > $$HEX_TEMP && \
-	cd $(BUILD_DIR) && ./obj_dir/Vguineveer_tb +firmware=$$HEX_TEMP ${TB_EXTRA_ARGS};
+$(BUILD_DIR)/sim.vcd: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1) $(BUILD_DIR)/obj_dir/Vguineveer_tb | $(BUILD_DIR)
+	cd $(BUILD_DIR) && ./obj_dir/Vguineveer_tb +firmware0=$(HEX_FILE_CORE0) +firmware1=$(HEX_FILE_CORE1) ${TB_EXTRA_ARGS}
 
 $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD_DIR)
 	verilator --cc -CFLAGS "-std=c++14" -coverage-max-width 20000 $(defines) \
@@ -199,5 +210,5 @@ $(BUILD_DIR):
 $(BUILD_DIR)/report.html: build_test
 	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/sw/guineveer_$(TEST).robot
 
-.PHONY: all clean $(BUILD_DIR)/sim.vcd $(BUILD_DIR)/report.html hw testbench sim build_test renode_test
+.PHONY: all clean hw testbench sim build_test renode_test
 .PRECIOUS: $(BUILD_DIR)/sim.vcd
