@@ -38,7 +38,7 @@ module top (
         .CLKIN1_PERIOD  (10.0), // 100MHz
         .CLKFBOUT_MULT  (16),
         .CLKOUT0_DIVIDE (50),
-        .CLKOUT1_DIVIDE (8)
+        .CLKOUT1_DIVIDE (10)
 
     ) u_pll (
         .RST            (btn_i[0]),
@@ -49,7 +49,7 @@ module top (
 
         .LOCKED         (pll_locked),
         .CLKOUT0        (pll_clkout0),  // 32MHz
-        .CLKOUT1        (pll_clkout1)   // 200MHz
+        .CLKOUT1        (pll_clkout1)   // 160MHz
     );
 
     BUFG u_bufg0 (.I(pll_clkout0), .O(clk_soc));
