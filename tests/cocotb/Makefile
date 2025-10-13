@@ -1,7 +1,7 @@
 # Copyright (c) 2025 Antmicro <www.antmicro.com>
 # SPDX-License-Identifier: Apache-2.0
 
-TEST_DIRS = uart_core_ahb i3c
+TEST_DIRS = uart_core_ahb i3c streaming-boot-axi-twocore
 TEST_RESULTS = $(addsuffix /results.xml,${TEST_DIRS})
 
 verify: venv $(TEST_RESULTS)
