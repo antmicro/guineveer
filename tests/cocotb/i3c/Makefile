@@ -60,7 +60,11 @@ VERILOG_INCLUDE_DIRS_RAW=\
 	$(AXI_INCLUDE_PATH)
 VERILOG_INCLUDE_DIRS=$(strip $(call uniq,$(VERILOG_INCLUDE_DIRS_RAW)))
 
-COMPILE_ARGS += +define+GUINEVEER_MEMORY_FILE='"'$(abspath ${CURDIR}/../../build/i3c-cocotb.hex)'"'
+HEX_FILE0 ?= $(abspath ${CURDIR}/../sw/build/core0/i3c-cocotb.hex)
+HEX_FILE1 ?= $(abspath ${CURDIR}/../sw/build/core1/i3c-cocotb.hex)
+
+COMPILE_ARGS += +define+HEX_FILE0='"'$(HEX_FILE0)'"'
+COMPILE_ARGS += +define+HEX_FILE1='"'$(HEX_FILE1)'"'
 
 VERILATOR_SKIP_WARNINGS = -Wno-REDEFMACRO
 
