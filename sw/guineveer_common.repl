@@ -1,7 +1,13 @@
-memory: Memory.MappedMemory @ sysbus 0x80000000
+memory0: Memory.MappedMemory @ sysbus 0x80000000
     size: 0x10000000
 
-cpu: CPU.VeeR_EL2 @ sysbus
+cpu0: CPU.VeeR_EL2 @ sysbus
     hartId: 0
+
+memory1: Memory.MappedMemory @ sysbus 0x90000000
+    size: 0x10000000
+
+cpu1: CPU.VeeR_EL2 @ sysbus
+    hartId: 1
 
 uart: UART.OpenTitan_UART @ sysbus 0x30000000

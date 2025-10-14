@@ -3,7 +3,8 @@ $name?="Guineveer"
 
 # Setup
 
-$elf?=$ORIGIN/../build/uart.elf
+$elf0?=$ORIGIN/../tests/sw/build/core0/uart.elf
+$elf1?=$ORIGIN/../tests/sw/build/core1/uart.elf
 $platform?=$ORIGIN/guineveer.repl
 
 path add $ORIGIN
@@ -36,7 +37,8 @@ showAnalyzer mem_mailbox
 
 macro reset
 """
-    sysbus LoadELF $elf
+    sysbus LoadELF $elf0 cpu=cpu0
+    sysbus LoadELF $elf1 cpu=cpu1
 """
 
 runMacro $reset

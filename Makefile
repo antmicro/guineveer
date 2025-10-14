@@ -85,8 +85,12 @@ CC_ABI := -mabi=ilp32 -march=rv32imc_zicsr_zifencei
 GCC_PREFIX := riscv64-unknown-elf
 
 TEST ?= uart
+RENODE_TEST ?= $(TEST)
 HEX_FILE_CORE0 ?= $(SCRIPT_DIR)/tests/sw/build/core0/$(TEST).hex
+ELF_FILE_CORE0 ?= $(SCRIPT_DIR)/tests/sw/build/core0/$(TEST).elf
 HEX_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).hex
+ELF_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).elf
+
 -include $(TEST_DIR)/$(TEST).mki
 
 TB_FILES = $(TB_DIR)/defines.sv $(VERILOG_SOURCES) $(TB_DIR)/guineveer_tb.sv 
@@ -123,10 +127,10 @@ build_test: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1)
 
 renode_test: $(BUILD_DIR)/report.html
 
-$(HEX_FILE_CORE0):
+$(HEX_FILE_CORE0) $(ELF_FILE_CORE0):
 	TEST=$(TEST) CORE=core0 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
 
-$(HEX_FILE_CORE1):
+$(HEX_FILE_CORE1) $(ELF_FILE_CORE1):
 	TEST=$(TEST) CORE=core1 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
 
 $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS)
@@ -170,8 +174,11 @@ $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD
 $(BUILD_DIR):
 	mkdir -p $@
 
-$(BUILD_DIR)/report.html: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1)
-	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/sw/guineveer_$(TEST).robot
+$(BUILD_DIR)/report.html: $(ELF_FILE_CORE0) $(ELF_FILE_CORE1) $(BUILD_DIR)
+ifeq ($(RENODE_TEST),i3c_cosim)
+	make -C $(SCRIPT_DIR)/sw/renode_i3c_cosim
+endif
+	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/sw/guineveer_$(RENODE_TEST).robot
 
 .PHONY: all clean hw testbench sim build_test renode_test
 .PRECIOUS: $(BUILD_DIR)/sim.vcd
