@@ -3,7 +3,7 @@ Library     Dialogs
 
 *** Test Cases ***
 Should Read Reset Values
-    Execute Command           $elf=@${CURDIR}/../i3c.elf
+    Execute Command           $elf=@${CURDIR}/../build/i3c.elf
     Execute Command           include "${CURDIR}/guineveer_i3c_cosim.resc"
     Create Terminal Tester    sysbus.uart  timeout=0.01
     Start Emulation
@@ -22,7 +22,7 @@ Should Read Reset Values
     Wait For Line On Uart     Testing the value of RESET_CONTROL.IBI_QUEUE_RST... OK. (0x0 == 0x0)
 
  Should Test Read Only
-     Execute Command           $elf=@${CURDIR}/../i3c.elf
+     Execute Command           $elf=@${CURDIR}/../build/i3c.elf
      Execute Command           include "${CURDIR}/guineveer_i3c_cosim.resc"
      Create Terminal Tester    sysbus.uart  timeout=0.01
      Start Emulation
@@ -38,7 +38,7 @@ Should Read Reset Values
      Wait For Line On Uart     Testing whether QUEUE_SIZE.TX_DATA_BUFFER_SIZE is read-only... OK.
  
  Should Test Writable
-     Execute Command           $elf=@${CURDIR}/../i3c.elf
+     Execute Command           $elf=@${CURDIR}/../build/i3c.elf
      Execute Command           include "${CURDIR}/guineveer_i3c_cosim.resc"
      Create Terminal Tester    sysbus.uart  timeout=0.01
      Start Emulation
