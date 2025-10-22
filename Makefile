@@ -203,7 +203,7 @@ $(BUILD_DIR):
 	mkdir -p $@
 
 $(BUILD_DIR)/report.html: $(ELF_FILE_CORE0) $(ELF_FILE_CORE1) $(BUILD_DIR)
-ifeq ($(RENODE_TEST),i3c_cosim)
+ifneq ($(filter i3c_cosim axi-streaming-boot-dualcore,$(RENODE_TEST)),)
 	make -C $(SCRIPT_DIR)/sw/renode_i3c_cosim
 endif
 	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/sw/guineveer_$(RENODE_TEST).robot

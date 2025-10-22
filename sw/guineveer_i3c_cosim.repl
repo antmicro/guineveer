@@ -1,5 +1,7 @@
 using "guineveer_common.repl"
 
 i3c: CoSimulated.CoSimulatedPeripheral @ sysbus <0x30001000, +0x1000>
+    limitBuffer: 50000
+    timeout: 500000
     address: "127.0.0.1"
     cosimToRenodeSignalRange: <0, +5>
