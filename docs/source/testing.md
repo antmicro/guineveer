@@ -20,6 +20,11 @@ Currently, three software test samples are available:
     * performing various directed CCC transactions,
     * performing a streaming boot via the recovery I3C target,
     * performing a streaming boot using the AXI bypass functionality.
+* `axi-streaming-boot-dualcore` - example tests AXI streaming boot feature of `i3c-core` using two cores
+    * core 0 is waiting for payload from `i3c-core` via registers
+    * core 1 is sending payload to `i3c-core` via registers
+    * payload can be modified and rebuild, source files are located in `tests/sw/axi-streaming-boot-dualcore/core1/payload`
+    * payload size is limited in core 0 software, to incrase limit change `MAX_STREAMING_BOOT_SIZE`
 
 Building software examples is described in the [User guide](user_guide.md#building-software-examples).
 
