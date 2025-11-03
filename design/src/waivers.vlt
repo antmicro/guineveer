@@ -18,7 +18,8 @@ lint_off -rule UNOPTFLAT
 // Disable the TIMESCALEMOD warning for all files except the testbenches.
 lint_off -rule TIMESCALEMOD
 lint_on -rule TIMESCALEMOD -file "*/guineveer_tb.sv"
-lint_on -rule TIMESCALEMOD -file "*/guineveer_i3c_dut.sv"
+lint_on -rule TIMESCALEMOD -file "*/guineveer_cocotb_dut.sv"
+
 
 // Waivers for Guineveer
 

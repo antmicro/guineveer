@@ -7,7 +7,7 @@
 // and allowing only 32-bit wide accesses, while the AXI-to-AHB bridge connected
 // before supports only 64-bit transactions on adresses aligned to 64-bits as well.
 
-module wrapped_uart (
+module uart_wrapper (
     input wire clk_i,
     input wire rst_ni,
     input wire uart_rx_i,

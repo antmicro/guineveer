@@ -3,8 +3,8 @@ $name?="Guineveer"
 
 # Setup
 
-$elf0?=$ORIGIN/../tests/sw/build/core0/uart.elf
-$elf1?=$ORIGIN/../tests/sw/build/core1/uart.elf
+$elf0?=$ORIGIN/../sw/build/core0/uart.elf
+$elf1?=$ORIGIN/../sw/build/core1/uart.elf
 $platform?=$ORIGIN/guineveer.repl
 
 path add $ORIGIN

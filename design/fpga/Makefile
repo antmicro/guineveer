@@ -5,8 +5,8 @@ BOARD ?= Arty-A7-100T
 
 TEST ?= uart
 
-HEX_FILE0 ?= $(FPGA_SCRIPT_DIR)/../sw/build/core0/$(TEST).hex
-HEX_FILE1 ?= $(FPGA_SCRIPT_DIR)/../sw/build/core1/$(TEST).hex
+HEX_FILE0 ?= $(FPGA_SCRIPT_DIR)/../../tests/sw/build/core0/$(TEST).hex
+HEX_FILE1 ?= $(FPGA_SCRIPT_DIR)/../../tests/sw/build/core1/$(TEST).hex
 
 generate_block_design: $(TCL_FILE)
 

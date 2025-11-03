@@ -147,4 +147,4 @@ ips:
   i3c_core:
     file: repo[repo_guin]:i3c_wrapper
   uart_core:
-    file: repo[repo_guin]:wrapped_uart
+    file: repo[repo_guin]:uart_wrapper

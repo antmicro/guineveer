@@ -3,7 +3,7 @@
 set -o pipefail # Check for errors in pipeline
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) # The full directory name of the script no matter where it is being called from
-THIRD_PARTY_DIR="${SCRIPT_DIR}/../third_party"
+THIRD_PARTY_DIR="${SCRIPT_DIR}/../../third_party"
 AXI_DIR="axi"
 if [ -z $OUTPUT_FILE_LOCATION ]; then
     OUTPUT_FILE_LOCATION="${SCRIPT_DIR}/axi.f"

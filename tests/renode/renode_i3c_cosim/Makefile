@@ -7,7 +7,7 @@ endef
 defines := +define+DIGITAL_IO_I3C=1
 
 SCRIPT_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-ROOT_DIR := $(abspath $(SCRIPT_DIR)/../../)
+ROOT_DIR := $(abspath $(SCRIPT_DIR)/../../../)
 BUILD_DIR := $(ROOT_DIR)/build/renode_i3c_cosim
 
 CALIPTRA_ROOT := $(ROOT_DIR)/third_party/caliptra-rtl

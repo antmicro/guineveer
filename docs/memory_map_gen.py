@@ -34,7 +34,7 @@ def format_hex(val: int) -> str:
 
 
 if __name__ == "__main__":
-    interconnect_config_location = "../hw/interconnect_utils/intercon_config.yaml"
+    interconnect_config_location = "../design/src/interconnect_utils/intercon_config.yaml"
     map_object = {}
     with open(interconnect_config_location, "r") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)

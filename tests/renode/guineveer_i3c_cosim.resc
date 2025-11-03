@@ -1,7 +1,7 @@
 $platform=$ORIGIN/guineveer_i3c_cosim.repl
 include $ORIGIN/guineveer.resc
 
-$cosimExecPath?=$ORIGIN/../build/renode_i3c_cosim/Vsim
+$cosimExecPath?=$ORIGIN/../../build/renode_i3c_cosim/Vsim
 
 i3c SimulationContextLinux "+RENODE_RECEIVER_PORT={0} +RENODE_SENDER_PORT={1} +RENODE_ADDRESS={2}"
 i3c SimulationFilePathLinux $cosimExecPath
