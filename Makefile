@@ -181,4 +181,3 @@ endif
 	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/sw/guineveer_$(RENODE_TEST).robot
 
 .PHONY: all clean hw testbench sim build_test renode_test
-.PRECIOUS: $(BUILD_DIR)/sim.vcd
