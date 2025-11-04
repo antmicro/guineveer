@@ -15,7 +15,7 @@ RV_ROOT := $(SCRIPT_DIR)/../../third_party/Cores-VeeR-EL2
 TEST_SRCS := $(wildcard $(TEST_DIR)/$(CORE)/*.c $(TEST_DIR)/$(CORE)/*.s)
 TEST_OBJS := $(addprefix $(CORE_BUILD_DIR)/,$(addsuffix .o,$(notdir $(basename $(TEST_SRCS)))))
 
-LIBS := uart
+LIBS := uart i3c
 LIBS_DIR := $(SCRIPT_DIR)/libs
 LIB_INCLUDES := $(addprefix -I,$(addprefix $(LIBS_DIR)/,$(LIBS)))
 
