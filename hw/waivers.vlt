@@ -11,13 +11,22 @@ lint_off -rule WIDTHTRUNC -file "*/axi_pkg.sv"
 lint_off -rule WIDTHTRUNC -file "*/axi/src/axi*.sv"
 lint_off -rule WIDTHTRUNC -file "*/rr_arb_tree.sv"
 lint_off -rule WIDTHTRUNC -file "*/mem_to_banks_detailed.sv"
+lint_off -rule UNOPTFLAT -file "*/axi_to_detailed_mem.sv"
+lint_off -rule UNOPTFLAT -file "*/axi_demux_simple.sv"
+lint_off -rule UNOPTFLAT -file "*/axi_id_prepend.sv"
+lint_off -rule UNOPTFLAT -file "*/spill_register.sv"
+lint_off -rule UNOPTFLAT -file "*/axi_err_slv.sv"
+lint_off -rule UNOPTFLAT -file "*/rr_arb_tree.sv"
+lint_off -rule UNOPTFLAT -file "*/stream_fork.sv"
+lint_off -rule UNOPTFLAT -file "*/stream_mux.sv"
+lint_off -rule UNOPTFLAT -file "*/axi_mux.sv"
 lint_off -rule UNSIGNED -file "*/rr_arb_tree.sv"
 
 // VeeR (main VeeR waivers included in Makefile)
+lint_off -rule CASEINCOMPLETE -file "*/dasm.svi"
 lint_off -rule WIDTHEXPAND -file "*/dasm.svi"
 lint_off -rule WIDTHTRUNC -file "*/dasm.svi"
 lint_off -rule WIDTHTRUNC -file "*/el2_mem.sv"
-lint_off -rule CASEINCOMPLETE -file "*/dasm.svi"
 lint_off -rule SIDEEFFECT -file "*/axi4_to_ahb.sv"
 
 // I3C
@@ -37,3 +46,13 @@ lint_off -rule WIDTHTRUNC -file "*/i2c_target_fsm.sv"
 lint_off -rule WIDTHTRUNC -file "*/i3c_axi_sub_rd.sv"
 lint_off -rule WIDTHTRUNC -file "*/i3c_axi_sub_wr.sv"
 lint_off -rule WIDTHTRUNC -file "*/width_converter_Nto8.sv"
+lint_off -rule UNOPTFLAT -file "*/controller_standby_i3c.sv"
+lint_off -rule UNOPTFLAT -file "*/i3c_axi_sub_rd.sv"
+lint_off -rule UNOPTFLAT -file "*/bus_rx_flow.sv"
+lint_off -rule UNOPTFLAT -file "*/bus_tx_flow.sv"
+lint_off -rule UNOPTFLAT -file "*/i3c.sv"
+
+// Disable the TIMESCALEMOD warning for all files except the testbenches.
+lint_off -rule TIMESCALEMOD
+lint_on -rule TIMESCALEMOD -file "*/guineveer_tb.sv"
+lint_on -rule TIMESCALEMOD -file "*/guineveer_i3c_dut.sv"

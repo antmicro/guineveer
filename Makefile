@@ -98,7 +98,9 @@ ELF_FILE := $(BUILD_DIR)/$(TEST).elf
 TB_FILES = $(VERILOG_SOURCES) $(TB_DIR)/guineveer_tb.sv
 TB_INCLS = $(VERILOG_INCLUDE_DIRS) $(TB_DIR) $(RV_ROOT)/testbench
 
-VERILATOR_SKIP_WARNINGS = -Wno-TIMESCALEMOD -Wno-UNOPTFLAT -Wno-REDEFMACRO
+# -Wno-REDEFMACRO is needed because RV_TOP is first defined in some header in caliptra-rtl,
+# and then is redefined (to the correct value) in the VeeR config header.
+VERILATOR_SKIP_WARNINGS = -Wno-REDEFMACRO
 
 VERILATOR_DEBUG := --trace-fst --trace-structs
 
