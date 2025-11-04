@@ -1,0 +1,120 @@
+#ifndef I3C_H
+#define I3C_h
+
+#include <stdint.h>
+#include <setjmp.h>
+#include <stdarg.h>
+#include <stddef.h>
+#include "utils.h"
+
+#ifndef MAX_STREAMING_BOOT_SIZE
+#define MAX_STREAMING_BOOT_SIZE 0x1000
+#endif
+
+/* ---------- I3C ---------- */
+
+#define I3C_BASE	(0x30001000)
+
+#define I3C_STBY_CR_CONTROL			(0x184)
+#define  I3C_STBY_CR_CONTROL_TARGET_XACT_ENABLE	(1 << 12)
+#define  I3C_STBY_CR_CONTROL_DAA_SETDASA_ENABLE	(1 << 14)
+#define  I3C_STBY_CR_CONTROL_ENABLE_INIT_MASK	(0xc0000000)
+#define  I3C_STBY_CR_CONTROL_ENABLE_INIT_SHIFT	(30)
+#define  I3C_STBY_CR_CONTROL_ENABLE_INIT_RUN	(2)
+#define I3C_STBY_CR_DEVICE_ADDR			(0x188)
+#define I3C_STBY_CR_VIRT_DEVICE_ADDR		(0x1b8)
+#define  I3C_STBY_CR_DEVICE_ADDR_ADDR_MASK	(0x0000007f)
+#define  I3C_STBY_CR_DEVICE_ADDR_STATIC_SHIFT	(0)
+#define  I3C_STBY_CR_DEVICE_ADDR_STATIC_VALID	(1 << 15)
+#define  I3C_STBY_CR_DEVICE_ADDR_DYNAMIC_SHIFT	(16)
+#define  I3C_STBY_CR_DEVICE_ADDR_DYNAMIC_VALID	(1 << 31)
+#define I3C_STBY_CR_DEVICE_CHAR			(0x198)
+#define  I3C_STBY_CR_DEVICE_CHAR_PID_HI_MASK	(0xfffe)
+#define  I3C_STBY_CR_DEVICE_CHAR_DCR_SHIFT	(16)
+#define  I3C_STBY_CR_DEVICE_CHAR_DCR_MASK	(0xff)
+#define  I3C_STBY_CR_DEVICE_CHAR_BCR_SHIFT	(24)
+#define  I3C_STBY_CR_DEVICE_CHAR_BCR_MASK	(0xff)
+#define I3C_STBY_CR_DEVICE_PID_LO		(0x19c)
+
+#define I3C_TTI_INTERRUPT_STATUS		(0x1d0)
+#define I3C_TTI_INTERRUPT_ENABLE		(0x1d4)
+#define  I3C_TTI_INTERRUPT_RX_DESC_STAT		(1 << 0)
+#define  I3C_TTI_INTERRUPT_TX_DESC_STAT		(1 << 1)
+#define I3C_TTI_RX_DESC_QUEUE_PORT		(0x1dc)
+#define I3C_TTI_RX_DATA_PORT			(0x1e0)
+#define I3C_TTI_TX_DESC_QUEUE_PORT		(0x1e4)
+#define I3C_TTI_TX_DATA_PORT			(0x1e8)
+#define I3C_TTI_QUEUE_THLD_CTRL			(0x1f8)
+#define  I3C_TTI_QUEUE_THLD_CTRL_RX_DESC_SHIFT	(8)
+#define  I3C_TTI_QUEUE_THLD_CTRL_RX_DESC_MASK	(0xff00)
+#define  I3C_TTI_QUEUE_THLD_CTRL_RX_DESC_INIT	(0x01)
+#define I3C_TTI_BUFFER_THLD_CTRL		(0x1fc)
+#define  I3C_TTI_BUFFER_THLD_CTRL_RX_DATA_SHIFT	(8)
+#define  I3C_TTI_BUFFER_THLD_CTRL_RX_DATA_MASK	(0x700)
+
+#define I3C_SECFW_PROT_CAP_2			(0x10c)
+#define  I3C_SECFW_PROT_CAP_VERSION_1p1		(0x0101)
+#define  I3C_SECFW_PROT_CAP_DEVICE_ID		(1 << 16)
+#define  I3C_SECFW_PROT_CAP_FORCED_RECOVERY	(1 << 17)
+#define  I3C_SECFW_PROT_CAP_MGMT_RESET		(1 << 18)
+#define  I3C_SECFW_PROT_CAP_DEVICE_STATUS	(1 << 20)
+#define  I3C_SECFW_PROT_CAP_INDIRECT_CTRL	(1 << 21)
+#define  I3C_SECFW_PROT_CAP_PUSH_CIMAGE_SUPPORT	(1 << 23)
+#define  I3C_SECFW_PROT_CAP_FLASHLESS_BOOT	(1 << 27)
+#define I3C_SECFW_DEVICE_STATUS_0		(0x130)
+#define  I3C_SECFW_DEV_STATUS_RECOVERY_READY	(0x03)
+#define  I3C_SECFW_REC_REASON_STREAMING_BOOT	(0x0012 << 16)
+#define I3C_SECFW_DEVICE_RESET			(0x138)
+#define  I3C_SECFW_DEVICE_RESET_CTRL_MASK	(0xff)
+#define  I3C_SECFW_DEVICE_RESET_CTRL_SHIFT	(0)
+#define  I3C_SECFW_DEVICE_RESET_FORCED_MASK	(0xff)
+#define  I3C_SECFW_DEVICE_RESET_FORCED_SHIFT	(8)
+#define  I3C_SECFW_DEVICE_RESET_FORCED_STREAMING_BOOT	(0x0e)
+#define I3C_SECFW_RECOVERY_CONTROL		(0x13c)
+#define  I3C_SECFW_RECOVERY_CONTROL_ACTIVATE	(0x0f << 16)
+#define I3C_SECFW_RECOVERY_STATUS		(0x140)
+#define  I3C_SECFW_RECOVERY_STATUS_AWAITING	(0x01)
+#define  I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL	(0x03)
+#define  I3C_SECFW_RECOVERY_STATUS_FAILED	(0x0c)
+#define I3C_SECFW_INDIRECT_FIFO_CTRL_1		(0x14c)
+#define I3C_SECFW_INDIRECT_FIFO_STATUS_0	(0x150)
+#define  I3C_SECFW_INDIRECT_FIFO_EMPTY		(1 << 0)
+#define  I3C_SECFW_INDIRECT_FIFO_FULL		(1 << 1)
+#define I3C_SECFW_INDIRECT_FIFO_DATA		(0x168)
+
+#define I3C_SOCMGMT_REC_INTF_CFG		(0x20c)
+#define  I3C_SOCMGMT_REC_INTF_CFG_BYPASS	(1 << 0)
+#define  I3C_SOCMGMT_REC_INTF_CFG_PAYLOAD_DONE	(1 << 1)
+#define I3C_SOCMGMT_REC_INTF_REG_W1C_ACCESS	(0x210)
+#define  I3C_SOCMGMT_REC_INTF_REG_DEVICE_MGMT_RESET	(0x02 << 0)
+#define  I3C_SOCMGMT_REC_INTF_REG_ACTIVATE_IMAGE	(0x0f << 8)
+
+
+#define STATIC_ADDR (0x5A)
+#define VIRT_STATIC_ADDR (0x6A)
+
+void i3c_wait_for_payload_available();
+
+void start_streaming_boot_reciver();
+
+void i3c_init();
+
+void i3c_clear_dynamic_addr();
+
+int i3c_has_dynamic_addr();
+
+uint8_t i3c_dynamic_addr();
+
+void i3c_wait_for_rx();
+
+void i3c_wait_for_tx();
+
+uint32_t i3c_pop_rx_desc();
+
+void i3c_push_tx_desc(uint32_t);
+
+void i3c_read_rx_data(void*, size_t);
+
+void i3c_write_tx_data(const void*, size_t);
+
+#endif

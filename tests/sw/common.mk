@@ -1,4 +1,5 @@
 BUILD_DIR ?= $(SCRIPT_DIR)/build
+LIB_BUILD_DIR := $(BUILD_DIR)/lib
 
 RV_ROOT ?= $(SCRIPT_DIR)/../../../../third_party/Cores-VeeR-EL2
 
@@ -16,9 +17,9 @@ LINK ?= $(SCRIPT_DIR)/src/$(TEST).ld
 HEX_FILE ?= $(BUILD_DIR)/$(TEST).hex
 ELF_FILE ?= $(BUILD_DIR)/$(TEST).elf
 
-LIBS := uart i3c
+LIBS ?= uart i3c utils
 
-LIBS_DIR := $(SCRIPT_DIR)/libs
+LIBS_DIR := $(SCRIPT_DIR)/../../libs
 LIB_INCLUDES := $(addprefix -I,$(addprefix $(LIBS_DIR)/,$(LIBS)))
 
 LIB_SRCS_C := $(foreach lib,$(LIBS),$(wildcard $(LIBS_DIR)/$(lib)/*.c))
@@ -27,9 +28,9 @@ LIB_SRCS_S := $(foreach lib,$(LIBS),$(wildcard $(LIBS_DIR)/$(lib)/*.s))
 LIB_OBJS := $(patsubst $(LIBS_DIR)/%.c,$(LIB_BUILD_DIR)/%.o,$(LIB_SRCS_C)) \
   $(patsubst $(LIBS_DIR)/%.s,$(LIB_BUILD_DIR)/%.o,$(LIB_SRCS_S))
 
-$(ELF_FILE): $(PICOLIBC_SPECS) $(TEST_OBJS) $(BUILD_DIR)
+$(ELF_FILE): $(PICOLIBC_SPECS) $(TEST_OBJS) $(BUILD_DIR) $(LIB_OBJS)
 	$(GCC_PREFIX)-gcc $(LD_ABI) --verbose -Wl,-Map=$(BUILD_DIR)/$(TEST).map -T$(LINK) \
-			--specs=$(PICOLIBC_SPECS) -nostartfiles $(TEST_OBJS) -o $@
+			--specs=$(PICOLIBC_SPECS) -nostartfiles $(TEST_OBJS) $(LIB_OBJS) -o $@
 	$(GCC_PREFIX)-objdump -S $@ > $(BUILD_DIR)/$(TEST).dis
 	$(GCC_PREFIX)-nm -B -n $@ > $(BUILD_DIR)/$(TEST).sym
 
@@ -48,13 +49,16 @@ $(BUILD_DIR)/%.o: $(SCRIPT_DIR)/src/%.s $(PICOLIBC_SPECS) | $(CORE_BUILD_DIR)
 $(BUILD_DIR)/%.o: $(SCRIPT_DIR)/src/%.c $(PICOLIBC_SPECS) $(GENERATED_PAYLOAD) | $(CORE_BUILD_DIR)
 	$(GCC_PREFIX)-gcc --specs=$(PICOLIBC_SPECS) $(CPPFLAGS) $(LIB_INCLUDES) ${CC_ABI} -c $< -o $@
 
-$(LIB_BUILD_DIR)/%.o: $(LIBS_DIR)/%.c $(PICOLIBC_SPECS) | $(CORE_BUILD_DIR)
+$(LIB_BUILD_DIR)/%.o: $(LIBS_DIR)/%.c $(PICOLIBC_SPECS) | $(LIB_BUILD_DIR)
 	mkdir -p $(dir $@)
 	$(GCC_PREFIX)-gcc --specs=$(PICOLIBC_SPECS) ${CC_ABI} $(LIB_INCLUDES) -c $< -o $@
 
-$(LIB_BUILD_DIR)/%.o: $(LIBS_DIR)/%.s $(PICOLIBC_SPECS) | $(CORE_BUILD_DIR)
+$(LIB_BUILD_DIR)/%.o: $(LIBS_DIR)/%.s $(PICOLIBC_SPECS) | $(LIB_BUILD_DIR)
 	mkdir -p $(dir $@)
 	$(GCC_PREFIX)-gcc --specs=$(PICOLIBC_SPECS) ${CC_ABI} -c $< -o $@
 
 $(BUILD_DIR):
+	mkdir -p $@
+
+$(LIB_BUILD_DIR): $(BUILD_DIR)
 	mkdir -p $@

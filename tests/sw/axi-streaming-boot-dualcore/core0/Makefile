@@ -10,4 +10,7 @@ clean:
 
 all: build
 
+test:
+	@echo $(LIB_OBJS)
+
 .PHONY: build clean all
