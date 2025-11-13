@@ -9,7 +9,7 @@ if [ -z $OUTPUT_FILE_LOCATION ]; then
     OUTPUT_FILE_LOCATION="${SCRIPT_DIR}/axi.f"
 fi
 BENDER_URL="https://pulp-platform.github.io/bender/init"
-BENDER_DIRECT_URL="https://github.com/pulp-platform/bender/releases/download/v0.28.1/bender-0.28.1-x86_64-linux-gnu.tar.gz"
+BENDER_DIRECT_URL="https://github.com/pulp-platform/bender/releases/download/v0.29.0/bender-0.29.0-x86_64-linux-gnu.tar.gz"
 if [ -z $BENDER_MANIFEST_DIR ]; then
     BENDER_MANIFEST_DIR="."
 fi
