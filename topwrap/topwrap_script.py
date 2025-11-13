@@ -11,7 +11,7 @@ raw_cores = [axi_cdc, guineveer_sram]
 
 # Load the guineveer IR module from YAML design description
 front = YamlFrontend(raw_cores)
-[guineveer] = front.parse_files([Path("design.yaml")])
+guineveer = front.parse_files([Path("design.yaml")]).modules[0]
 guineveer.id = Identifier(name=guineveer.id.name, vendor="antmicro", library="guineveer")
 
 # Add independent signals to VeeR's memory interfaces
