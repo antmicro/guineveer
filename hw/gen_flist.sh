@@ -37,6 +37,8 @@ else
 fi
 
 echo "Generating the file list"
+
+./bender update --dir $BENDER_MANIFEST_DIR
 ./bender script flist --dir $BENDER_MANIFEST_DIR > "$OUTPUT_FILE_LOCATION"
 
 # Remove deprecated dependency since it causes errors
