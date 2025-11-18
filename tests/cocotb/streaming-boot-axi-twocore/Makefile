@@ -64,4 +64,6 @@ VERILOG_INCLUDE_DIRS=$(strip $(call uniq,$(VERILOG_INCLUDE_DIRS_RAW)))
 COMPILE_ARGS += +define+HEX_FILE0='"'$(abspath ${CURDIR}/../sw/build/core0/axi-streaming-boot-dualcore.hex)'"'
 COMPILE_ARGS += +define+HEX_FILE1='"'$(abspath ${CURDIR}/../sw/build/core1/axi-streaming-boot-dualcore.hex)'"'
 
+VERILATOR_SKIP_WARNINGS = -Wno-REDEFMACRO
+
 include $(CURDIR)/../common.mk
