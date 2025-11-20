@@ -1,9 +1,9 @@
 # Introduction
 
-Guineveer is a flexible framework for generating SoCs based on the RISC-V Veer EL2 core.
-It provides a simple SoC design that can be modified and expanded with new peripherals.
+Guineveer is a reference SoC disgn based on the Veer EL2 RISC-V core that uses AXI interconnect to connect two CPUs with UART, I3C and memory.
+Topwrap is used as a generator for the top module, which enables convenient SoC designing and configuration changes.
 
 This documentation is divided into the following chapters:
-* {doc}`system_architecture` describes key components and interconnections of the SoC
+* {doc}`system_architecture` describes key components and interconnects in the SoC
 * {doc}`testing` describes design simulation and testing with Renode and Verilator
 * {doc}`user_guide` provides build instructions and describes basic usage
