@@ -2,59 +2,18 @@
 
 // Waivers for third-party code.
 
-// PULP
-lint_off -rule WIDTHEXPAND -file "*/axi_pkg.sv"
-lint_off -rule WIDTHEXPAND -file "*/axi/src/axi*.sv"
-lint_off -rule WIDTHEXPAND -file "*/mem_to_banks_detailed.sv"
-lint_off -rule WIDTHEXPAND -file "*/stream_to_mem.sv"
-lint_off -rule WIDTHTRUNC -file "*/axi_pkg.sv"
-lint_off -rule WIDTHTRUNC -file "*/axi/src/axi*.sv"
-lint_off -rule WIDTHTRUNC -file "*/rr_arb_tree.sv"
-lint_off -rule WIDTHTRUNC -file "*/mem_to_banks_detailed.sv"
-lint_off -rule UNOPTFLAT -file "*/axi_to_detailed_mem.sv"
-lint_off -rule UNOPTFLAT -file "*/axi_demux_simple.sv"
-lint_off -rule UNOPTFLAT -file "*/axi_id_prepend.sv"
-lint_off -rule UNOPTFLAT -file "*/spill_register.sv"
-lint_off -rule UNOPTFLAT -file "*/axi_err_slv.sv"
-lint_off -rule UNOPTFLAT -file "*/rr_arb_tree.sv"
-lint_off -rule UNOPTFLAT -file "*/stream_fork.sv"
-lint_off -rule UNOPTFLAT -file "*/stream_mux.sv"
-lint_off -rule UNOPTFLAT -file "*/axi_mux.sv"
-lint_off -rule UNSIGNED -file "*/rr_arb_tree.sv"
+// Silence all lints in third-party code.
+lint_off -file "*/third_party/*"
+lint_off -file "*/build/axi/*"
 
-// VeeR (main VeeR waivers included in Makefile)
-lint_off -rule CASEINCOMPLETE -file "*/dasm.svi"
-lint_off -rule WIDTHEXPAND -file "*/dasm.svi"
-lint_off -rule WIDTHTRUNC -file "*/dasm.svi"
-lint_off -rule WIDTHTRUNC -file "*/el2_mem.sv"
-lint_off -rule SIDEEFFECT -file "*/axi4_to_ahb.sv"
+// MULTIDRIVEN needs to be turned off explicitly.
+lint_off -rule MULTIDRIVEN -file "*/third_party/caliptra-rtl/src/axi/rtl/axi_if.sv"
 
-// I3C
-lint_off -rule MULTIDRIVEN -file "*/axi_if.sv"
-lint_off -rule WIDTHEXPAND -file "*/axi_if.sv"
-lint_off -rule WIDTHEXPAND -file "*/axi_adapter.sv"
-lint_off -rule WIDTHEXPAND -file "*/i2c_target_fsm.sv"
-lint_off -rule WIDTHEXPAND -file "*/descriptor_ibi.sv"
-lint_off -rule WIDTHEXPAND -file "*/flow_active.sv"
-lint_off -rule WIDTHEXPAND -file "*/recovery_executor.sv"
-lint_off -rule WIDTHEXPAND -file "*/recovery_handler.sv"
-lint_off -rule WIDTHEXPAND -file "*/recovery_transmitter.sv"
-lint_off -rule WIDTHEXPAND -file "*/controller.sv"
-lint_off -rule WIDTHEXPAND -file "*/configuration.sv"
-lint_off -rule WIDTHTRUNC -file "*/axi_if.sv"
-lint_off -rule WIDTHTRUNC -file "*/axi_adapter.sv"
-lint_off -rule WIDTHTRUNC -file "*/flow_active.sv"
-lint_off -rule WIDTHTRUNC -file "*/i2c_target_fsm.sv"
-lint_off -rule WIDTHTRUNC -file "*/i3c_axi_sub_rd.sv"
-lint_off -rule WIDTHTRUNC -file "*/i3c_axi_sub_wr.sv"
-lint_off -rule WIDTHTRUNC -file "*/width_converter_Nto8.sv"
-lint_off -rule UNOPTFLAT -file "*/controller_active.sv"
-lint_off -rule UNOPTFLAT -file "*/controller_standby_i3c.sv"
-lint_off -rule UNOPTFLAT -file "*/i3c_axi_sub_rd.sv"
-lint_off -rule UNOPTFLAT -file "*/bus_rx_flow.sv"
-lint_off -rule UNOPTFLAT -file "*/bus_tx_flow.sv"
-lint_off -rule UNOPTFLAT -file "*/i3c.sv"
-lint_off -rule CMPCONST -file "*/I3CCSR.sv"
+// SIDEEFFECT needs to be turned off explicitly.
+lint_off -rule SIDEEFFECT -file "*/third_party/Cores-VeeR-EL2/design/lib/axi4_to_ahb.sv"
+
+// Disable UNOPTFLAT. These warnings move around a bunch, and are difficult to waive consistently.
+lint_off -rule UNOPTFLAT
 
 // Disable the TIMESCALEMOD warning for all files except the testbenches.
 lint_off -rule TIMESCALEMOD
