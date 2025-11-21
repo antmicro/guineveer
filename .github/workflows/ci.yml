@@ -1,0 +1,47 @@
+name: Guineveer
+
+on: [push, pull_request]
+
+jobs:
+  build_docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Setup npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-full chromium
+          pip install -r docs/requirements.txt
+      - name: Build docs and static demo
+        run: |
+          cd docs
+          make html
+          make latexpdf
+          cp build/latex/*.pdf build/html/
+          make linkcheck
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gh-page
+          path: docs/build/html
+      - name: Deploy to Github Pages
+        if: github.event_name == 'push'
+        run: |
+          cd docs/build/html
+          touch .nojekyll
+          git init
+          cp ../../../.git/config ./.git/config
+          git add .
+          git config --local user.email "push@gha"
+          git config --local user.name "GHA"
+          git commit -am "update ${{ github.sha }}"
+          git push -u origin +HEAD:gh-pages
+          rm -rf .git
