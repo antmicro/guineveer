@@ -1,4 +1,5 @@
 html2image
-https://github.com/antmicro/antmicro-sphinx-utils/archive/main.zip
-pipeline_manager @ git+https://github.com/antmicro/kenning-pipeline-manager@f732af9c45ccd3f38062b9cd7ed555059cba02be
+antmicro-sphinx-utils @ git+https://github.com/antmicro/antmicro-sphinx-utils.git
+pipeline_manager @ git+https://github.com/antmicro/kenning-pipeline-manager
 pyyaml
+jsonschema2md

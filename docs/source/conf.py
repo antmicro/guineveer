@@ -21,13 +21,6 @@ from antmicro_sphinx_utils.defaults import (
     antmicro_latex,
 )
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-# sys.path.insert(0, os.path.abspath('.'))
-
-sys.path.insert(0, os.path.abspath("../extensions"))
-
 # -- General configuration -----------------------------------------------------
 
 # General information about the project.
@@ -47,7 +40,12 @@ sphinx_immaterial_override_builtin_admonitions = False
 numfig = True
 
 # If you need to add extensions just add to those lists
-extensions = list(set(default_extensions + ["draw_graph"]))
+extensions = list(
+    set(
+        default_extensions
+        + ["sphinx.ext.napoleon", "pipeline_manager.sphinxext.draw_graph"]
+    )
+)  # noqa: E501
 myst_enable_extensions = default_myst_enable_extensions
 myst_fence_as_directive = default_myst_fence_as_directive
 
