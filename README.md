@@ -46,6 +46,7 @@ System packages:
 `python3` packages:
 
 * `pyyaml`
+* `topwrap`
 
 Extra Python requirements to run Renode tests:
 
