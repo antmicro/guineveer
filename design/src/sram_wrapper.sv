@@ -6,20 +6,21 @@
 `include "axi/typedef.svh"
 
 module sram_wrapper #(
-    parameter string GUINEVEER_MEMORY_FILE = ""
+    parameter string GUINEVEER_MEMORY_FILE = "",
+    parameter int ID_WIDTH
 ) (
-    `AXI_S_PORT(sram, logic [31:0], logic [63:0], logic [7:0], logic [4:0], logic, logic, logic,
+    `AXI_S_PORT(sram, logic [31:0], logic [63:0], logic [7:0], logic [ID_WIDTH-1:0], logic, logic, logic,
                 logic, logic)
     input wire clk_i,
     input wire rst_ni
 );
-  `AXI_TYPEDEF_ALL(axi, logic [16:0], logic [4:0], logic [63:0], logic [7:0], logic)
+  `AXI_TYPEDEF_ALL(axi, logic [31:0], logic [ID_WIDTH-1:0], logic [63:0], logic [7:0], logic)
   axi_req_t  axi_req;
   axi_resp_t axi_resp;
   `AXI_ASSIGN_SLAVE_TO_FLAT(sram, axi_req, axi_resp)
 
   guineveer_sram #(
-      .ADDR_WIDTH($bits(axi_req.aw.addr)),
+      .ADDR_WIDTH(16),
       .DATA_WIDTH($bits(axi_req.w.data)),
       .ID_WIDTH  ($bits(axi_req.aw.id)),
       .AXI_REQ_T (axi_req_t),

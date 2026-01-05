@@ -5,18 +5,20 @@
 `include "axi/port.svh"
 `include "axi/typedef.svh"
 
-module axi_cdc_wrapper (
-    `AXI_S_PORT(src, logic [31:0], logic [63:0], logic [7:0], logic [4:0], logic, logic, logic,
+module axi_cdc_wrapper #(
+    parameter int ID_WIDTH
+    ) (
+    `AXI_S_PORT(src, logic [31:0], logic [63:0], logic [7:0], logic [ID_WIDTH-1:0], logic, logic, logic,
                 logic, logic)
-    `AXI_M_PORT(dst, logic [31:0], logic [63:0], logic [7:0], logic [4:0], logic, logic, logic,
+    `AXI_M_PORT(dst, logic [31:0], logic [63:0], logic [7:0], logic [ID_WIDTH-1:0], logic, logic, logic,
                 logic, logic)
     input wire src_clk_i,
     input wire src_rst_ni,
     input wire dst_clk_i,
     input wire dst_rst_ni
 );
-  `AXI_TYPEDEF_ALL(src, logic [31:0], logic [4:0], logic [63:0], logic [7:0], logic)
-  `AXI_TYPEDEF_ALL(dst, logic [31:0], logic [4:0], logic [63:0], logic [7:0], logic)
+  `AXI_TYPEDEF_ALL(src, logic [31:0], logic [ID_WIDTH-1:0], logic [63:0], logic [7:0], logic)
+  `AXI_TYPEDEF_ALL(dst, logic [31:0], logic [ID_WIDTH-1:0], logic [63:0], logic [7:0], logic)
   src_req_t  src_req;
   src_resp_t src_resp;
   dst_req_t  dst_req;

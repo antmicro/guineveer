@@ -5,8 +5,10 @@ design:
   parameters:
     lmem0:
       GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
+      ID_WIDTH: 5
     lmem1:
       GUINEVEER_MEMORY_FILE: "`HEX_FILE1"
+      ID_WIDTH: 5
     axi_bridge:
       TAG: 5
     i3c_core:
@@ -14,6 +16,8 @@ design:
       AxiDataWidth: 64
       AxiUserWidth: 1
       AxiIdWidth: 5
+    i_axi_cdc_lsu:
+      ID_WIDTH: 5
   interfaces:
     i3c_core:
       axi: [i_axi_cdc_lsu, m_axi_dst]

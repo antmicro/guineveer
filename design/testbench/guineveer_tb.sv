@@ -256,10 +256,12 @@ module guineveer_tb #(
     if ($value$plusargs("firmware0=%s", firmware0)) begin
       $readmemh(firmware0, top_guineveer.lmem0.xguineveer_sram.mem);
     end
-
+    
+`ifdef DUALCORE
     if ($value$plusargs("firmware1=%s", firmware1)) begin
       $readmemh(firmware1, top_guineveer.lmem1.xguineveer_sram.mem);
     end
+`endif
 
     tp = $fopen("trace_port.csv", "w");
     el = $fopen("exec.log", "w");
