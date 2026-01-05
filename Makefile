@@ -74,7 +74,8 @@ all: testbench
 
 clean: | $(BUILD_DIR)
 	rm -rf $(BUILD_DIR) $(HW_DIR)/guineveer.sv
-	$(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile clean
+	CORE=core0 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile clean
+	CORE=core1 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile clean
 
 
 hw: $(VEER_SNAPSHOT) $(BUILD_DIR)/axi.f $(HW_DIR)/guineveer.sv
