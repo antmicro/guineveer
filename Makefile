@@ -33,6 +33,14 @@ ELF_FILE_CORE0 ?= $(SCRIPT_DIR)/tests/sw/build/core0/$(TEST).elf
 HEX_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).hex
 ELF_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).elf
 
+DESIGN ?= singlecore
+DUALCORE_ONLY_TESTS := axi-streaming-boot-dualcore
+ifeq ($(DESIGN),singlecore)
+	ifneq ($(filter $(TEST),$(DUALCORE_ONLY_TESTS)),)
+    $(error $(TEST) isn't supported in singlecore architecture, use 'dualcore')
+	endif
+endif
+
 -include $(TEST_DIR)/$(TEST).mki
 
 TB_FILES = $(TB_DIR)/defines.sv $(VERILOG_SOURCES) $(TB_DIR)/guineveer_tb.sv 
@@ -46,7 +54,7 @@ VERILATOR_DEBUG := --trace-fst --trace-structs
 
 SOC_WRAPPER_DEPS := \
 	$(wildcard $(TW_DIR)/interfaces/*) \
-	$(TW_DIR)/design.yaml
+	$(TW_DIR)/design-$(DESIGN).yaml
 
 TW_REPO = repo_guin
 TW_REPO_DIR = $(TW_DIR)/$(TW_REPO)
@@ -104,7 +112,7 @@ $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_IN
 	topwrap repo parse $(TW_REPO) $(I3C_ROOT_DIR)/src/i3c_defines.svh $(I3C_ROOT_DIR)/src/i3c_wrapper.sv $(TW_PARSE_FLAGS) \
 		--grouping-hint=AXIguin=axi
 
-	topwrap build -d $(TW_DIR)/design.yaml --build-dir $(HW_DIR)
+	topwrap build -d $(TW_DIR)/design-$(DESIGN).yaml --build-dir $(HW_DIR)
 
 	sed -i 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/guineveer.sv
 
@@ -126,8 +134,15 @@ $(BUILD_DIR)/axi.f: $(HW_DIR)/gen_flist.sh | $(BUILD_DIR)
 	find $(BUILD_DIR) -type f -name "*.sv" -exec sed -i 's/axi_pkg/axi_axi_pkg/g' {} +
 	find $(BUILD_DIR) -type f -name "*.svh" -exec sed -i 's/axi_pkg/axi_axi_pkg/g' {} +
 
+TESTBENCH_ARGS += +firmware0=$(HEX_FILE_CORE0)
+
+ifeq ($(DESIGN),dualcore)
+TESTBENCH_ARGS += +firmware1=$(HEX_FILE_CORE1)
+VERILATOR_EXTRA_ARGS += -DDUALCORE
+endif
+
 $(BUILD_DIR)/sim.vcd: $(HEX_FILE_CORE0) $(HEX_FILE_CORE1) $(BUILD_DIR)/obj_dir/Vguineveer_tb | $(BUILD_DIR)
-	cd $(BUILD_DIR) && ./obj_dir/Vguineveer_tb +firmware0=$(HEX_FILE_CORE0) +firmware1=$(HEX_FILE_CORE1) ${TB_EXTRA_ARGS}
+	cd $(BUILD_DIR) && ./obj_dir/Vguineveer_tb $(TESTBENCH_ARGS) ${TB_EXTRA_ARGS}
 
 $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD_DIR)
 	verilator --cc -CFLAGS "-std=c++14 -O3" -coverage-max-width 20000 $(defines) \
@@ -146,3 +161,5 @@ endif
 	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/tests/renode/guineveer_$(RENODE_TEST).robot
 
 .PHONY: all clean hw testbench sim build_test renode_test
+
+.PRECIOUS: $(BUILD_DIR)/sim.vcd

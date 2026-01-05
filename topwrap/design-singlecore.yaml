@@ -1,0 +1,130 @@
+design:
+  name: guineveer
+  parameters:
+    lmem0:
+      GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
+    axi_bridge:
+      TAG: 5
+    i3c_core:
+      AxiAddrWidth: 32
+      AxiDataWidth: 64
+      AxiUserWidth: 1
+      AxiIdWidth: 5
+  interfaces:
+    i3c_core:
+      axi: [i_axi_cdc_lsu, m_axi_dst]
+    uart_core:
+      ahb: [axi_bridge, ahb]
+    lmem0:
+      s_axi_sram: [axi_interconnect, mem0]
+    rvtop_wrapper0:
+      el2_mem_export: [rvtop_wrapper0, el2_icache_export]
+  ports:
+    i_axi_cdc_lsu:
+      src_clk_i: clk_i
+      src_rst_ni: rst_ni
+      dst_clk_i: i3c_clk_i
+      dst_rst_ni: i3c_rst_ni
+    axi_bridge:
+      bus_clk_en: 1
+      clk: clk_i
+      clk_override: 0
+      dec_tlu_force_halt: 0
+      free_clk: clk_i
+      rst_l: rst_ni
+      scan_mode: 0
+      ahb_hready: 1
+    rvtop_wrapper0:
+      clk: clk_i
+      core_id: 0
+      i_cpu_halt_req: 0
+      i_cpu_run_req: 0
+      dbg_bus_clk_en: 1
+      dma_bus_clk_en: 1
+      ifu_bus_clk_en: 1
+      lsu_bus_clk_en: 1
+      mbist_mode: 0
+      mpc_debug_halt_req: 0
+      mpc_debug_run_req: 0
+      mpc_reset_run_req: 1
+      rst_l: cpu_rst_ni
+      scan_mode: 0
+      soft_int: 0
+      rst_vec: 0x40000000
+    lmem0:
+      clk_i: clk_i
+      rst_ni: rst_ni
+    i3c_core:
+      clk_i: i3c_clk_i
+      rst_ni: i3c_rst_ni
+      disable_id_filtering_i: 1
+      priv_ids_i: '' # Mentioned but unconnected intentionally to silence warning
+      scl_i: i3c_scl_i
+      sda_i: i3c_sda_i
+      scl_o: i3c_scl_o
+      sda_o: i3c_sda_o
+      scl_oe: i3c_scl_oe
+      sda_oe: i3c_sda_oe
+      sel_od_pp_o: i3c_sel_od_pp_o
+    uart_core:
+      uart_rx_i: uart_rx_i
+      uart_tx_o: uart_tx_o
+      clk_i: clk_i
+      rst_ni: rst_ni
+  interconnects:
+    axi_interconnect1:
+      clock: clk_i
+      reset: rst_ni
+      type: AXI
+      params:
+        atop: False
+      subordinates:
+        i_axi_cdc_lsu:
+          s_axi_src:
+            address: 0x30001000
+            size: 0x1000
+        lmem0:
+          s_axi_sram:
+            address: 0x80000000
+            size: 0x1f400
+        axi_bridge:
+          axi:
+            address: 0x30000000
+            size: 0x1000
+      managers:
+        rvtop_wrapper0:
+          ifu_axi:
+            id_width: 3
+          lsu_axi:
+            id_width: 3
+external:
+  ports:
+    in:
+    - clk_i
+    - rst_ni
+    - i3c_clk_i
+    - i3c_rst_ni
+    - i3c_sda_i
+    - i3c_scl_i
+    - cpu_rst_ni
+    - uart_rx_i
+    out:
+    - i3c_sda_o
+    - i3c_scl_o
+    - i3c_sda_oe
+    - i3c_scl_oe
+    - i3c_sel_od_pp_o
+    - uart_tx_o
+ips:
+  i_axi_cdc_lsu:
+    file: repo[repo_guin]:axi_cdc_wrapper
+  lmem0:
+    file: repo[repo_guin]:sram_wrapper
+  axi_bridge:
+    file: repo[repo_guin]:axi4_to_ahb
+  rvtop_wrapper0:
+    file: repo[repo_guin]:el2_veer_wrapper
+  i3c_core:
+    file: repo[repo_guin]:i3c_wrapper
+  uart_core:
+    file: repo[repo_guin]:uart_wrapper
