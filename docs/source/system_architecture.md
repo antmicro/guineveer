@@ -1,10 +1,16 @@
 # System architecture
 
+## Configurations
+
+Guineveer supports two configurations:
+ * `singlecore`: Features a single VeeR EL2 core.
+ * `dualcore`: Features two VeeR EL2 cores and two independent SRAM modules.
+
 ## Block diagram
 
 The following diagram illustrates the key components and interconnections of the Guineveer SoC:
 
-![Guineveer diagram](img/guineveer.png)
+![Guineveer diagram](img/guineveer-singlecore.png)
 
 The Guineveer reference System-on-Chip (SoC) design employs the VeeR EL2 core which is a 32-bit CPU supporting RISC-V’s extensions for integer (I), compressed instruction (C), multiplication and division (M), and instruction-fetch fence, CSR, and subset of bit manipulation instructions (Z).
 
@@ -51,7 +57,19 @@ The I3C core uses mostly its default configuration, with one notable difference:
 
 ## Memory map
 
-The table below summarizes the Guineveer memory address map, including the start, end, and size for the various component types.
+The tables below summarizes the Guineveer memory address map in diffrent configurations, including the start, end, and size for the various component types.
+
+### Singlecore
+
 ::: {csv-table}
-    :file: memory_map.csv
+    :file: memory_map_singlecore.csv
     :header-rows: 1
+:::
+
+### Dualcore
+
+::: {csv-table}
+    :file: memory_map_dualcore.csv
+    :header-rows: 1
+:::
+

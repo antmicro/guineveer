@@ -12,12 +12,15 @@ Copyright (c) 2024-2025 [Antmicro](https://www.antmicro.com)
 
 Guineveer is a configurable RISC-V VeeR EL2 SoC.
 It provides a simple SoC design that can be modified and expanded with new peripherals.
+It features two variants `singlecore` and `dualcore`.
 
 ### Architecture
 
+### Signlecore
+
 The default system architecture of the SoC is shown in the diagram below:
 
-![Guineveer diagram](docs/source/img/guineveer.png)
+![Guineveer diagram](docs/source/img/guineveer-singlecore.png)
 
 ### Default memory map
 
@@ -28,7 +31,29 @@ The table below summarizes the SoC's default memory address map:
 | 0x0000_0000 | 0x1FFF_FFFF | 512 MB | VeeR EL2 reserved space|
 | 0x3000_0000 | 0x3000_1000 | 4 KB | Uart |
 | 0x3000_1000 | 0x3000_2000 | 4 KB | I3c |
-| 0x8000_0000 | 0x8FFF_FFFF | 256 MB | Mem |
+| 0x8000_0000 | 0x8001_F400 | 125kB | Mem |
+
+### Dualcore
+
+Dualcore was created for:
+ - testing streaming boot capabilites of [i3c-core](https://github.com/chipsalliance/i3c-core).
+ - to show how easly is to add new IP cores to design that uses Topwrap.
+
+The default system architecture of the SoC is shown in the diagram below:
+
+![Guineveer diagram](docs/source/img/guineveer-dualcore.png)
+
+### Default memory map
+
+The table below summarizes the SoC's default memory address map:
+
+|**Start Address** | **End Address** | **Size** | **Type** |
+| --- | --- | --- | --- |
+| 0x0000_0000 | 0x1FFF_FFFF | 512 MB | VeeR EL2 reserved space|
+| 0x3000_0000 | 0x3000_1000 | 4 KB | Uart |
+| 0x3000_1000 | 0x3000_2000 | 4 KB | I3c |
+| 0x8000_0000 | 0x8001_F400 | 125kB | Mem for core 0 |
+| 0x9000_0000 | 0x9001_F400 | 125kB | Mem for core 1 |
 
 ## Requirements
 

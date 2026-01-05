@@ -25,6 +25,7 @@ Currently, three software test samples are available:
     * core 1 is sending payload to `i3c-core` via registers
     * payload can be modified and rebuild, source files are located in `tests/sw/axi-streaming-boot-dualcore/core1/payload`
     * payload size is limited in core 0 software, to incrase limit change `MAX_STREAMING_BOOT_SIZE`
+    * Needs `dualcore` design
 
 Building software examples is described in the [User guide](user_guide.md#building-software-examples).
 

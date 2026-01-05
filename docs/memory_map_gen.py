@@ -1,6 +1,7 @@
 import yaml
 import csv
 import os
+from pathlib import Path
 
 
 def _underscore_hex(hex: str) -> str:
@@ -33,13 +34,11 @@ def format_hex(val: int) -> str:
     return _underscore_hex(hex_str)
 
 
-if __name__ == "__main__":
-    interconnect_config_location = "../topwrap/design.yaml"
-    map_object = {}
-    with open(interconnect_config_location, "r") as f:
+def generate_map(design: Path, output: Path):
+    with open(design, "r") as f:
         data = yaml.load(f, Loader=yaml.FullLoader)
-        os.makedirs("build", exist_ok=True)
-        with open("build/memory_map.csv", "w", newline="") as memory_map_csv:
+        output.parent.mkdir(exist_ok=True)
+        with open(output, "w", newline="") as memory_map_csv:
             table_columns = ["Start Address", "End Address", "Size", "Type"]
             writer = csv.DictWriter(memory_map_csv, fieldnames=table_columns)
             writer.writeheader()
@@ -59,4 +58,14 @@ if __name__ == "__main__":
                         table_columns[3]: peripheral,
                     }
                 )
-            print("Memory map generated successfully")
+            print(f"Memory map generated successfully for {design.name}")
+
+if __name__ == "__main__":
+    generate_map(
+        Path("../topwrap/design-dualcore.yaml"),
+        Path("build/memory_map_dualcore.csv")
+    )
+    generate_map(
+        Path("../topwrap/design-singlecore.yaml"),
+        Path("build/memory_map_singlecore.csv")
+    )

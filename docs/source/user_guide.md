@@ -12,7 +12,16 @@ As of now, the available samples are:
 * `uart` - initializes and transfers a "Hello UART" string over UART,
 * `i3c` - checks the I3C register values after reset and initializes the peripheral in device mode.
 * `i3c-cocotb` - checks communication over I3C; intended to be used with the I3C Cocotb tests.
-* `axi-streaming-boot-dualcore` - uses `i3c-core`'s streaming boot capabilites.
+* `axi-streaming-boot-dualcore` - uses `i3c-core`'s streaming boot capabilites, needs `dualcore` design.
+
+## Different designs
+By setting the `DESIGN` environmental variable, you can choose between different Topwrap configurations. 
+
+Currently available options:
+* `dualcore`: Features two VeeR cores and two memory modules.
+* `singlecore`: Features a single VeeR core.
+
+By default `singlecore` is used.
 
 ## Building testbench simulation
 
