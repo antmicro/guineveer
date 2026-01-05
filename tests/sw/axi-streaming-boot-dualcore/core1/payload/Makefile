@@ -2,9 +2,13 @@ SCRIPT_DIR := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 TEST := payload
 RV_ROOT ?= $(SCRIPT_DIR)/../../../../../third_party/Cores-VeeR-EL2
 
+SW_DIR := $(SCRIPT_DIR)/../../../
 BUILD_DIR := $(SCRIPT_DIR)/build
 H_FILE := $(BUILD_DIR)/$(TEST).h
 BIN_FILE := $(BUILD_DIR)/$(TEST).bin
+
+ADDITIONAL_LINKER_FLAGS := -Wl,--gc-sections -mno-relax
+ADDITIONAL_GCC_FLAGS := -Os -ffunction-sections -fdata-sections -fPIC -mcmodel=medany -mno-relax -fvisibility=hidden
 
 include $(SCRIPT_DIR)/../../../common.mk
 

@@ -1,6 +1,8 @@
 SCRIPT_DIR := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 TEST := axi-streaming-boot-dualcore
 
+ADDITIONAL_GCC_FLAGS := -DMAX_STREAMING_BOOT_SIZE=0x2000
+
 include $(SCRIPT_DIR)/../../common.mk
 
 build: $(HEX_FILE)
