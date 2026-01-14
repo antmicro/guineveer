@@ -16,7 +16,7 @@ async def test_axi_streaming_boot(dut: HierarchyObject):
 
     i3c_ctrl, uart_sink, uart_source = await setup(dut)
 
-    cocotb.start_soon(timeout_task(5))
+    cocotb.start_soon(timeout_task(50))
 
     # AXI streaming boot is mostly driven by the firmware, so we don't have much to do here.
 

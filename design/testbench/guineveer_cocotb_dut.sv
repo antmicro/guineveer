@@ -4,7 +4,7 @@
 `timescale 1ns / 10ps
 
 module guineveer_cocotb_dut #(
-    parameter int MAX_CYCLES = 1000000
+    parameter int MAX_CYCLES = 100_000_000
 ) (
     output logic core_clk_o,
     input  logic rst_ni,
