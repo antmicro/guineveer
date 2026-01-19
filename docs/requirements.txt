@@ -3,3 +3,4 @@ antmicro-sphinx-utils @ git+https://github.com/antmicro/antmicro-sphinx-utils.gi
 pipeline_manager @ git+https://github.com/antmicro/kenning-pipeline-manager
 pyyaml
 jsonschema2md
+myst-parser!=5.0.0
