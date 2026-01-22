@@ -3,7 +3,7 @@
 ## Building SoC sources
 
 Use the `make hw` command to generate the top module in `hw/guineveer.sv`, using Topwrap and the neccesary files, in the `build/` folder.
-This command also creates an AXI-based SoC network (`axi_intercon.sv`) source file, in the `hw/` folder.
+This command also creates an AXI interconnect that is generated and merged into `hw/guineveer.sv`
 
 ## Building software examples
 
