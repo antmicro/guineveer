@@ -20,7 +20,7 @@
 `define COMMON_CELLS_ASSERTS_OFF
 
 module guineveer_tb #(
-    parameter int MAX_CYCLES = 99_000_000,
+    parameter int MAX_CYCLES = 100_000_000,
     `include "el2_param.vh"
 ) ();
   bit                         core_clk;
