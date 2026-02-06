@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 #include "utils.h"
 
 void write32(uint32_t address, uint32_t value)

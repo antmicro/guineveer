@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 #include <stdint.h>
 #include "printf.h"
 #include "i3c_registers.h"

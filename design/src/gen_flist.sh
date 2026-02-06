@@ -1,4 +1,7 @@
 #!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 
 set -o pipefail # Check for errors in pipeline
 

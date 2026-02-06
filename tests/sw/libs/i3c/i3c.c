@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 #include "i3c.h"
 
 uint8_t streaming_boot_buffer[MAX_STREAMING_BOOT_SIZE] __attribute__((aligned(0x1000)));

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 BUILD_DIR ?= $(SCRIPT_DIR)/build
 LIB_BUILD_DIR := $(BUILD_DIR)/lib
 SW_DIR ?= $(SCRIPT_DIR)/../..

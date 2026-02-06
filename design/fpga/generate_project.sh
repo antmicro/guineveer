@@ -3,6 +3,9 @@
 # Antmicro's vivado tcl generator
 # author: pgielda@antmicro.com
 #
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 
 # 1. Set important project information (adjust)
 PROJECT_NAME="guineveer"

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 *** Test Cases ***
 Should Read Reset Values
     Execute Command	      $elf0=@${CURDIR}/../sw/build/core0/i3c.elf

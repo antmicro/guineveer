@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 # Clock signal
 set_property -dict { PACKAGE_PIN E3    IOSTANDARD LVCMOS33 } [get_ports { clk100_i }]; #IO_L12P_T1_MRCC_35 Sch=gclk[100]
 create_clock -add -name sys_clk_pin -period 10.00 [get_ports { clk100_i }];

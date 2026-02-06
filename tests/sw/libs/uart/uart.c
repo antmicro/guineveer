@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 #include "uart.h"
 
 void uart_init(uint64_t baud)

@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
+
 FPGA_SCRIPT_DIR := $(patsubst %/,%,$(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 include $(FPGA_SCRIPT_DIR)/../../Makefile
 TCL_FILE := $(FPGA_SCRIPT_DIR)/guineveer.tcl

@@ -1,6 +1,6 @@
 # Guineveer
 
-Copyright (c) 2024-2025 [Antmicro](https://www.antmicro.com)
+Copyright (c) 2024-2026 [Antmicro](https://www.antmicro.com)
 
 <picture>
   <source srcset="images/guineveer-logo-light.png" media="(prefers-color-scheme: light)"/>

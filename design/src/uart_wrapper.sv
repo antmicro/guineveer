@@ -1,4 +1,4 @@
-// Copyright (c) 2025 Antmicro <www.antmicro.com>
+// Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
 // SPDX-License-Identifier: Apache-2.0
 
 // This is a wrapper over Caliptra's UART where AHB haddr and hsize signals are
