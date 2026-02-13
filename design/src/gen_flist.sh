@@ -25,18 +25,13 @@ git submodule update --init --recursive --remote "$AXI_DIR"
 pushd "$AXI_DIR"
 
 echo "Downloading and initializing Bender..."
-if curl --proto '=https' --tlsv1.2 -sSf "$BENDER_URL" | bash; then
-    echo "Bender installed successfully with automatic installation."
-else
-    echo "Automatic installation failed. Trying manual installation"
 
-    if curl -L "$BENDER_DIRECT_URL" -o bender.tar.gz; then
-        tar -xzf bender.tar.gz && rm -f bender.tar.gz
-        echo "Manual installation completed."
-    else
-        echo "Failed to download Bender. Exiting..."
-        exit 1
-    fi
+if curl -L "$BENDER_DIRECT_URL" -o bender.tar.gz; then
+    tar -xzf bender.tar.gz && rm -f bender.tar.gz
+    echo "Manual installation completed."
+else
+    echo "Failed to download Bender. Exiting..."
+    exit 1
 fi
 
 echo "Generating the file list"
