@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
 
@@ -12,7 +12,9 @@ if [ -z $OUTPUT_FILE_LOCATION ]; then
     OUTPUT_FILE_LOCATION="${SCRIPT_DIR}/axi.f"
 fi
 BENDER_URL="https://pulp-platform.github.io/bender/init"
-BENDER_DIRECT_URL="https://github.com/pulp-platform/bender/releases/download/v0.29.0/bender-0.29.0-x86_64-linux-gnu.tar.gz"
+ARCH=$(uname -m)
+[ "$ARCH" = "aarch64" ] && ARCH="arm64"
+BENDER_DIRECT_URL="https://github.com/pulp-platform/bender/releases/download/v0.29.0/bender-0.29.0-${ARCH}-linux-gnu.tar.gz"
 if [ -z $BENDER_MANIFEST_DIR ]; then
     BENDER_MANIFEST_DIR="."
 fi
