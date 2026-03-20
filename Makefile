@@ -96,10 +96,10 @@ $(HEX_FILE_CORE1) $(ELF_FILE_CORE1):
 
 $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUDE_DIRS)
 # Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
-	sed -i "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
+	sed -i.bak "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
 
-	-rm -r $(TW_REPO_DIR)
-	-rm $(SCRIPT_DIR)/topwrap.yaml
+	-rm -rf $(TW_REPO_DIR)
+	-rm -f $(SCRIPT_DIR)/topwrap.yaml
 	topwrap repo init $(TW_REPO) $(TW_REPO_DIR)
 #	TODO: Ideally the interfaces in topwrap's built-in repo would be improved instead.
 	cp -r $(TW_DIR)/interfaces $(TW_REPO_DIR)
@@ -115,7 +115,7 @@ $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_IN
 
 	topwrap build -d $(TW_DIR)/design-$(DESIGN).yaml --build-dir $(HW_DIR)
 
-	sed -i 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/guineveer.sv
+	sed -i.bak 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/guineveer.sv
 
 $(VEER_SNAPSHOT): $(VEER_SNAPSHOT)/common_defines.vh
 $(VEER_SNAPSHOT)/%: | $(BUILD_DIR)
@@ -132,8 +132,8 @@ $(BUILD_DIR)/axi.f: $(HW_DIR)/gen_flist.sh | $(BUILD_DIR)
 	cp -r $(AXI_SOURCE_DIR)/include $(BUILD_DIR)/axi
 	export OUTPUT_FILE_LOCATION=$@ && export BENDER_MANIFEST_DIR=$(BUILD_DIR)/axi && $<
 # Replace axi_pkg with axi_axi_pkg in axi submodule due to package collision with caliptra-rtl
-	find $(BUILD_DIR) -type f -name "*.sv" -exec sed -i 's/axi_pkg/axi_axi_pkg/g' {} +
-	find $(BUILD_DIR) -type f -name "*.svh" -exec sed -i 's/axi_pkg/axi_axi_pkg/g' {} +
+	find $(BUILD_DIR) -type f -name "*.sv" -exec sed -i.bak 's/axi_pkg/axi_axi_pkg/g' {} +
+	find $(BUILD_DIR) -type f -name "*.svh" -exec sed -i.bak 's/axi_pkg/axi_axi_pkg/g' {} +
 
 TESTBENCH_ARGS += +firmware0=$(HEX_FILE_CORE0)
 
