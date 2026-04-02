@@ -10,15 +10,15 @@ Copyright (c) 2024-2026 [Antmicro](https://www.antmicro.com)
 
 ## Introduction
 
-Guineveer is a configurable RISC-V VeeR EL2 SoC.
-It provides a simple SoC design that can be modified and expanded with new peripherals.
-It features two variants `singlecore` and `dualcore`.
+Guineveer is a configurable SoC using the VeeR EL2 RISC-V core.
+
+It uses the [Topwrap](https://github.com/antmicro/topwrap) tool for the SoC definition, providing a simple SoC design that can be modified and expanded with new peripherals in two variants - `singlecore` and `dualcore`.
 
 ### Architecture
 
-### Signlecore
+### `singlecore`
 
-The default system architecture of the SoC is shown in the diagram below:
+The default system architecture of the single core variant of the SoC is shown in the diagram below:
 
 ![Guineveer diagram](docs/source/img/guineveer-singlecore.png)
 
@@ -33,13 +33,14 @@ The table below summarizes the SoC's default memory address map:
 | 0x3000_1000 | 0x3000_2000 | 4 KB | I3c |
 | 0x8000_0000 | 0x8001_F400 | 125kB | Mem |
 
-### Dualcore
+### `dualcore`
 
-Dualcore was created for:
- - testing streaming boot capabilites of [i3c-core](https://github.com/chipsalliance/i3c-core).
- - to show how easly is to add new IP cores to design that uses Topwrap.
+The `dualcore` variant was created for:
 
-The default system architecture of the SoC is shown in the diagram below:
+- testing the streaming boot capabilites of the CHIPS Alliance [i3c-core](https://github.com/chipsalliance/i3c-core).
+- to show how easy it is to add new IP cores to a design that uses Topwrap.
+
+The default system architecture of the dual core variant of the SoC is shown in the diagram below:
 
 ![Guineveer diagram](docs/source/img/guineveer-dualcore.png)
 
@@ -81,5 +82,5 @@ Extra Python requirements to run Renode tests:
 
 ## Usage
 
-For detailed information about system architecture, testing and usage, refer to the documentation.
+For detailed information about system architecture, testing and usage, refer to the [documentation](https://chipsalliance.github.io/guineveer/).
 
