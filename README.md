@@ -29,15 +29,15 @@ The table below summarizes the SoC's default memory address map:
 |**Start Address** | **End Address** | **Size** | **Type** |
 | --- | --- | --- | --- |
 | 0x0000_0000 | 0x1FFF_FFFF | 512 MB | VeeR EL2 reserved space|
-| 0x3000_0000 | 0x3000_1000 | 4 KB | Uart |
-| 0x3000_1000 | 0x3000_2000 | 4 KB | I3c |
+| 0x3000_0000 | 0x3000_1000 | 4 KB | UART |
+| 0x3000_1000 | 0x3000_2000 | 4 KB | I3C |
 | 0x8000_0000 | 0x8001_F400 | 125kB | Mem |
 
 ### `dualcore`
 
 The `dualcore` variant was created for:
 
-- testing the streaming boot capabilites of the CHIPS Alliance [i3c-core](https://github.com/chipsalliance/i3c-core).
+- testing the streaming boot capabilites of the CHIPS Alliance [I3C-core](https://github.com/chipsalliance/i3c-core).
 - to show how easy it is to add new IP cores to a design that uses Topwrap.
 
 The default system architecture of the dual core variant of the SoC is shown in the diagram below:
@@ -51,8 +51,8 @@ The table below summarizes the SoC's default memory address map:
 |**Start Address** | **End Address** | **Size** | **Type** |
 | --- | --- | --- | --- |
 | 0x0000_0000 | 0x1FFF_FFFF | 512 MB | VeeR EL2 reserved space|
-| 0x3000_0000 | 0x3000_1000 | 4 KB | Uart |
-| 0x3000_1000 | 0x3000_2000 | 4 KB | I3c |
+| 0x3000_0000 | 0x3000_1000 | 4 KB | UART |
+| 0x3000_1000 | 0x3000_2000 | 4 KB | I3C |
 | 0x8000_0000 | 0x8001_F400 | 125kB | Mem for core 0 |
 | 0x9000_0000 | 0x9001_F400 | 125kB | Mem for core 1 |
 
