@@ -8,22 +8,22 @@ This command also creates an AXI interconnect that is generated and merged into 
 ## Building software examples
 
 Run `TEST=software_example_name make build_test` to compile one of the provided software samples.
-As of now, the available samples are:
+As of right now, the available samples are:
 * `uart` - initializes and transfers a "Hello UART" string over UART,
-* `i3c` - checks the I3C register values after reset and initializes the peripheral in device mode.
-* `i3c-cocotb` - checks communication over I3C; intended to be used with the I3C Cocotb tests.
-* `axi-streaming-boot-dualcore` - uses `i3c-core`'s streaming boot capabilites, needs `dualcore` design.
+* `i3c` - checks the I3C register values after reset and initializes the peripheral in device mode,
+* `i3c-cocotb` - checks communication over I3C; intended to be used with the I3C Cocotb tests,
+* `axi-streaming-boot-dualcore` - uses `i3c-core`'s streaming boot capabilites, requires `dualcore` design.
 
 ## Different designs
 By setting the `DESIGN` environmental variable, you can choose between different Topwrap configurations. 
 
 Currently available options:
-* `dualcore`: Features two VeeR cores and two memory modules.
+* `dualcore`: Features two VeeR cores and two memory modules,
 * `singlecore`: Features a single VeeR core.
 
-By default `singlecore` is used.
+By default, `singlecore` is used.
 
-## Building testbench simulation
+## Building the testbench simulation
 
 Run the `make testbench` command to generate the simulation testbench executable using `Verilator`.
 The program is placed in the `build/obj_dir/Vguineveer_tb` file.
@@ -35,28 +35,28 @@ If the hex file was created using `objdump -O verilog`, it will have addresses s
 Remember to change the addresses to comply with the address range required by \\$readmemh.
 ~~~
 
-## Building design for FPGA
+## Building designs for FPGA
 
 * The defined `HEX_FILE0` and `HEX_FILE1` need to point to the path where firmware for each core is stored - you can update this in `guineveer.tcl`.
     The HEX files are set automatically in the Makefile; using the `TEST` variable, you can select the files for a test, the same way as with building the software (`make build test`).
 * To generate the `tcl` file, run `BOARD=<board> make generate_block_design`, in the `fpga/` folder.
-    The supported boards are `NexysVideo-A7-200T` or `Arty-A7-100T`.
+    The supported boards are `NexysVideo-A7-200T` and `Arty-A7-100T`.
 * To synthesize Guineveer using Vivado, run `vivado -mode batch -script guineveer.tcl`.
 
-## Running example SW using the testbench
+## Running an example SW using the testbench
 
 Run `TEST=software_example_name make sim` to launch the testbench executable with the provided software.
-The log of all register values and their changes throughout the simulation will be written to the  `build/exec.log` file.
+The log of all register values and their changes throughout the simulation will be written in the `build/exec.log` file.
 
-## Running example SW using Renode Robot Framework
+## Running an example SW using Renode Robot Framework
 
 Run `TEST=software_example_name make renode_test` to launch the Renode simulation with the provided software.
 It will run the software and compare its output with the expected values.
 
-## Running example SW using Renode Robot Framework with cosimulation
+## Running an example SW using Renode Robot Framework with cosimulation
 
-Run `make` in the `sw/renode_i3c_cosim` directory to build the cosimulation binary of the I3C device, form the HDL sources.
-After building the cosimulation binary and the `i3c` test software, `renode-test` can be used to to run the test available in the `sw/guineveer_i3c_cosim.robot` file.
+Run `make` in the `sw/renode_i3c_cosim` directory to build the co-simulation binary of the I3C device from the HDL sources.
+After building the co-simulation binary and the `i3c` test software, `renode-test` can be used to run the test, available in the `sw/guineveer_i3c_cosim.robot` file.
 Refer to the following chapters in Renode's documentation for a detailed overview of the required dependencies and available options:
 * [Testing with Renode](https://renode.readthedocs.io/en/latest/introduction/testing.html)
 * [Co-simulating with an HDL simulator](https://renode.readthedocs.io/en/latest/advanced/co-simulating-with-an-hdl-simulator.html)

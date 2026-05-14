@@ -3,7 +3,7 @@
 ## Configurations
 
 Guineveer supports two configurations:
- * `singlecore`: Features a single VeeR EL2 core.
+ * `singlecore`: Features a single VeeR EL2 core,
  * `dualcore`: Features two VeeR EL2 cores and two independent SRAM modules.
 
 ## Block diagram
@@ -12,7 +12,7 @@ The following diagram illustrates the key components and interconnections of the
 
 ![Guineveer diagram](img/guineveer-singlecore.png)
 
-The Guineveer reference System-on-Chip (SoC) design employs the VeeR EL2 core which is a 32-bit CPU supporting RISC-V’s extensions for integer (I), compressed instruction (C), multiplication and division (M), and instruction-fetch fence, CSR, and subset of bit manipulation instructions (Z).
+The Guineveer reference System-on-Chip (SoC) design employs the VeeR EL2 core - a 32-bit CPU that supports RISC-V's extensions for: integer (I), compressed instruction (C), multiplication and division (M), instruction-fetch fence, CSR, and subset of bit manipulation instructions (Z).
 
 The reference design features an AXI system bus which is used to communicate with several peripherals, including an SRAM memory module (accessed via an `AXI_to_mem` interface), an `I3C core`, and an `AXI-to-AHB bridge` (providing access to an `OpenTitan UART` peripheral).
 There are two VeeR cores, each having its own memory and connection to the AXI interconnect.
@@ -48,7 +48,7 @@ The entire SoC is described in Topwrap/design.yaml, which contains connections, 
 
 ### VeeR EL2
 
-The VeeR EL2 core is configured with FPGA optimizations enabled; branch predictor, ICCM, DCCM, and I-cache disabled.
+The VeeR EL2 core is configured with FPGA optimizations enabled, and branch predictor, ICCM, DCCM, and I-cache disabled.
 The full set of configuration options used is found in the [root Makefile](https://github.com/antmicro/guineveer/blob/main/Makefile).
 
 ### I3C
@@ -57,7 +57,7 @@ The I3C core uses mostly its default configuration, with one notable difference:
 
 ## Memory map
 
-The tables below summarizes the Guineveer memory address map in diffrent configurations, including the start, end, and size for the various component types.
+The tables below summarize the Guineveer memory address map in diffrent configurations, including the start, end, and size for the various component types.
 
 ### Singlecore
 
