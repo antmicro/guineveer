@@ -1,21 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 Antmicro <www.antmicro.com>
 
-design:
-  name: guineveer
-  parameters:
-    lmem0:
-      GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
-      ID_WIDTH: 4
-    axi_bridge:
-      TAG: 4
-    i3c_core:
-      AxiAddrWidth: 32
-      AxiDataWidth: 64
-      AxiUserWidth: 1
-      AxiIdWidth: 4
-    i_axi_cdc_lsu:
-      ID_WIDTH: 4
+name: guineveer
+      
+connections:
   interfaces:
     i3c_core:
       axi: [i_axi_cdc_lsu, m_axi_dst]
@@ -77,32 +65,34 @@ design:
       uart_tx_o: uart_tx_o
       clk_i: clk_i
       rst_ni: rst_ni
-  interconnects:
-    axi_interconnect1:
-      clock: clk_i
-      reset: rst_ni
-      type: AXI
-      params:
-        atop: False
-      subordinates:
-        i_axi_cdc_lsu:
-          s_axi_src:
-            address: 0x30001000
-            size: 0x1000
-        lmem0:
-          s_axi_sram:
-            address: 0x80000000
-            size: 0x1f400
-        axi_bridge:
-          axi:
-            address: 0x30000000
-            size: 0x1000
-      managers:
-        rvtop_wrapper0:
-          ifu_axi:
-            id_width: 3
-          lsu_axi:
-            id_width: 3
+      
+interconnects:
+  axi_interconnect1:
+    clock: clk_i
+    reset: rst_ni
+    type: AXI
+    params:
+      atop: False
+    subordinates:
+      i_axi_cdc_lsu:
+        s_axi_src:
+          address: 0x30001000
+          size: 0x1000
+      lmem0:
+        s_axi_sram:
+          address: 0x80000000
+          size: 0x1f400
+      axi_bridge:
+        axi:
+          address: 0x30000000
+          size: 0x1000
+    managers:
+      rvtop_wrapper0:
+        ifu_axi:
+          id_width: 3
+        lsu_axi:
+          id_width: 3
+
 external:
   ports:
     in:
@@ -121,16 +111,29 @@ external:
     - i3c_scl_oe
     - i3c_sel_od_pp_o
     - uart_tx_o
+    
 ips:
   i_axi_cdc_lsu:
     file: repo[repo_guin]:axi_cdc_wrapper
+    parameters:
+      ID_WIDTH: 4
   lmem0:
     file: repo[repo_guin]:sram_wrapper
+    parameters:
+      ID_WIDTH: 4
+      GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
   axi_bridge:
     file: repo[repo_guin]:axi4_to_ahb
+    parameters:
+      TAG: 4
   rvtop_wrapper0:
     file: repo[repo_guin]:el2_veer_wrapper
   i3c_core:
     file: repo[repo_guin]:i3c_wrapper
+    parameters:
+      AxiAddrWidth: 32
+      AxiDataWidth: 64
+      AxiUserWidth: 1
+      AxiIdWidth: 4
   uart_core:
     file: repo[repo_guin]:uart_wrapper
