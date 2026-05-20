@@ -42,7 +42,7 @@ def generate_map(design: Path, output: Path):
             table_columns = ["Start Address", "End Address", "Size", "Type"]
             writer = csv.DictWriter(memory_map_csv, fieldnames=table_columns)
             writer.writeheader()
-            subordinates_topwrap = data["design"]["interconnects"]["axi_interconnect1"]["subordinates"]
+            subordinates_topwrap = data["interconnects"]["axi_interconnect1"]["subordinates"]
             subordinates = {
                 "VeeR EL2 reserved space": {"address": 0x0, "size": 0x1FFF_FFFF}
             } | {name: list(params.values())[0] for (name, params) in subordinates_topwrap.items()}
