@@ -2,116 +2,24 @@ id:
   library: libdefault
   name: el2_veer_wrapper
   vendor: vendor
+
+clocks:
+  cpu:
+    signal: clk
+
+resets:
+  cpu:
+    signal: rst_l
+    polarity: active low
+  dbg:
+    signal: dbg_rst_l
+    polarity: active low
+
 interfaces:
-  dma_axi:
-    mode: subordinate
-    signals:
-      in:
-        ARADDR: {bound: ['31', '0'], name: dma_axi_araddr}
-        ARBURST: {bound: ['1', '0'], name: dma_axi_arburst}
-        ARID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_arid}
-        ARLEN: {bound: ['7', '0'], name: dma_axi_arlen}
-        ARPROT: {bound: ['2', '0'], name: dma_axi_arprot}
-        ARSIZE: {bound: ['2', '0'], name: dma_axi_arsize}
-        ARVALID: {name: dma_axi_arvalid}
-        AWADDR: {bound: ['31', '0'], name: dma_axi_awaddr}
-        AWBURST: {bound: ['1', '0'], name: dma_axi_awburst}
-        AWID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_awid}
-        AWLEN: {bound: ['7', '0'], name: dma_axi_awlen}
-        AWPROT: {bound: ['2', '0'], name: dma_axi_awprot}
-        AWSIZE: {bound: ['2', '0'], name: dma_axi_awsize}
-        AWVALID: {name: dma_axi_awvalid}
-        BREADY: {name: dma_axi_bready}
-        RREADY: {name: dma_axi_rready}
-        WDATA: {bound: ['63', '0'], name: dma_axi_wdata}
-        WLAST: {name: dma_axi_wlast}
-        WSTRB: {bound: ['7', '0'], name: dma_axi_wstrb}
-        WVALID: {name: dma_axi_wvalid}
-      out:
-        ARREADY: {name: dma_axi_arready}
-        AWREADY: {name: dma_axi_awready}
-        BID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_bid}
-        BRESP: {bound: ['1', '0'], name: dma_axi_bresp}
-        BVALID: {name: dma_axi_bvalid}
-        RDATA: {bound: ['63', '0'], name: dma_axi_rdata}
-        RID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_rid}
-        RLAST: {name: dma_axi_rlast}
-        RRESP: {bound: ['1', '0'], name: dma_axi_rresp}
-        RVALID: {name: dma_axi_rvalid}
-        WREADY: {name: dma_axi_wready}
-    type: AXI4
-  el2_icache_export:
-    mode: unspecified
-    signals:
-      inout:
-        clk: null
-        dccm_addr_bank: null
-        dccm_bank_dout: null
-        dccm_bank_ecc: null
-        dccm_clken: null
-        dccm_wr_data_bank: null
-        dccm_wr_ecc_bank: null
-        dccm_wren_bank: null
-        ic_b_sb_bit_en_vec: null
-        ic_b_sb_wren: null
-        ic_bank_way_clken_final: null
-        ic_bank_way_clken_final_up: null
-        ic_rw_addr_bank_q: null
-        ic_rw_addr_q: null
-        ic_sb_wr_data: null
-        ic_tag_clken_final: null
-        ic_tag_data_raw_packed_pre: null
-        ic_tag_data_raw_pre: null
-        ic_tag_wr_data: null
-        ic_tag_wren_biten_vec: null
-        ic_tag_wren_q: null
-        iccm_addr_bank: null
-        iccm_bank_dout: null
-        iccm_bank_ecc: null
-        iccm_bank_wr_data: null
-        iccm_bank_wr_ecc: null
-        iccm_clken: null
-        iccm_wren_bank: null
-        wb_dout_pre_up: null
-        wb_packeddout_pre: null
-    type: el2_mem_if
-  el2_mem_export:
-    mode: unspecified
-    signals:
-      inout:
-        clk: null
-        dccm_addr_bank: null
-        dccm_bank_dout: null
-        dccm_bank_ecc: null
-        dccm_clken: null
-        dccm_wr_data_bank: null
-        dccm_wr_ecc_bank: null
-        dccm_wren_bank: null
-        ic_b_sb_bit_en_vec: null
-        ic_b_sb_wren: null
-        ic_bank_way_clken_final: null
-        ic_bank_way_clken_final_up: null
-        ic_rw_addr_bank_q: null
-        ic_rw_addr_q: null
-        ic_sb_wr_data: null
-        ic_tag_clken_final: null
-        ic_tag_data_raw_packed_pre: null
-        ic_tag_data_raw_pre: null
-        ic_tag_wr_data: null
-        ic_tag_wren_biten_vec: null
-        ic_tag_wren_q: null
-        iccm_addr_bank: null
-        iccm_bank_dout: null
-        iccm_bank_ecc: null
-        iccm_bank_wr_data: null
-        iccm_bank_wr_ecc: null
-        iccm_clken: null
-        iccm_wren_bank: null
-        wb_dout_pre_up: null
-        wb_packeddout_pre: null
-    type: el2_mem_if
   ifu_axi:
     mode: manager
+    clock: cpu
+    reset: cpu
     signals:
       in:
         ARREADY: {name: ifu_axi_arready}
@@ -155,8 +63,11 @@ interfaces:
         WSTRB: {bound: ['7', '0'], name: ifu_axi_wstrb}
         WVALID: {name: ifu_axi_wvalid}
     type: AXI4
+
   lsu_axi:
     mode: manager
+    clock: cpu
+    reset: cpu
     signals:
       in:
         ARREADY: {name: lsu_axi_arready}
@@ -200,8 +111,11 @@ interfaces:
         WSTRB: {bound: ['7', '0'], name: lsu_axi_wstrb}
         WVALID: {name: lsu_axi_wvalid}
     type: AXI4
+
   sb_axi:
     mode: manager
+    clock: cpu
+    reset: cpu
     signals:
       in:
         ARREADY: {name: sb_axi_arready}
@@ -245,212 +159,192 @@ interfaces:
         WSTRB: {bound: ['7', '0'], name: sb_axi_wstrb}
         WVALID: {name: sb_axi_wvalid}
     type: AXI4
+
+  dma_axi:
+    mode: subordinate
+    clock: cpu
+    reset: cpu
+    signals:
+      in:
+        ARADDR: {bound: ['31', '0'], name: dma_axi_araddr}
+        ARBURST: {bound: ['1', '0'], name: dma_axi_arburst}
+        ARID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_arid}
+        ARLEN: {bound: ['7', '0'], name: dma_axi_arlen}
+        ARPROT: {bound: ['2', '0'], name: dma_axi_arprot}
+        ARSIZE: {bound: ['2', '0'], name: dma_axi_arsize}
+        ARVALID: {name: dma_axi_arvalid}
+        AWADDR: {bound: ['31', '0'], name: dma_axi_awaddr}
+        AWBURST: {bound: ['1', '0'], name: dma_axi_awburst}
+        AWID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_awid}
+        AWLEN: {bound: ['7', '0'], name: dma_axi_awlen}
+        AWPROT: {bound: ['2', '0'], name: dma_axi_awprot}
+        AWSIZE: {bound: ['2', '0'], name: dma_axi_awsize}
+        AWVALID: {name: dma_axi_awvalid}
+        BREADY: {name: dma_axi_bready}
+        RREADY: {name: dma_axi_rready}
+        WDATA: {bound: ['63', '0'], name: dma_axi_wdata}
+        WLAST: {name: dma_axi_wlast}
+        WSTRB: {bound: ['7', '0'], name: dma_axi_wstrb}
+        WVALID: {name: dma_axi_wvalid}
+      out:
+        ARREADY: {name: dma_axi_arready}
+        AWREADY: {name: dma_axi_awready}
+        BID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_bid}
+        BRESP: {bound: ['1', '0'], name: dma_axi_bresp}
+        BVALID: {name: dma_axi_bvalid}
+        RDATA: {bound: ['63', '0'], name: dma_axi_rdata}
+        RID: {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_rid}
+        RLAST: {name: dma_axi_rlast}
+        RRESP: {bound: ['1', '0'], name: dma_axi_rresp}
+        RVALID: {name: dma_axi_rvalid}
+        WREADY: {name: dma_axi_wready}
+    type: AXI4
+
+  el2_icache_export:
+    mode: unspecified
+    signals:
+      inout:
+        clk: null
+        dccm_addr_bank: null
+        dccm_bank_dout: null
+        dccm_bank_ecc: null
+        dccm_clken: null
+        dccm_wr_data_bank: null
+        dccm_wr_ecc_bank: null
+        dccm_wren_bank: null
+        ic_b_sb_bit_en_vec: null
+        ic_b_sb_wren: null
+        ic_bank_way_clken_final: null
+        ic_bank_way_clken_final_up: null
+        ic_rw_addr_bank_q: null
+        ic_rw_addr_q: null
+        ic_sb_wr_data: null
+        ic_tag_clken_final: null
+        ic_tag_data_raw_packed_pre: null
+        ic_tag_data_raw_pre: null
+        ic_tag_wr_data: null
+        ic_tag_wren_biten_vec: null
+        ic_tag_wren_q: null
+        iccm_addr_bank: null
+        iccm_bank_dout: null
+        iccm_bank_ecc: null
+        iccm_bank_wr_data: null
+        iccm_bank_wr_ecc: null
+        iccm_clken: null
+        iccm_wren_bank: null
+        wb_dout_pre_up: null
+        wb_packeddout_pre: null
+    type: el2_mem_if
+
+  el2_mem_export:
+    mode: unspecified
+    signals:
+      inout:
+        clk: null
+        dccm_addr_bank: null
+        dccm_bank_dout: null
+        dccm_bank_ecc: null
+        dccm_clken: null
+        dccm_wr_data_bank: null
+        dccm_wr_ecc_bank: null
+        dccm_wren_bank: null
+        ic_b_sb_bit_en_vec: null
+        ic_b_sb_wren: null
+        ic_bank_way_clken_final: null
+        ic_bank_way_clken_final_up: null
+        ic_rw_addr_bank_q: null
+        ic_rw_addr_q: null
+        ic_sb_wr_data: null
+        ic_tag_clken_final: null
+        ic_tag_data_raw_packed_pre: null
+        ic_tag_data_raw_pre: null
+        ic_tag_wr_data: null
+        ic_tag_wren_biten_vec: null
+        ic_tag_wren_q: null
+        iccm_addr_bank: null
+        iccm_bank_dout: null
+        iccm_bank_ecc: null
+        iccm_bank_wr_data: null
+        iccm_bank_wr_ecc: null
+        iccm_clken: null
+        iccm_wren_bank: null
+        wb_dout_pre_up: null
+        wb_packeddout_pre: null
+    type: el2_mem_if
+
 signals:
   in:
-  - {name: dma_axi_bready}
-  - {name: lsu_axi_rvalid}
-  - {name: sb_axi_bvalid}
-  - {name: sb_axi_wready}
-  - {bound: [pt.SB_BUS_TAG-1, '0'], name: sb_axi_bid}
-  - {name: ifu_axi_rlast}
-  - {name: ifu_bus_clk_en}
-  - {name: dbg_rst_l}
-  - {name: sb_axi_rvalid}
-  - {name: nmi_int}
-  - {bound: ['31', '0'], name: dma_axi_awaddr}
-  - {name: dmi_core_enable}
-  - {name: i_cpu_halt_req}
-  - {bound: ['1', '0'], name: dma_axi_awburst}
-  - {bound: ['7', '0'], name: dma_axi_awlen}
-  - {name: sb_axi_rlast}
-  - {name: jtag_trst_n}
-  - {name: dma_axi_wvalid}
-  - {bound: ['2', '0'], name: dma_axi_arprot}
-  - {bound: [pt.LSU_BUS_TAG-1, '0'], name: lsu_axi_rid}
-  - {name: mbist_mode}
-  - {name: jtag_tdi}
-  - {name: jtag_tck}
-  - {bound: ['63', '0'], name: dma_axi_wdata}
-  - {name: dma_axi_awvalid}
-  - {name: dma_axi_arvalid}
-  - {bound: ['1', '0'], name: dma_axi_arburst}
-  - {bound: ['1', '0'], name: sb_axi_bresp}
-  - {bound: [pt.SB_BUS_TAG-1, '0'], name: sb_axi_rid}
-  - {name: lsu_axi_wready}
-  - {bound: [pt.IFU_BUS_TAG-1, '0'], name: ifu_axi_bid}
-  - {bound: ['1', '0'], name: lsu_axi_rresp}
-  - {name: dma_bus_clk_en}
-  - {name: soft_int}
-  - {bound: ['31', '1'], name: nmi_vec}
-  - {bound: ['2', '0'], name: dma_axi_arsize}
-  - {bound: ['31', '1'], name: jtag_id}
-  - {name: rst_l}
-  - {bound: ['1', '0'], name: sb_axi_rresp}
-  - {name: ifu_axi_arready}
-  - {name: mpc_debug_run_req}
-  - {bound: ['31', '0'], name: dmi_uncore_rdata}
-  - {name: mpc_reset_run_req}
-  - {bound: ['31', '1'], name: rst_vec}
-  - {name: dmi_uncore_enable}
-  - {name: lsu_axi_rlast}
-  - {bound: ['63', '0'], name: ifu_axi_rdata}
-  - {name: dma_axi_rready}
-  - {bound: ['1', '0'], name: ifu_axi_rresp}
-  - {name: ifu_axi_rvalid}
-  - {bound: [pt.LSU_BUS_TAG-1, '0'], name: lsu_axi_bid}
-  - {bound: ['7', '0'], name: dma_axi_wstrb}
-  - {name: ifu_axi_bvalid}
-  - {bound: ['63', '0'], name: sb_axi_rdata}
-  - {bound: ['7', '0'], name: dma_axi_arlen}
-  - {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_awid}
-  - {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_arid}
-  - {name: lsu_axi_awready}
-  - {name: lsu_bus_clk_en}
-  - {name: sb_axi_arready}
-  - {name: scan_mode}
-  - {bound: [pt.PIC_TOTAL_INT, '1'], name: extintsrc_req}
-  - {name: lsu_axi_bvalid}
-  - {name: lsu_axi_arready}
-  - {bound: ['2', '0'], name: dma_axi_awsize}
-  - {bound: ['1', '0'], name: lsu_axi_bresp}
-  - {bound: ['63', '0'], name: lsu_axi_rdata}
-  - {name: timer_int}
-  - {bound: ['1', '0'], name: ifu_axi_bresp}
-  - {bound: ['2', '0'], name: dma_axi_awprot}
   - {name: clk}
-  - {name: ifu_axi_wready}
-  - {bound: ['31', '0'], name: dma_axi_araddr}
-  - {name: mpc_debug_halt_req}
-  - {bound: [pt.IFU_BUS_TAG-1, '0'], name: ifu_axi_rid}
-  - {bound: ['31', '4'], name: core_id}
-  - {name: i_cpu_run_req}
-  - {name: sb_axi_awready}
-  - {name: dma_axi_wlast}
-  - {name: dbg_bus_clk_en}
-  - {name: ifu_axi_awready}
+  - {name: rst_l}
+  - {name: dbg_rst_l}
+  - {bound: ['31', '1'], name: rst_vec}
+  - {name: nmi_int}
+  - {bound: ['31', '1'], name: nmi_vec}
+  - {bound: ['31', '1'], name: jtag_id}
+
+  - {name: lsu_bus_clk_en, default: 1}
+  - {name: ifu_bus_clk_en, default: 1}
+  - {name: dbg_bus_clk_en, default: 1}
+  - {name: dma_bus_clk_en, default: 1}
+
+  - {name: timer_int}
+  - {name: soft_int, default: 0}
+  - {bound: [pt.PIC_TOTAL_INT, '1'], name: extintsrc_req}
+
+  - {name: jtag_tck}
   - {name: jtag_tms}
+  - {name: jtag_tdi}
+  - {name: jtag_trst_n}
+
+  - {bound: ['31', '4'], name: core_id}
+
+  - {name: mpc_debug_halt_req, default: 0}
+  - {name: mpc_debug_run_req, default: 0}
+  - {name: mpc_reset_run_req, default: 1}
+
+  - {name: i_cpu_halt_req, default: 0}
+  - {name: i_cpu_run_req, default: 0}
+
+  - {name: scan_mode, default: 0}
+  - {name: mbist_mode, default: 0}
+
+  - {name: dmi_core_enable}
+  - {name: dmi_uncore_enable}
+  - {bound: ['31', '0'], name: dmi_uncore_rdata}
+
   out:
-  - {bound: ['3', '0'], name: sb_axi_arcache}
-  - {bound: ['2', '0'], name: sb_axi_awsize}
-  - {bound: ['3', '0'], name: lsu_axi_arregion}
-  - {name: jtag_tdo}
-  - {name: iccm_ecc_single_error}
-  - {bound: ['3', '0'], name: sb_axi_awqos}
-  - {bound: ['2', '0'], name: sb_axi_arprot}
-  - {name: dec_tlu_perfcnt3}
-  - {bound: [' 6', '0'], name: dmi_uncore_addr}
-  - {bound: ['31', '0'], name: lsu_axi_araddr}
-  - {bound: ['4', '0'], name: trace_rv_i_ecause_ip}
-  - {name: debug_brkpt_status}
-  - {name: sb_axi_wvalid}
-  - {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_bid}
-  - {name: ifu_axi_wvalid}
-  - {name: ifu_axi_rready}
-  - {name: lsu_axi_wvalid}
-  - {bound: ['31', '0'], name: lsu_axi_awaddr}
-  - {bound: ['3', '0'], name: ifu_axi_awcache}
-  - {name: sb_axi_wlast}
-  - {name: lsu_axi_arvalid}
-  - {bound: ['2', '0'], name: ifu_axi_arprot}
-  - {bound: ['1', '0'], name: lsu_axi_awburst}
-  - {name: sb_axi_bready}
-  - {bound: ['7', '0'], name: sb_axi_wstrb}
-  - {bound: ['31', '0'], name: trace_rv_i_address_ip}
-  - {name: ifu_axi_wlast}
-  - {bound: ['7', '0'], name: lsu_axi_awlen}
-  - {bound: ['1', '0'], name: ifu_axi_arburst}
-  - {bound: ['1', '0'], name: dma_axi_bresp}
-  - {bound: ['31', '0'], name: trace_rv_i_tval_ip}
-  - {name: sb_axi_awlock}
-  - {bound: ['31', '0'], name: sb_axi_awaddr}
-  - {name: lsu_axi_awlock}
-  - {bound: ['63', '0'], name: lsu_axi_wdata}
-  - {name: dmi_uncore_wr_en}
-  - {bound: ['63', '0'], name: dma_axi_rdata}
-  - {bound: ['1', '0'], name: sb_axi_arburst}
-  - {name: sb_axi_rready}
   - {bound: ['31', '0'], name: trace_rv_i_insn_ip}
-  - {name: lsu_axi_awvalid}
-  - {bound: ['7', '0'], name: sb_axi_arlen}
-  - {name: dma_axi_rlast}
-  - {bound: ['3', '0'], name: lsu_axi_awregion}
-  - {bound: ['31', '0'], name: ifu_axi_awaddr}
-  - {bound: ['7', '0'], name: ifu_axi_arlen}
-  - {name: dma_axi_awready}
-  - {name: dma_axi_rvalid}
-  - {bound: ['2', '0'], name: sb_axi_arsize}
-  - {bound: ['1', '0'], name: lsu_axi_arburst}
-  - {bound: ['2', '0'], name: ifu_axi_awprot}
-  - {name: ifu_axi_arlock}
-  - {bound: ['7', '0'], name: lsu_axi_arlen}
-  - {bound: ['3', '0'], name: sb_axi_arregion}
-  - {bound: ['31', '0'], name: sb_axi_araddr}
-  - {bound: ['63', '0'], name: sb_axi_wdata}
-  - {name: dmi_active}
-  - {bound: ['2', '0'], name: lsu_axi_arsize}
-  - {name: sb_axi_awvalid}
-  - {name: o_debug_mode_status}
-  - {bound: ['3', '0'], name: ifu_axi_arqos}
-  - {bound: ['7', '0'], name: ifu_axi_awlen}
-  - {name: dma_axi_bvalid}
-  - {bound: ['3', '0'], name: ifu_axi_awregion}
-  - {name: trace_rv_i_exception_ip}
-  - {bound: ['3', '0'], name: lsu_axi_awqos}
-  - {bound: ['1', '0'], name: sb_axi_awburst}
-  - {name: dma_axi_arready}
-  - {bound: ['1', '0'], name: dma_axi_rresp}
-  - {bound: ['3', '0'], name: sb_axi_awregion}
-  - {name: lsu_axi_arlock}
-  - {bound: ['31', '0'], name: ifu_axi_araddr}
-  - {name: mpc_debug_run_ack}
-  - {bound: ['31', '0'], name: dmi_uncore_wdata}
-  - {name: dec_tlu_perfcnt1}
-  - {bound: ['7', '0'], name: lsu_axi_wstrb}
-  - {bound: [pt.IFU_BUS_TAG-1, '0'], name: ifu_axi_arid}
-  - {name: dmi_uncore_en}
-  - {bound: ['3', '0'], name: lsu_axi_awcache}
-  - {name: o_cpu_run_ack}
-  - {bound: ['7', '0'], name: sb_axi_awlen}
-  - {name: dec_tlu_perfcnt0}
-  - {bound: ['3', '0'], name: sb_axi_awcache}
-  - {name: dccm_ecc_double_error}
-  - {bound: ['3', '0'], name: lsu_axi_arcache}
-  - {name: sb_axi_arvalid}
-  - {name: dma_axi_wready}
-  - {bound: ['1', '0'], name: ifu_axi_awburst}
-  - {bound: [pt.SB_BUS_TAG-1, '0'], name: sb_axi_awid}
-  - {bound: ['2', '0'], name: sb_axi_awprot}
-  - {name: o_cpu_halt_ack}
-  - {bound: ['2', '0'], name: lsu_axi_awprot}
-  - {name: sb_axi_arlock}
-  - {name: ifu_axi_awlock}
-  - {name: o_cpu_halt_status}
-  - {name: jtag_tdoEn}
-  - {bound: [pt.IFU_BUS_TAG-1, '0'], name: ifu_axi_awid}
-  - {bound: [pt.DMA_BUS_TAG-1, '0'], name: dma_axi_rid}
-  - {name: trace_rv_i_interrupt_ip}
-  - {name: dccm_ecc_single_error}
-  - {bound: [pt.LSU_BUS_TAG-1, '0'], name: lsu_axi_arid}
-  - {bound: ['3', '0'], name: ifu_axi_arregion}
-  - {bound: [pt.LSU_BUS_TAG-1, '0'], name: lsu_axi_awid}
-  - {name: iccm_ecc_double_error}
-  - {name: mpc_debug_halt_ack}
+  - {bound: ['31', '0'], name: trace_rv_i_address_ip}
   - {name: trace_rv_i_valid_ip}
-  - {name: lsu_axi_wlast}
-  - {bound: ['2', '0'], name: ifu_axi_arsize}
-  - {bound: ['2', '0'], name: lsu_axi_arprot}
-  - {bound: ['2', '0'], name: lsu_axi_awsize}
-  - {bound: ['3', '0'], name: lsu_axi_arqos}
-  - {name: ifu_axi_bready}
-  - {name: lsu_axi_rready}
-  - {name: lsu_axi_bready}
-  - {bound: ['3', '0'], name: ifu_axi_arcache}
-  - {bound: ['7', '0'], name: ifu_axi_wstrb}
-  - {bound: [pt.SB_BUS_TAG-1, '0'], name: sb_axi_arid}
-  - {bound: ['63', '0'], name: ifu_axi_wdata}
-  - {name: ifu_axi_arvalid}
-  - {bound: ['3', '0'], name: sb_axi_arqos}
-  - {name: ifu_axi_awvalid}
-  - {bound: ['3', '0'], name: ifu_axi_awqos}
+  - {name: trace_rv_i_exception_ip}
+  - {bound: ['4', '0'], name: trace_rv_i_ecause_ip}
+  - {name: trace_rv_i_interrupt_ip}
+  - {bound: ['31', '0'], name: trace_rv_i_tval_ip}
+
+  - {name: iccm_ecc_single_error}
+  - {name: iccm_ecc_double_error}
+  - {name: dccm_ecc_single_error}
+  - {name: dccm_ecc_double_error}
+
+  - {name: dec_tlu_perfcnt0}
+  - {name: dec_tlu_perfcnt1}
   - {name: dec_tlu_perfcnt2}
-  - {bound: ['2', '0'], name: ifu_axi_awsize}
+  - {name: dec_tlu_perfcnt3}
+
+  - {name: jtag_tdo}
+  - {name: jtag_tdoEn}
+
+  - {name: mpc_debug_halt_ack}
+  - {name: mpc_debug_run_ack}
+  - {name: debug_brkpt_status}
+
+  - {name: o_cpu_halt_ack}
+  - {name: o_cpu_halt_status}
+  - {name: o_debug_mode_status}
+  - {name: o_cpu_run_ack}
+
+  - {name: dmi_uncore_en}
+  - {name: dmi_uncore_wr_en}
+  - {bound: ['6', '0'], name: dmi_uncore_addr}
+  - {bound: ['31', '0'], name: dmi_uncore_wdata}
+  - {name: dmi_active}

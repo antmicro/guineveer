@@ -5,6 +5,23 @@
 
 name: guineveer
 
+clock_domains:
+  default:
+    signal: clk_i
+  i3c:
+    signal: i3c_clk_i
+
+reset_domains:
+  default:
+    signal: rst_ni
+    polarity: active low
+  cpu:
+    signal: cpu_rst_ni
+    polarity: active low
+  i3c:
+    signal: i3c_rst_ni
+    polarity: active low
+
 connections:
   interfaces:
     i3c_core:
@@ -31,38 +48,10 @@ connections:
       scan_mode: 0
       ahb_hready: 1
     rvtop_wrapper0:
-      clk: clk_i
       core_id: 0
-      i_cpu_halt_req: 0
-      i_cpu_run_req: 0
-      dbg_bus_clk_en: 1
-      dma_bus_clk_en: 1
-      ifu_bus_clk_en: 1
-      lsu_bus_clk_en: 1
-      mbist_mode: 0
-      mpc_debug_halt_req: 0
-      mpc_debug_run_req: 0
-      mpc_reset_run_req: 1
-      rst_l: cpu_rst_ni
-      scan_mode: 0
-      soft_int: 0
       rst_vec: 0x40000000
     rvtop_wrapper1:
-      clk: clk_i
       core_id: 3
-      i_cpu_halt_req: 0
-      i_cpu_run_req: 0
-      dbg_bus_clk_en: 1
-      dma_bus_clk_en: 1
-      ifu_bus_clk_en: 1
-      lsu_bus_clk_en: 1
-      mbist_mode: 0
-      mpc_debug_halt_req: 0
-      mpc_debug_run_req: 0
-      mpc_reset_run_req: 1
-      rst_l: cpu_rst_ni
-      scan_mode: 0
-      soft_int: 0
       rst_vec: 0x48000000
     lmem0:
       clk_i: clk_i
@@ -124,6 +113,7 @@ interconnects:
         lsu_axi:
           id_width: 3
 
+
 external:
   ports:
     in:
@@ -164,8 +154,14 @@ ips:
       TAG: 5
   rvtop_wrapper0:
     file: repo[repo]:el2_veer_wrapper
+    resets:
+      cpu: cpu
+      dbg: cpu
   rvtop_wrapper1:
     file: repo[repo]:el2_veer_wrapper
+    resets:
+      cpu: cpu
+      dbg: cpu
   i3c_core:
     file: repo[repo]:i3c_wrapper
     parameters:
