@@ -50,10 +50,6 @@ connections:
       clk_i: clk_i
       rst_ni: rst_ni
     i3c_core:
-      clk_i: i3c_clk_i
-      rst_ni: i3c_rst_ni
-      disable_id_filtering_i: 1
-      priv_ids_i: '' # Mentioned but unconnected intentionally to silence warning
       scl_i: i3c_scl_i
       sda_i: i3c_sda_i
       scl_o: i3c_scl_o
@@ -139,5 +135,9 @@ ips:
       AxiDataWidth: 64
       AxiUserWidth: 1
       AxiIdWidth: 4
+    clocks:
+      i3c: i3c
+    resets:
+      i3c: i3c
   uart_core:
     file: repo[repo]:uart_wrapper
