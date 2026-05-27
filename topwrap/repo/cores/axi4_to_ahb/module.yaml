@@ -38,6 +38,7 @@ interfaces:
     mode: subordinate
     clock: bridge
     reset: bridge
+    size: 0x1000
     signals:
       in:
         ARADDR: {bound: ['31', '0'], name: axi_araddr}

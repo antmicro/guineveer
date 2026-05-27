@@ -65,14 +65,12 @@ memory_maps:
     i_axi_cdc_lsu:
       s_axi_src:
         address: 0x30001000
-        size: 0x1000
     lmem0:
       address: 0x80000000
       size: 0x1f400
     axi_bridge:
       axi:
         address: 0x30000000
-        size: 0x1000
 
 external:
   ports:

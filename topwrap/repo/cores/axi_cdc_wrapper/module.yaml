@@ -75,6 +75,7 @@ interfaces:
     mode: subordinate
     clock: src
     reset: src
+    size: 0x1000
     signals:
       in:
         ARADDR: {bound: ['31', '0'], name: s_axi_src_araddr}
