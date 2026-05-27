@@ -28,6 +28,7 @@ connections:
       ahb: [axi_bridge, ahb]
     rvtop_wrapper0:
       el2_mem_export: [rvtop_wrapper0, el2_icache_export]
+
   ports:
     rvtop_wrapper0:
       core_id: 0
@@ -43,7 +44,7 @@ connections:
     uart_core:
       uart_rx_i: uart_rx_i
       uart_tx_o: uart_tx_o
-      
+
 interconnects:
   axi_interconnect1:
     clock: clk_i
@@ -51,25 +52,27 @@ interconnects:
     type: AXI
     params:
       atop: False
-    subordinates:
-      i_axi_cdc_lsu:
-        s_axi_src:
-          address: 0x30001000
-          size: 0x1000
-      lmem0:
-        s_axi_sram:
-          address: 0x80000000
-          size: 0x1f400
-      axi_bridge:
-        axi:
-          address: 0x30000000
-          size: 0x1000
+    memory_map: mmap1
     managers:
       rvtop_wrapper0:
         ifu_axi:
           id_width: 3
         lsu_axi:
           id_width: 3
+
+memory_maps:
+  mmap1:
+    i_axi_cdc_lsu:
+      s_axi_src:
+        address: 0x30001000
+        size: 0x1000
+    lmem0:
+      address: 0x80000000
+      size: 0x1f400
+    axi_bridge:
+      axi:
+        address: 0x30000000
+        size: 0x1000
 
 external:
   ports:
@@ -101,20 +104,24 @@ ips:
     resets:
       src: default
       dst: i3c
+
   lmem0:
     file: repo[repo]:sram_wrapper
     parameters:
       ID_WIDTH: 4
       GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
+
   axi_bridge:
     file: repo[repo]:axi4_to_ahb
     parameters:
       TAG: 4
+
   rvtop_wrapper0:
     file: repo[repo]:el2_veer_wrapper
     resets:
       cpu: cpu
       dbg: cpu
+
   i3c_core:
     file: repo[repo]:i3c_wrapper
     parameters:
@@ -126,5 +133,6 @@ ips:
       i3c: i3c
     resets:
       i3c: i3c
+
   uart_core:
     file: repo[repo]:uart_wrapper
