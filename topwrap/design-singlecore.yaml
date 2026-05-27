@@ -29,11 +29,6 @@ connections:
     rvtop_wrapper0:
       el2_mem_export: [rvtop_wrapper0, el2_icache_export]
   ports:
-    i_axi_cdc_lsu:
-      src_clk_i: clk_i
-      src_rst_ni: rst_ni
-      dst_clk_i: i3c_clk_i
-      dst_rst_ni: i3c_rst_ni
     axi_bridge:
       bus_clk_en: 1
       clk: clk_i
@@ -111,6 +106,12 @@ ips:
     file: repo[repo]:axi_cdc_wrapper
     parameters:
       ID_WIDTH: 4
+    clocks:
+      src: default
+      dst: i3c
+    resets:
+      src: default
+      dst: i3c
   lmem0:
     file: repo[repo]:sram_wrapper
     parameters:

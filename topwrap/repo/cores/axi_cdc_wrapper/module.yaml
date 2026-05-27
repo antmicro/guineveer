@@ -2,9 +2,26 @@ id:
   library: libdefault
   name: axi_cdc_wrapper
   vendor: vendor
+
+clocks:
+  src:
+    signal: src_clk_i
+  dst:
+    signal: dst_clk_i
+
+resets:
+  src:
+    signal: src_rst_ni
+    polarity: active low
+  dst:
+    signal: dst_rst_ni
+    polarity: active low
+
 interfaces:
   m_axi_dst:
     mode: manager
+    clock: dst
+    reset: dst
     signals:
       in:
         ARREADY: {name: m_axi_dst_arready}
@@ -53,8 +70,11 @@ interfaces:
         WUSER: {name: m_axi_dst_wuser}
         WVALID: {name: m_axi_dst_wvalid}
     type: AXI4
+
   s_axi_src:
     mode: subordinate
+    clock: src
+    reset: src
     signals:
       in:
         ARADDR: {bound: ['31', '0'], name: s_axi_src_araddr}
@@ -103,100 +123,13 @@ interfaces:
         RVALID: {name: s_axi_src_rvalid}
         WREADY: {name: s_axi_src_wready}
     type: AXI4
+
 parameters:
   ID_WIDTH: null
+
 signals:
   in:
-  - {name: s_axi_src_arregion}
-  - {bound: ['31', '0'], name: s_axi_src_awaddr}
-  - {name: s_axi_src_wlast}
-  - {name: s_axi_src_bready}
-  - {name: s_axi_src_wvalid}
-  - {name: m_axi_dst_awready}
-  - {bound: [ID_WIDTH-1, '0'], name: m_axi_dst_bid}
-  - {bound: ['63', '0'], name: m_axi_dst_rdata}
-  - {name: dst_clk_i}
-  - {name: s_axi_src_arlock}
-  - {name: s_axi_src_arlen}
-  - {name: m_axi_dst_arready}
-  - {name: s_axi_src_arprot}
-  - {name: s_axi_src_awburst}
-  - {name: m_axi_dst_ruser}
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_src_awid}
-  - {name: dst_rst_ni}
-  - {name: s_axi_src_arsize}
-  - {name: s_axi_src_arcache}
-  - {bound: ['31', '0'], name: s_axi_src_araddr}
-  - {name: s_axi_src_wuser}
-  - {name: m_axi_dst_wready}
-  - {name: s_axi_src_awregion}
-  - {name: m_axi_dst_rresp}
-  - {name: m_axi_dst_rlast}
-  - {bound: ['7', '0'], name: s_axi_src_wstrb}
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_src_arid}
-  - {name: s_axi_src_arqos}
-  - {name: s_axi_src_arvalid}
-  - {name: s_axi_src_arburst}
-  - {name: s_axi_src_rready}
-  - {name: m_axi_dst_bresp}
-  - {name: m_axi_dst_rvalid}
   - {name: src_clk_i}
-  - {name: m_axi_dst_buser}
-  - {name: s_axi_src_awvalid}
-  - {bound: ['63', '0'], name: s_axi_src_wdata}
-  - {name: s_axi_src_awqos}
-  - {name: s_axi_src_awlock}
-  - {name: s_axi_src_awsize}
-  - {name: s_axi_src_awprot}
-  - {name: m_axi_dst_bvalid}
-  - {name: s_axi_src_awcache}
-  - {name: s_axi_src_awlen}
-  - {bound: [ID_WIDTH-1, '0'], name: m_axi_dst_rid}
-  - {name: s_axi_src_aruser}
-  - {name: s_axi_src_awuser}
   - {name: src_rst_ni}
-  out:
-  - {name: m_axi_dst_wuser}
-  - {bound: ['63', '0'], name: m_axi_dst_wdata}
-  - {name: m_axi_dst_wlast}
-  - {name: m_axi_dst_rready}
-  - {name: m_axi_dst_arregion}
-  - {name: m_axi_dst_aruser}
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_src_rid}
-  - {name: s_axi_src_rresp}
-  - {bound: ['63', '0'], name: s_axi_src_rdata}
-  - {name: m_axi_dst_awqos}
-  - {name: m_axi_dst_awcache}
-  - {name: m_axi_dst_arsize}
-  - {name: m_axi_dst_awsize}
-  - {bound: ['31', '0'], name: m_axi_dst_awaddr}
-  - {name: s_axi_src_rvalid}
-  - {name: s_axi_src_buser}
-  - {name: m_axi_dst_awuser}
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_src_bid}
-  - {name: m_axi_dst_arburst}
-  - {name: m_axi_dst_awvalid}
-  - {name: m_axi_dst_awlock}
-  - {name: s_axi_src_wready}
-  - {name: s_axi_src_ruser}
-  - {name: m_axi_dst_arlen}
-  - {bound: ['31', '0'], name: m_axi_dst_araddr}
-  - {name: m_axi_dst_awlen}
-  - {name: m_axi_dst_awburst}
-  - {name: s_axi_src_arready}
-  - {name: s_axi_src_awready}
-  - {bound: [ID_WIDTH-1, '0'], name: m_axi_dst_arid}
-  - {name: s_axi_src_rlast}
-  - {name: m_axi_dst_wvalid}
-  - {name: m_axi_dst_bready}
-  - {name: m_axi_dst_arcache}
-  - {name: m_axi_dst_arlock}
-  - {name: m_axi_dst_awregion}
-  - {name: s_axi_src_bresp}
-  - {name: m_axi_dst_arprot}
-  - {bound: ['7', '0'], name: m_axi_dst_wstrb}
-  - {bound: [ID_WIDTH-1, '0'], name: m_axi_dst_awid}
-  - {name: m_axi_dst_arqos}
-  - {name: s_axi_src_bvalid}
-  - {name: m_axi_dst_awprot}
-  - {name: m_axi_dst_arvalid}
+  - {name: dst_clk_i}
+  - {name: dst_rst_ni}
