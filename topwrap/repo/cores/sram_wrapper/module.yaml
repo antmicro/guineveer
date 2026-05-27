@@ -2,9 +2,21 @@ id:
   library: libdefault
   name: sram_wrapper
   vendor: vendor
+
+clocks:
+  mem:
+    signal: clk_i
+
+resets:
+  mem:
+    signal: rst_ni
+    polarity: active low
+
 interfaces:
   s_axi_sram:
     mode: subordinate
+    clock: mem
+    reset: mem
     signals:
       in:
         ARADDR: {bound: ['31', '0'], name: s_axi_sram_araddr}
@@ -53,55 +65,12 @@ interfaces:
         RVALID: {name: s_axi_sram_rvalid}
         WREADY: {name: s_axi_sram_wready}
     type: AXI4
+
 parameters:
   GUINEVEER_MEMORY_FILE: '""'
   ID_WIDTH: null
+
 signals:
   in:
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_sram_awid}
-  - {name: s_axi_sram_awlen}
-  - {name: s_axi_sram_wuser}
-  - {name: s_axi_sram_awcache}
-  - {name: s_axi_sram_awvalid}
-  - {name: rst_ni}
-  - {name: s_axi_sram_awsize}
-  - {name: s_axi_sram_awuser}
-  - {name: s_axi_sram_arlock}
-  - {name: s_axi_sram_awregion}
   - {name: clk_i}
-  - {name: s_axi_sram_arsize}
-  - {name: s_axi_sram_arlen}
-  - {name: s_axi_sram_aruser}
-  - {bound: ['31', '0'], name: s_axi_sram_araddr}
-  - {bound: ['63', '0'], name: s_axi_sram_wdata}
-  - {name: s_axi_sram_awprot}
-  - {bound: ['7', '0'], name: s_axi_sram_wstrb}
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_sram_arid}
-  - {name: s_axi_sram_arcache}
-  - {name: s_axi_sram_awburst}
-  - {name: s_axi_sram_arprot}
-  - {bound: ['31', '0'], name: s_axi_sram_awaddr}
-  - {name: s_axi_sram_arregion}
-  - {name: s_axi_sram_arburst}
-  - {name: s_axi_sram_rready}
-  - {name: s_axi_sram_awlock}
-  - {name: s_axi_sram_wlast}
-  - {name: s_axi_sram_arvalid}
-  - {name: s_axi_sram_bready}
-  - {name: s_axi_sram_awqos}
-  - {name: s_axi_sram_arqos}
-  - {name: s_axi_sram_wvalid}
-  out:
-  - {name: s_axi_sram_arready}
-  - {name: s_axi_sram_bvalid}
-  - {name: s_axi_sram_wready}
-  - {name: s_axi_sram_rresp}
-  - {bound: ['63', '0'], name: s_axi_sram_rdata}
-  - {name: s_axi_sram_ruser}
-  - {name: s_axi_sram_bresp}
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_sram_rid}
-  - {bound: [ID_WIDTH-1, '0'], name: s_axi_sram_bid}
-  - {name: s_axi_sram_rlast}
-  - {name: s_axi_sram_awready}
-  - {name: s_axi_sram_rvalid}
-  - {name: s_axi_sram_buser}
+  - {name: rst_ni}

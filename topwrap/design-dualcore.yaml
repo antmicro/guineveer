@@ -53,12 +53,6 @@ connections:
     rvtop_wrapper1:
       core_id: 3
       rst_vec: 0x48000000
-    lmem0:
-      clk_i: clk_i
-      rst_ni: rst_ni
-    lmem1:
-      clk_i: clk_i
-      rst_ni: rst_ni
     i3c_core:
       scl_i: i3c_scl_i
       sda_i: i3c_sda_i
