@@ -2,9 +2,23 @@ id:
   library: libdefault
   name: axi4_to_ahb
   vendor: vendor
+
+clocks:
+  bridge:
+    signal: clk
+  free_clk:
+    signal: free_clk
+
+resets:
+  bridge:
+    signal: rst_l
+    polarity: active low
+
 interfaces:
   ahb:
     mode: manager
+    clock: bridge
+    reset: bridge
     signals:
       in:
         HRDATA: {bound: ['63', '0'], name: ahb_hrdata}
@@ -19,8 +33,11 @@ interfaces:
         HWDATA: {bound: ['63', '0'], name: ahb_hwdata}
         HWRITE: {name: ahb_hwrite}
     type: AHBguin
+
   axi:
     mode: subordinate
+    clock: bridge
+    reset: bridge
     signals:
       in:
         ARADDR: {bound: ['31', '0'], name: axi_araddr}
@@ -52,55 +69,22 @@ interfaces:
         RVALID: {name: axi_rvalid}
         WREADY: {name: axi_wready}
     type: AXI4
+
 parameters:
   ID: '1'
   PRTY: '1'
   TAG: '1'
+
 signals:
   in:
-  - {name: scan_mode}
-  - {name: axi_bready}
-  - {name: ahb_hresp}
-  - {bound: [TAG-1, '0'], name: axi_arid}
-  - {name: axi_arvalid}
-  - {name: axi_awvalid}
-  - {bound: ['2', '0'], name: axi_awprot}
-  - {name: axi_rready}
-  - {bound: ['31', '0'], name: axi_araddr}
-  - {bound: ['2', '0'], name: axi_awsize}
-  - {name: axi_wvalid}
-  - {bound: ['63', '0'], name: axi_wdata}
-  - {name: bus_clk_en}
-  - {bound: ['63', '0'], name: ahb_hrdata}
   - {name: clk}
-  - {name: clk_override}
-  - {name: ahb_hready}
-  - {bound: ['2', '0'], name: axi_arsize}
-  - {name: axi_wlast}
   - {name: free_clk}
-  - {name: dec_tlu_force_halt}
-  - {bound: ['31', '0'], name: axi_awaddr}
-  - {bound: ['7', '0'], name: axi_wstrb}
   - {name: rst_l}
-  - {bound: ['2', '0'], name: axi_arprot}
-  - {bound: [TAG-1, '0'], name: axi_awid}
-  out:
-  - {bound: ['1', '0'], name: axi_bresp}
-  - {bound: ['31', '0'], name: ahb_haddr}
-  - {name: axi_rvalid}
-  - {bound: ['1', '0'], name: ahb_htrans}
-  - {bound: ['63', '0'], name: ahb_hwdata}
-  - {name: ahb_hwrite}
-  - {bound: ['2', '0'], name: ahb_hsize}
-  - {name: axi_wready}
-  - {name: axi_arready}
-  - {bound: ['2', '0'], name: ahb_hburst}
-  - {bound: [TAG-1, '0'], name: axi_bid}
-  - {name: axi_awready}
-  - {name: axi_rlast}
-  - {name: ahb_hmastlock}
-  - {bound: ['3', '0'], name: ahb_hprot}
-  - {bound: [TAG-1, '0'], name: axi_rid}
-  - {bound: ['63', '0'], name: axi_rdata}
-  - {name: axi_bvalid}
-  - {bound: ['1', '0'], name: axi_rresp}
+
+  - {name: scan_mode, default: 0}
+
+  - {name: bus_clk_en, default: 1}
+  - {name: clk_override, default: 0}
+  - {name: dec_tlu_force_halt, default: 0}
+
+  - {name: ahb_hready, default: 1}

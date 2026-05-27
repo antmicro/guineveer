@@ -29,15 +29,6 @@ connections:
     rvtop_wrapper0:
       el2_mem_export: [rvtop_wrapper0, el2_icache_export]
   ports:
-    axi_bridge:
-      bus_clk_en: 1
-      clk: clk_i
-      clk_override: 0
-      dec_tlu_force_halt: 0
-      free_clk: clk_i
-      rst_l: rst_ni
-      scan_mode: 0
-      ahb_hready: 1
     rvtop_wrapper0:
       core_id: 0
       rst_vec: 0x40000000
