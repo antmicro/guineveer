@@ -9,8 +9,6 @@ connections:
       axi: [i_axi_cdc_lsu, m_axi_dst]
     uart_core:
       ahb: [axi_bridge, ahb]
-    lmem0:
-      s_axi_sram: [axi_interconnect, mem0]
     rvtop_wrapper0:
       el2_mem_export: [rvtop_wrapper0, el2_icache_export]
   ports:
