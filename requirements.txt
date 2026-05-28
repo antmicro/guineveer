@@ -1,2 +1,1 @@
-pyslang==10.0.0
-git+https://github.com/antmicro/topwrap@f8de2eb3046a4f72a6dd76430737c3ba094b22bb
+git+https://github.com/antmicro/topwrap@f416803b0ce5d183bd7cfee2e6b8db14bd055f9c
