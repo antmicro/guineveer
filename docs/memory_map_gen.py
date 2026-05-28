@@ -2,6 +2,10 @@ import yaml
 import csv
 import os
 from pathlib import Path
+from typing import Union
+
+from topwrap.cli import load_modules_from_repos
+from topwrap.frontend.yaml.frontend import YamlFrontend
 
 
 def _underscore_hex(hex: str) -> str:
@@ -34,31 +38,58 @@ def format_hex(val: int) -> str:
     return _underscore_hex(hex_str)
 
 
-def generate_map(design: Path, output: Path):
-    with open(design, "r") as f:
-        data = yaml.load(f, Loader=yaml.FullLoader)
-        output.parent.mkdir(exist_ok=True)
-        with open(output, "w", newline="") as memory_map_csv:
-            table_columns = ["Start Address", "End Address", "Size", "Type"]
-            writer = csv.DictWriter(memory_map_csv, fieldnames=table_columns)
-            writer.writeheader()
-            subordinates_topwrap = data["interconnects"]["axi_interconnect1"]["subordinates"]
-            subordinates = {
-                "VeeR EL2 reserved space": {"address": 0x0, "size": 0x1FFF_FFFF}
-            } | {name: list(params.values())[0] for (name, params) in subordinates_topwrap.items()}
-            for peripheral, map_location in subordinates.items():
-                start_address = format_hex(map_location["address"])
-                end_address = format_hex(map_location["address"] + map_location["size"])
-                size = format_hex(map_location["size"])
-                writer.writerow(
-                    {
-                        table_columns[0]: start_address,
-                        table_columns[1]: end_address,
-                        table_columns[2]: size,
-                        table_columns[3]: peripheral,
-                    }
-                )
-            print(f"Memory map generated successfully for {design.name}")
+def design_component_to_mmap_name(name: str) -> str:
+    return {
+        "lmem0": "Memory for core 0",
+        "lmem1": "Memory for core 1",
+        "axi_bridge": "UART",
+        "i_axi_cdc_lsu": "I3C core",
+    }[name]
+
+
+def generate_map(design_file: Path, output: Path):
+    frontend = YamlFrontend()
+
+    repo_modules, _ = load_modules_from_repos()
+
+    frontend = YamlFrontend(repo_modules)
+    module = frontend.parse_design_file(design_file).modules[0]
+
+    assert module.design is not None
+    design = module.design
+    design.update_interconnects_from_memory_maps()
+
+    subordinates = {
+        "VeeR EL2 reserved space": {"address": 0x0, "size": 0x2000_0000}
+    }
+    intr = design.interconnects.find_by_name_or_error("axi_interconnect1")
+    for intf, params in intr.subordinates.items():
+        name = design_component_to_mmap_name(intf.resolve().instance.name)
+
+        subordinates[name] = {
+            "address": int(params.address.value),
+            "size": int(params.size.value),
+        }
+
+    output.parent.mkdir(exist_ok=True)
+    with open(output, "w", newline="") as memory_map_csv:
+        table_columns = ["Start Address", "End Address", "Size", "Type"]
+        writer = csv.DictWriter(memory_map_csv, fieldnames=table_columns)
+        writer.writeheader()
+        for peripheral, map_location in subordinates.items():
+            start_address = map_location["address"]
+            size = map_location["size"]
+            end_address = start_address + size - 1
+            writer.writerow(
+                {
+                    table_columns[0]: start_address,
+                    table_columns[1]: end_address,
+                    table_columns[2]: size,
+                    table_columns[3]: peripheral,
+                }
+            )
+        print(f"Memory map generated successfully for {design_file}")
+
 
 if __name__ == "__main__":
     generate_map(
