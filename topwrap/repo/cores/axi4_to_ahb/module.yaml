@@ -1,0 +1,106 @@
+id:
+  library: libdefault
+  name: axi4_to_ahb
+  vendor: vendor
+interfaces:
+  ahb:
+    mode: manager
+    signals:
+      in:
+        HRDATA: {bound: ['63', '0'], name: ahb_hrdata}
+        HRESP: {name: ahb_hresp}
+      out:
+        HADDR: {bound: ['31', '0'], name: ahb_haddr}
+        HBURST: {bound: ['2', '0'], name: ahb_hburst}
+        HMASTLOCK: {name: ahb_hmastlock}
+        HPROT: {bound: ['3', '0'], name: ahb_hprot}
+        HSIZE: {bound: ['2', '0'], name: ahb_hsize}
+        HTRANS: {bound: ['1', '0'], name: ahb_htrans}
+        HWDATA: {bound: ['63', '0'], name: ahb_hwdata}
+        HWRITE: {name: ahb_hwrite}
+    type: AHBguin
+  axi:
+    mode: subordinate
+    signals:
+      in:
+        ARADDR: {bound: ['31', '0'], name: axi_araddr}
+        ARID: {bound: [TAG-1, '0'], name: axi_arid}
+        ARPROT: {bound: ['2', '0'], name: axi_arprot}
+        ARSIZE: {bound: ['2', '0'], name: axi_arsize}
+        ARVALID: {name: axi_arvalid}
+        AWADDR: {bound: ['31', '0'], name: axi_awaddr}
+        AWID: {bound: [TAG-1, '0'], name: axi_awid}
+        AWPROT: {bound: ['2', '0'], name: axi_awprot}
+        AWSIZE: {bound: ['2', '0'], name: axi_awsize}
+        AWVALID: {name: axi_awvalid}
+        BREADY: {name: axi_bready}
+        RREADY: {name: axi_rready}
+        WDATA: {bound: ['63', '0'], name: axi_wdata}
+        WLAST: {name: axi_wlast}
+        WSTRB: {bound: ['7', '0'], name: axi_wstrb}
+        WVALID: {name: axi_wvalid}
+      out:
+        ARREADY: {name: axi_arready}
+        AWREADY: {name: axi_awready}
+        BID: {bound: [TAG-1, '0'], name: axi_bid}
+        BRESP: {bound: ['1', '0'], name: axi_bresp}
+        BVALID: {name: axi_bvalid}
+        RDATA: {bound: ['63', '0'], name: axi_rdata}
+        RID: {bound: [TAG-1, '0'], name: axi_rid}
+        RLAST: {name: axi_rlast}
+        RRESP: {bound: ['1', '0'], name: axi_rresp}
+        RVALID: {name: axi_rvalid}
+        WREADY: {name: axi_wready}
+    type: AXI4
+parameters:
+  ID: '1'
+  PRTY: '1'
+  TAG: '1'
+signals:
+  in:
+  - {name: scan_mode}
+  - {name: axi_bready}
+  - {name: ahb_hresp}
+  - {bound: [TAG-1, '0'], name: axi_arid}
+  - {name: axi_arvalid}
+  - {name: axi_awvalid}
+  - {bound: ['2', '0'], name: axi_awprot}
+  - {name: axi_rready}
+  - {bound: ['31', '0'], name: axi_araddr}
+  - {bound: ['2', '0'], name: axi_awsize}
+  - {name: axi_wvalid}
+  - {bound: ['63', '0'], name: axi_wdata}
+  - {name: bus_clk_en}
+  - {bound: ['63', '0'], name: ahb_hrdata}
+  - {name: clk}
+  - {name: clk_override}
+  - {name: ahb_hready}
+  - {bound: ['2', '0'], name: axi_arsize}
+  - {name: axi_wlast}
+  - {name: free_clk}
+  - {name: dec_tlu_force_halt}
+  - {bound: ['31', '0'], name: axi_awaddr}
+  - {bound: ['7', '0'], name: axi_wstrb}
+  - {name: rst_l}
+  - {bound: ['2', '0'], name: axi_arprot}
+  - {bound: [TAG-1, '0'], name: axi_awid}
+  out:
+  - {bound: ['1', '0'], name: axi_bresp}
+  - {bound: ['31', '0'], name: ahb_haddr}
+  - {name: axi_rvalid}
+  - {bound: ['1', '0'], name: ahb_htrans}
+  - {bound: ['63', '0'], name: ahb_hwdata}
+  - {name: ahb_hwrite}
+  - {bound: ['2', '0'], name: ahb_hsize}
+  - {name: axi_wready}
+  - {name: axi_arready}
+  - {bound: ['2', '0'], name: ahb_hburst}
+  - {bound: [TAG-1, '0'], name: axi_bid}
+  - {name: axi_awready}
+  - {name: axi_rlast}
+  - {name: ahb_hmastlock}
+  - {bound: ['3', '0'], name: ahb_hprot}
+  - {bound: [TAG-1, '0'], name: axi_rid}
+  - {bound: ['63', '0'], name: axi_rdata}
+  - {name: axi_bvalid}
+  - {bound: ['1', '0'], name: axi_rresp}

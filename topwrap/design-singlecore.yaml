@@ -112,26 +112,26 @@ external:
     
 ips:
   i_axi_cdc_lsu:
-    file: repo[repo_guin]:axi_cdc_wrapper
+    file: repo[repo]:axi_cdc_wrapper
     parameters:
       ID_WIDTH: 4
   lmem0:
-    file: repo[repo_guin]:sram_wrapper
+    file: repo[repo]:sram_wrapper
     parameters:
       ID_WIDTH: 4
       GUINEVEER_MEMORY_FILE: "`HEX_FILE0"
   axi_bridge:
-    file: repo[repo_guin]:axi4_to_ahb
+    file: repo[repo]:axi4_to_ahb
     parameters:
       TAG: 4
   rvtop_wrapper0:
-    file: repo[repo_guin]:el2_veer_wrapper
+    file: repo[repo]:el2_veer_wrapper
   i3c_core:
-    file: repo[repo_guin]:i3c_wrapper
+    file: repo[repo]:i3c_wrapper
     parameters:
       AxiAddrWidth: 32
       AxiDataWidth: 64
       AxiUserWidth: 1
       AxiIdWidth: 4
   uart_core:
-    file: repo[repo_guin]:uart_wrapper
+    file: repo[repo]:uart_wrapper

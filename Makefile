@@ -37,7 +37,7 @@ DESIGN ?= singlecore
 DUALCORE_ONLY_TESTS := axi-streaming-boot-dualcore
 ifeq ($(DESIGN),singlecore)
 	ifneq ($(filter $(TEST),$(DUALCORE_ONLY_TESTS)),)
-    $(error $(TEST) isn't supported in singlecore architecture, use 'dualcore')
+		$(error $(TEST) isn\'t supported in singlecore architecture, use \'dualcore\')
 	endif
 endif
 
@@ -52,21 +52,15 @@ VERILATOR_SKIP_WARNINGS = -Wno-REDEFMACRO
 
 VERILATOR_DEBUG := --trace-fst --trace-structs
 
-SOC_WRAPPER_DEPS := \
-	$(wildcard $(TW_DIR)/interfaces/*) \
-	$(TW_DIR)/design-$(DESIGN).yaml
+SOC_WRAPPER_DEPS := $(TW_DIR)/design-$(DESIGN).yaml
 
-TW_REPO = repo_guin
+TW_REPO = repo
 TW_REPO_DIR = $(TW_DIR)/$(TW_REPO)
 
-# `--all-sources` is needed so that header files listed as arguments to `topwrap repo parse` are
-# included in the core source sets, which is necessary for cores such as sram_wrapper due to macro
-# usage.
 TW_PARSE_FLAGS = \
 	--inference \
-	--inference-interface AXIguin \
-	--inference-interface AHBguin \
-	--all-sources
+	--inference-interface AXI4 \
+	--inference-interface AHBguin
 
 TW_AXI_PREREQ_SRCS = $(BUILD_DIR)/axi/src/axi_pkg.sv $(wildcard $(AXI_INCLUDE_PATH)/axi/*.svh)
 
@@ -98,6 +92,15 @@ $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_IN
 # Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
 	sed -i.bak "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
 
+	topwrap build -d $(TW_DIR)/design-$(DESIGN).yaml --build-dir $(HW_DIR)
+
+	sed -i.bak 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/guineveer.sv
+
+
+# This target is only included for reference.
+# Running this target will lose all changes made to the IP core YAML files,
+# such as adding clocks and resets or default values for ports.
+regenerate_tw_repo: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUDE_DIRS)
 	-rm -rf $(TW_REPO_DIR)
 	-rm -f $(SCRIPT_DIR)/topwrap.yaml
 	topwrap repo init $(TW_REPO) $(TW_REPO_DIR)
@@ -111,11 +114,7 @@ $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_IN
 	topwrap repo parse $(TW_REPO) $(HW_DIR)/uart_wrapper.sv $(TW_PARSE_FLAGS) --grouping-hint=AHBguin=ahb
 	topwrap repo parse $(TW_REPO) $(RV_ROOT)/design/lib/axi4_to_ahb.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(I3C_ROOT_DIR)/src/i3c_defines.svh $(I3C_ROOT_DIR)/src/i3c_wrapper.sv $(TW_PARSE_FLAGS) \
-		--grouping-hint=AXIguin=axi
-
-	topwrap build -d $(TW_DIR)/design-$(DESIGN).yaml --build-dir $(HW_DIR)
-
-	sed -i.bak 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/guineveer.sv
+		--grouping-hint=AXI4=axi
 
 $(VEER_SNAPSHOT): $(VEER_SNAPSHOT)/common_defines.vh
 $(VEER_SNAPSHOT)/%: | $(BUILD_DIR)
@@ -161,6 +160,6 @@ ifneq ($(filter i3c_cosim axi-streaming-boot-dualcore,$(RENODE_TEST)),)
 endif
 	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/tests/renode/guineveer_$(RENODE_TEST).robot
 
-.PHONY: all clean hw testbench sim build_test renode_test
+.PHONY: all clean hw testbench sim build_test renode_test regenerate_tw_repo
 
 .PRECIOUS: $(BUILD_DIR)/sim.vcd

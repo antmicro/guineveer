@@ -12,10 +12,8 @@ tests/**/coverage.dat
 
 design/src/axi_intercon.sv
 design/src/guineveer.sv
+design/src/guineveer.sv.bak
 
 design/fpga/vivado*
 design/fpga/guineveer/
 design/fpga/guineveer.tcl
-
-topwrap.yaml
-topwrap/repo_guin

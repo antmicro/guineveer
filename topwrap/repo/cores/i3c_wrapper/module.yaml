@@ -1,0 +1,113 @@
+id:
+  library: libdefault
+  name: i3c_wrapper
+  vendor: vendor
+interfaces:
+  axi:
+    mode: subordinate
+    signals:
+      in:
+        ARADDR: {bound: [AxiAddrWidth-1, '0'], name: araddr_i}
+        ARBURST: {bound: ['             1', '0'], name: arburst_i}
+        ARID: {bound: ['  AxiIdWidth-1', '0'], name: arid_i}
+        ARLEN: {bound: ['             7', '0'], name: arlen_i}
+        ARLOCK: {name: arlock_i}
+        ARSIZE: {bound: ['             2', '0'], name: arsize_i}
+        ARUSER: {bound: [AxiUserWidth-1, '0'], name: aruser_i}
+        ARVALID: {name: arvalid_i}
+        AWADDR: {bound: [AxiAddrWidth-1, '0'], name: awaddr_i}
+        AWBURST: {bound: ['             1', '0'], name: awburst_i}
+        AWID: {bound: ['  AxiIdWidth-1', '0'], name: awid_i}
+        AWLEN: {bound: ['             7', '0'], name: awlen_i}
+        AWLOCK: {name: awlock_i}
+        AWSIZE: {bound: ['             2', '0'], name: awsize_i}
+        AWUSER: {bound: [AxiUserWidth-1, '0'], name: awuser_i}
+        AWVALID: {name: awvalid_i}
+        BREADY: {name: bready_i}
+        RREADY: {name: rready_i}
+        WDATA: {bound: ['  AxiDataWidth-1', '0'], name: wdata_i}
+        WLAST: {name: wlast_i}
+        WSTRB: {bound: [AxiDataWidth/8-1, '0'], name: wstrb_i}
+        WUSER: {bound: ['  AxiUserWidth-1', '0'], name: wuser_i}
+        WVALID: {name: wvalid_i}
+      out:
+        ARREADY: {name: arready_o}
+        AWREADY: {name: awready_o}
+        BID: {bound: [AxiIdWidth-1, '0'], name: bid_o}
+        BRESP: {bound: ['           1', '0'], name: bresp_o}
+        BUSER: {bound: [AxiUserWidth-1, '0'], name: buser_o}
+        BVALID: {name: bvalid_o}
+        RDATA: {bound: [AxiDataWidth-1, '0'], name: rdata_o}
+        RID: {bound: ['  AxiIdWidth-1', '0'], name: rid_o}
+        RLAST: {name: rlast_o}
+        RRESP: {bound: ['             1', '0'], name: rresp_o}
+        RUSER: {bound: [AxiUserWidth-1, '0'], name: ruser_o}
+        RVALID: {name: rvalid_o}
+        WREADY: {name: wready_o}
+    type: AXI4
+parameters:
+  AxiAddrWidth: '12'
+  AxiDataWidth: '32'
+  AxiIdWidth: '8'
+  AxiUserWidth: '32'
+  CsrAddrWidth: I3CCSR_pkg::I3CCSR_MIN_ADDR_WIDTH
+  CsrDataWidth: I3CCSR_pkg::I3CCSR_DATA_WIDTH
+  DatAw: i3c_pkg::DatAw
+  DctAw: i3c_pkg::DctAw
+  NumPrivIds: '4'
+signals:
+  in:
+  - {bound: ['             2', '0'], name: arsize_i}
+  - {bound: [AxiUserWidth-1, '0'], name: awuser_i}
+  - {name: rst_ni}
+  - {name: arlock_i}
+  - {bound: [AxiAddrWidth-1, '0'], name: awaddr_i}
+  - {name: scl_i}
+  - {bound: [AxiUserWidth-1, '0'], name: aruser_i}
+  - {name: priv_ids_i}
+  - {name: clk_i}
+  - {bound: [AxiAddrWidth-1, '0'], name: araddr_i}
+  - {name: sda_i}
+  - {name: arvalid_i}
+  - {bound: ['             1', '0'], name: arburst_i}
+  - {bound: ['             7', '0'], name: arlen_i}
+  - {bound: ['  AxiDataWidth-1', '0'], name: wdata_i}
+  - {bound: [AxiDataWidth/8-1, '0'], name: wstrb_i}
+  - {bound: ['  AxiIdWidth-1', '0'], name: arid_i}
+  - {bound: ['             7', '0'], name: awlen_i}
+  - {bound: ['             2', '0'], name: awsize_i}
+  - {name: peripheral_reset_done_i}
+  - {name: wvalid_i}
+  - {name: awvalid_i}
+  - {name: disable_id_filtering_i}
+  - {name: awlock_i}
+  - {name: rready_i}
+  - {bound: ['  AxiIdWidth-1', '0'], name: awid_i}
+  - {bound: ['  AxiUserWidth-1', '0'], name: wuser_i}
+  - {name: wlast_i}
+  - {bound: ['             1', '0'], name: awburst_i}
+  - {name: bready_i}
+  out:
+  - {name: sel_od_pp_o}
+  - {bound: ['  AxiIdWidth-1', '0'], name: rid_o}
+  - {bound: [AxiIdWidth-1, '0'], name: bid_o}
+  - {name: scl_o}
+  - {name: escalated_reset_o}
+  - {name: sda_oe}
+  - {name: recovery_payload_available_o}
+  - {name: rlast_o}
+  - {name: awready_o}
+  - {name: scl_oe}
+  - {bound: ['             1', '0'], name: rresp_o}
+  - {name: arready_o}
+  - {name: bvalid_o}
+  - {name: sda_o}
+  - {bound: [AxiDataWidth-1, '0'], name: rdata_o}
+  - {bound: [AxiUserWidth-1, '0'], name: ruser_o}
+  - {bound: [AxiUserWidth-1, '0'], name: buser_o}
+  - {name: recovery_image_activated_o}
+  - {name: rvalid_o}
+  - {name: peripheral_reset_o}
+  - {name: irq_o}
+  - {bound: ['           1', '0'], name: bresp_o}
+  - {name: wready_o}

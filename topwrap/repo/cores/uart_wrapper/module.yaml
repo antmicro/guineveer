@@ -1,0 +1,32 @@
+id:
+  library: libdefault
+  name: uart_wrapper
+  vendor: vendor
+interfaces:
+  ahb:
+    mode: subordinate
+    signals:
+      in:
+        HADDR: {bound: ['31', '0'], name: haddr_i}
+        HSIZE: {bound: ['2', '0'], name: hsize_i}
+        HTRANS: {bound: ['1', '0'], name: htrans_i}
+        HWDATA: {bound: ['63', '0'], name: hwdata_i}
+        HWRITE: {name: hwrite_i}
+      out:
+        HRDATA: {bound: ['63', '0'], name: hrdata_o}
+        HRESP: {name: hresp_o}
+    type: AHBguin
+signals:
+  in:
+  - {bound: ['63', '0'], name: hwdata_i}
+  - {bound: ['2', '0'], name: hsize_i}
+  - {bound: ['31', '0'], name: haddr_i}
+  - {name: uart_rx_i}
+  - {name: rst_ni}
+  - {bound: ['1', '0'], name: htrans_i}
+  - {name: hwrite_i}
+  - {name: clk_i}
+  out:
+  - {bound: ['63', '0'], name: hrdata_o}
+  - {name: uart_tx_o}
+  - {name: hresp_o}
