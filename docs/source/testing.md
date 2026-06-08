@@ -36,7 +36,7 @@ Software tests can be run in multiple ways:
 * in Renode, with a behavioral model of the I3C device,
 * in Renode, with a co-simulated model of the I3C device, generated from the original HDL sources.
 
-Running the test software using each of the available methods is described in the [User guide](user_guide.md#running-example-sw-using-the-testbench)
+Running the test software using each of the available methods is described in the [User guide](user_guide.md#running-an-example-sw-using-the-testbench)
 
 ## FPGA tests
 ## Supported FPGA boards

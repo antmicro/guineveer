@@ -23,6 +23,17 @@ Currently available options:
 
 By default, `singlecore` is used.
 
+## Topwrap user repository
+
+Guineveer includes a pre-made Topwrap repository containing IP core description files as well as the necessary interface definitions.
+The IP core files were generated using `topwrap repo parse`, then refined into their current versions by adding information about clocks and resets, default values for input ports, etc.
+The `regenerate_tw_repo` Makefile target can be used to regenerate the repo contents.
+
+~~~{warning}
+Regenerating the repo contents will lose all the changes made to the IP core files.
+Without further changes, this will break the designs, since they depend on the IP core files containing information such as clocks and resets, etc.
+~~~
+
 ## Building the testbench simulation
 
 Run the `make testbench` command to generate the simulation testbench executable using `Verilator`.
