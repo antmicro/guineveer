@@ -34,7 +34,7 @@ HEX_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).hex
 ELF_FILE_CORE1 ?= $(SCRIPT_DIR)/tests/sw/build/core1/$(TEST).elf
 
 DESIGN ?= singlecore
-DUALCORE_ONLY_TESTS := axi-streaming-boot-dualcore
+DUALCORE_ONLY_TESTS := axi-streaming-boot-dualcore i3c-dualcore
 ifeq ($(DESIGN),singlecore)
 	ifneq ($(filter $(TEST),$(DUALCORE_ONLY_TESTS)),)
 		$(error $(TEST) isn\'t supported in singlecore architecture, use \'dualcore\')
