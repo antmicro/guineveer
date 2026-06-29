@@ -9,7 +9,7 @@ Should Read Reset Values
     Execute Command	          $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
     Execute Command	          $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
     Execute Command           include "${CURDIR}/guineveer_i3c_cosim.resc"
-    Create Terminal Tester    sysbus.uart  timeout=0.01
+    Create Terminal Tester    sysbus.uart_core  timeout=0.01
     Start Emulation
 
     Wait For Line On Uart     Testing the value of EXTCAP_HEADER.CAP_ID... OK. (0xc4 == 0xc4)
@@ -29,7 +29,7 @@ Should Read Reset Values
      Execute Command	       $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
      Execute Command	       $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
      Execute Command           include "${CURDIR}/guineveer_i3c_cosim.resc"
-     Create Terminal Tester    sysbus.uart  timeout=0.01
+     Create Terminal Tester    sysbus.uart_core  timeout=0.01
      Start Emulation
  
      Wait For Line On Uart     Testing whether EXTCAP_HEADER.CAP_ID is read-only... OK.
@@ -46,7 +46,7 @@ Should Read Reset Values
      Execute Command	       $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
      Execute Command	       $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
      Execute Command           include "${CURDIR}/guineveer_i3c_cosim.resc"
-     Create Terminal Tester    sysbus.uart  timeout=0.01
+     Create Terminal Tester    sysbus.uart_core  timeout=0.01
      Start Emulation
  
      Wait For Line On Uart     Testing whether CONTROL.HJ_EN is writable... OK.

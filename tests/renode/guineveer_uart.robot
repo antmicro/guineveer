@@ -4,7 +4,7 @@
 *** Test Cases ***
 Should Transmit And Receive UART data
     Execute Command           include "${CURDIR}/guineveer.resc"
-    Create Terminal Tester    sysbus.uart
+    Create Terminal Tester    sysbus.uart_core
     Execute Command           start
     Wait For Line On Uart     Hello from core 1
     Wait For Line On Uart     Hello from core 0

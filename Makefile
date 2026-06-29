@@ -88,6 +88,11 @@ $(HEX_FILE_CORE0) $(ELF_FILE_CORE0):
 $(HEX_FILE_CORE1) $(ELF_FILE_CORE1):
 	TEST=$(TEST) CORE=core1 $(MAKE) -f $(SCRIPT_DIR)/tests/sw/Makefile build
 
+$(SCRIPT_DIR)/tests/renode/guineveer.repl $(SCRIPT_DIR)/tests/renode/guieneveer_common.repl &: $(TW_DIR)/design-dualcore.yaml
+	mkdir -p $(HW_DIR)/tmp
+	topwrap build -d $(TW_DIR)/design-dualcore.yaml --build-dir $(HW_DIR)/tmp
+	mv $(HW_DIR)/tmp/*.repl $(SCRIPT_DIR)/tests/renode/
+
 $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUDE_DIRS)
 # Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
 	sed -i.bak "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
@@ -154,7 +159,7 @@ $(BUILD_DIR)/obj_dir/Vguineveer_tb: $(TB_FILES) $(TB_INCLS) $(TB_CPPS) | $(BUILD
 $(BUILD_DIR):
 	mkdir -p $@
 
-$(BUILD_DIR)/report.html: $(ELF_FILE_CORE0) $(ELF_FILE_CORE1) $(BUILD_DIR)
+$(BUILD_DIR)/report.html: $(ELF_FILE_CORE0) $(ELF_FILE_CORE1) $(BUILD_DIR) $(SCRIPT_DIR)/tests/renode/guieneveer_common.repl $(SCRIPT_DIR)/tests/renode/guieneveer_common.repl
 ifneq ($(filter i3c_cosim axi-streaming-boot-dualcore,$(RENODE_TEST)),)
 	make -C $(SCRIPT_DIR)/tests/renode/renode_i3c_cosim
 endif

@@ -134,3 +134,39 @@ ips:
 
   uart_core:
     file: repo[repo]:uart_wrapper
+
+extensions:
+  renode_peripheral_gen:
+    supported_peripherals:
+      - target:
+          name: sram_wrapper
+          vendor: vendor
+          library: libdefault
+        renode_device: Memory.MappedMemory
+        map:
+          - { dest: "size", src: ".memory_map.size" }
+      - target:
+          name: "el2_veer_wrapper"
+          vendor: vendor
+          library: libdefault
+        renode_device: CPU.VeeR_EL2
+        map:
+          - { dest: "hartId", src: ".connections.core_id" }
+      - target:
+          name: "i3c_wrapper"
+          vendor: vendor
+          library: libdefault
+        renode_device: I3C.Caliptra_I3C
+      - target:
+          name: "uart_wrapper"
+          vendor: vendor
+          library: libdefault
+          version: '1.0'
+        renode_device: UART.OpenTitan_UART
+    output:
+      - filename: "guineveer_common.repl"
+        filter: ["*", "-i3c_core"]
+      - filename: "guineveer.repl"
+        filter: ["i3c_core"]
+        includes: ["guineveer_common.repl"]
+

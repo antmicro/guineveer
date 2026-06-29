@@ -6,7 +6,7 @@ Readable Register From Both Cores
     Execute Command	      $elf0=@${CURDIR}/../sw/build/core0/i3c-dualcore.elf
     Execute Command	      $elf1=@${CURDIR}/../sw/build/core1/i3c-dualcore.elf
     Execute Command           include "${CURDIR}/guineveer.resc"
-    Create Terminal Tester    sysbus.uart
+    Create Terminal Tester    sysbus.uart_core
     Execute Command           start
 
     Wait For Line On Uart     Testing the value of CONTROL.HJ_EN... OK.

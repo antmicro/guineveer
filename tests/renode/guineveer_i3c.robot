@@ -6,7 +6,7 @@ Should Read Reset Values
     Execute Command	      $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
     Execute Command	      $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
     Execute Command           include "${CURDIR}/guineveer.resc"
-    Create Terminal Tester    sysbus.uart
+    Create Terminal Tester    sysbus.uart_core
     Execute Command           start
 
     Wait For Line On Uart     Testing the value of EXTCAP_HEADER.CAP_ID... OK. (0xc4 == 0xc4)
@@ -26,7 +26,7 @@ Should Test Read Only
     Execute Command	      $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
     Execute Command	      $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
     Execute Command           include "${CURDIR}/guineveer.resc"
-    Create Terminal Tester    sysbus.uart
+    Create Terminal Tester    sysbus.uart_core
     Execute Command           start
 
     Wait For Line On Uart     Testing whether EXTCAP_HEADER.CAP_ID is read-only... OK.
@@ -43,7 +43,7 @@ Should Test Writable
     Execute Command	      $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
     Execute Command	      $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
     Execute Command           include "${CURDIR}/guineveer.resc"
-    Create Terminal Tester    sysbus.uart
+    Create Terminal Tester    sysbus.uart_core
     Execute Command           start
 
     Wait For Line On Uart     Testing whether CONTROL.HJ_EN is writable... OK.
@@ -63,7 +63,7 @@ Should Force Interrupts
     Execute Command	      $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
     Execute Command	      $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
     Execute Command           include "${CURDIR}/guineveer.resc"
-    Create Terminal Tester    sysbus.uart
+    Create Terminal Tester    sysbus.uart_core
     Execute Command           start
 
     Wait For Line On Uart     Testing the value of INTR_STATUS.ALL... OK. (0x0 == 0x0)
