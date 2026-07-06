@@ -32,7 +32,11 @@ interfaces:
         HTRANS: {bound: ['1', '0'], name: ahb_htrans}
         HWDATA: {bound: ['63', '0'], name: ahb_hwdata}
         HWRITE: {name: ahb_hwrite}
-    type: AHBguin
+    type:
+      library: libdefault
+      name: AHBguin
+      vendor: vendor
+      version: '1.0'
 
   axi:
     mode: subordinate
@@ -69,7 +73,10 @@ interfaces:
         RRESP: {bound: ['1', '0'], name: axi_rresp}
         RVALID: {name: axi_rvalid}
         WREADY: {name: axi_wready}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
 parameters:
   ID: '1'

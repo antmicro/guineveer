@@ -1,1 +1,1 @@
-git+https://github.com/antmicro/topwrap@f416803b0ce5d183bd7cfee2e6b8db14bd055f9c
+git+https://github.com/antmicro/topwrap@c080ba9583564c7a929f1542d873188faafe8472

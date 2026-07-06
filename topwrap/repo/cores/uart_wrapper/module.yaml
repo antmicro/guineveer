@@ -2,6 +2,7 @@ id:
   library: libdefault
   name: uart_wrapper
   vendor: vendor
+  version: '1.0'
 
 clocks:
   uart:
@@ -27,13 +28,15 @@ interfaces:
       out:
         HRDATA: {bound: ['63', '0'], name: hrdata_o}
         HRESP: {name: hresp_o}
-    type: AHBguin
-
+    type:
+      library: libdefault
+      name: AHBguin
+      vendor: vendor
+      version: '1.0'
 signals:
   in:
   - {name: clk_i}
-  - {name: rst_ni}
-
   - {name: uart_rx_i}
+  - {name: rst_ni}
   out:
   - {name: uart_tx_o}

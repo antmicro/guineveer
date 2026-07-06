@@ -69,7 +69,10 @@ interfaces:
         WSTRB: {bound: ['7', '0'], name: m_axi_dst_wstrb}
         WUSER: {name: m_axi_dst_wuser}
         WVALID: {name: m_axi_dst_wvalid}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
   s_axi_src:
     mode: subordinate
@@ -123,7 +126,10 @@ interfaces:
         RUSER: {name: s_axi_src_ruser}
         RVALID: {name: s_axi_src_rvalid}
         WREADY: {name: s_axi_src_wready}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
 parameters:
   ID_WIDTH: null

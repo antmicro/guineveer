@@ -56,7 +56,10 @@ interfaces:
         RUSER: {bound: [AxiUserWidth-1, '0'], name: ruser_o}
         RVALID: {name: rvalid_o}
         WREADY: {name: wready_o}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
 parameters:
   AxiAddrWidth: '12'

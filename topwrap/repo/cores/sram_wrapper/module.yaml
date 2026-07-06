@@ -64,7 +64,10 @@ interfaces:
         RUSER: {name: s_axi_sram_ruser}
         RVALID: {name: s_axi_sram_rvalid}
         WREADY: {name: s_axi_sram_wready}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
 parameters:
   GUINEVEER_MEMORY_FILE: '""'

@@ -62,7 +62,10 @@ interfaces:
         WLAST: {name: ifu_axi_wlast}
         WSTRB: {bound: ['7', '0'], name: ifu_axi_wstrb}
         WVALID: {name: ifu_axi_wvalid}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
   lsu_axi:
     mode: manager
@@ -110,7 +113,10 @@ interfaces:
         WLAST: {name: lsu_axi_wlast}
         WSTRB: {bound: ['7', '0'], name: lsu_axi_wstrb}
         WVALID: {name: lsu_axi_wvalid}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
   sb_axi:
     mode: manager
@@ -158,7 +164,10 @@ interfaces:
         WLAST: {name: sb_axi_wlast}
         WSTRB: {bound: ['7', '0'], name: sb_axi_wstrb}
         WVALID: {name: sb_axi_wvalid}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
   dma_axi:
     mode: subordinate
@@ -198,7 +207,10 @@ interfaces:
         RRESP: {bound: ['1', '0'], name: dma_axi_rresp}
         RVALID: {name: dma_axi_rvalid}
         WREADY: {name: dma_axi_wready}
-    type: AXI4
+    type:
+      library: libdefault
+      name: AXI4
+      vendor: vendor
 
   el2_icache_export:
     mode: unspecified
@@ -234,7 +246,10 @@ interfaces:
         iccm_wren_bank: null
         wb_dout_pre_up: null
         wb_packeddout_pre: null
-    type: el2_mem_if
+    type:
+      library: libdefault
+      name: el2_mem_if
+      vendor: vendor
 
   el2_mem_export:
     mode: unspecified
@@ -270,7 +285,10 @@ interfaces:
         iccm_wren_bank: null
         wb_dout_pre_up: null
         wb_packeddout_pre: null
-    type: el2_mem_if
+    type:
+      library: libdefault
+      name: el2_mem_if
+      vendor: vendor
 
 signals:
   in:
