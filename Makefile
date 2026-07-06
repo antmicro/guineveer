@@ -111,7 +111,7 @@ regenerate_tw_repo: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUD
 		$(RV_ROOT)/design/el2_veer_wrapper.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/axi_cdc_wrapper.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/sram_wrapper.sv $(TW_PARSE_FLAGS)
-	topwrap repo parse $(TW_REPO) $(HW_DIR)/uart_wrapper.sv $(TW_PARSE_FLAGS) --grouping-hint=AHBguin=ahb
+	topwrap repo parse $(TW_REPO) $(SCRIPT_DIR)/design/src/ipxact/AHBguin.xml $(SCRIPT_DIR)/design/src/ipxact/uart_wrapper.xml -f ipxact -e skip
 	topwrap repo parse $(TW_REPO) $(RV_ROOT)/design/lib/axi4_to_ahb.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(I3C_ROOT_DIR)/src/i3c_defines.svh $(I3C_ROOT_DIR)/src/i3c_wrapper.sv $(TW_PARSE_FLAGS) \
 		--grouping-hint=AXI4=axi
