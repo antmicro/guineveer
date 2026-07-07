@@ -34,7 +34,7 @@ AXI_SOURCE_DIR = $(abspath $(SCRIPT_DIR)/third_party/axi)
 
 AXI_INTERCON_FLIST=$(strip $(file < ${BUILD_DIR}/axi.f))
 BENDER_INCLUDE_PATH=$(BUILD_DIR)/axi/.bender/git/checkouts
-COMMON_CELLS_INCLUDE_PATH=$(abspath $(wildcard $(BENDER_INCLUDE_PATH)/common_cells-*/include/))
+COMMON_CELLS_INCLUDE_PATH=$(abspath $(shell echo $(BENDER_INCLUDE_PATH)/common_cells-*/include/))
 AXI_INCLUDE_PATH = $(abspath $(BUILD_DIR)/axi/include/)
 
 define uniq =
