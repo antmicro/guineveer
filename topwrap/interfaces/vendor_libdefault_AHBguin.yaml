@@ -1,0 +1,26 @@
+id:
+  library: libdefault
+  name: AHBguin
+  vendor: vendor
+signals:
+  optional:
+    in:
+      HRDATA: hrdata
+      HREADYOUT: hreadyout
+      HRESP: hresp
+    inout: {}
+    out:
+      HADDR: haddr
+      HBURST: hburst
+      HMASTLOCK: hmastlock
+      HPROT: hprot
+      HSEL: hsel
+      HSIZE: hsize
+      HTRANS: htrans
+      HWDATA: hwdata
+      HWRITE: hwrite
+      HWSTRB: hwstrb
+  required:
+    in: {}
+    inout: {}
+    out: {}
