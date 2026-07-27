@@ -106,6 +106,8 @@ $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_IN
 
 	sed -i.bak 's/axi_pkg/axi_axi_pkg/g' $(HW_DIR)/guineveer.sv
 
+ipxact_gen: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUDE_DIRS) | $(BUILD_DIR)
+	topwrap ipxact_gen -d $(TW_DIR)/design-$(DESIGN).yaml -b $(BUILD_DIR)/ipxact
 
 # This target is only included for reference.
 # Running this target will lose all changes made to the IP core YAML files,
@@ -121,7 +123,7 @@ regenerate_tw_repo: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUD
 		$(RV_ROOT)/design/el2_veer_wrapper.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/axi_cdc_wrapper.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(TW_AXI_PREREQ_SRCS) $(HW_DIR)/sram_wrapper.sv $(TW_PARSE_FLAGS)
-	topwrap repo parse $(TW_REPO) $(SCRIPT_DIR)/design/src/ipxact/AHBguin.xml $(SCRIPT_DIR)/design/src/ipxact/uart_wrapper.xml -e skip
+	topwrap repo parse $(TW_REPO) $(SCRIPT_DIR)/design/src/ipxact/AHBguin.xml $(SCRIPT_DIR)/design/src/ipxact/uart_wrapper.xml --frontend ipxact -e skip
 	topwrap repo parse $(TW_REPO) $(RV_ROOT)/design/lib/axi4_to_ahb.sv $(TW_PARSE_FLAGS)
 	topwrap repo parse $(TW_REPO) $(I3C_ROOT_DIR)/src/i3c_defines.svh $(I3C_ROOT_DIR)/src/i3c_wrapper.sv $(TW_PARSE_FLAGS) \
 		--grouping-hint=AXI4=axi
@@ -170,6 +172,6 @@ ifneq ($(filter i3c_cosim axi-streaming-boot-dualcore,$(RENODE_TEST)),)
 endif
 	cd $(BUILD_DIR) && renode-test $(SCRIPT_DIR)/tests/renode/guineveer_$(RENODE_TEST).robot
 
-.PHONY: all clean hw testbench sim build_test renode_test regenerate_tw_repo
+.PHONY: all clean hw testbench sim build_test renode_test regenerate_tw_repo ipxact_gen
 
 .PRECIOUS: $(BUILD_DIR)/sim.vcd

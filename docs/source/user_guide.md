@@ -71,3 +71,8 @@ After building the co-simulation binary and the `i3c` test software, `renode-tes
 Refer to the following chapters in Renode's documentation for a detailed overview of the required dependencies and available options:
 * [Testing with Renode](https://renode.readthedocs.io/en/latest/introduction/testing.html)
 * [Co-simulating with an HDL simulator](https://renode.readthedocs.io/en/latest/advanced/co-simulating-with-an-hdl-simulator.html)
+
+## Generating IPXACT 2022 files
+
+Run `make ipxact_gen` to generate IPXACT files in `build/ipxact`. Supported IPXACT version is 2022.
+Due to existing Topwrap limitations parameters aren't elaborated. It is recommended to use `sed` command to replace parameters with selected values.
