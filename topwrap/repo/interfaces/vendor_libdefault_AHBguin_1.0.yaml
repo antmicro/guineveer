@@ -2,6 +2,7 @@ id:
   library: libdefault
   name: AHBguin
   vendor: vendor
+  version: '1.0'
 signals:
   optional:
     in:

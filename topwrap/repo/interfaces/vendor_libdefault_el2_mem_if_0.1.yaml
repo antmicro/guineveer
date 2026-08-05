@@ -2,6 +2,7 @@ id:
   library: libdefault
   name: el2_mem_if
   vendor: vendor
+  version: '0.1'
 signals:
   optional:
     in: {}
