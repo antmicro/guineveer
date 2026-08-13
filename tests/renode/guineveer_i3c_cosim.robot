@@ -13,7 +13,7 @@ Should Read Reset Values
     Start Emulation
 
     Wait For Line On Uart     Testing the value of EXTCAP_HEADER.CAP_ID... OK. (0xc4 == 0xc4)
-    Wait For Line On Uart     Testing the value of EXTCAP_HEADER.CAP_LENGTH... OK. (0x10 == 0x10)
+    Wait For Line On Uart     Testing the value of EXTCAP_HEADER.CAP_LENGTH... OK. (0x40 == 0x40)
     Wait For Line On Uart     Testing the value of CONTROL.HJ_EN... OK. (0x1 == 0x1)
     Wait For Line On Uart     Testing the value of CONTROL.CRR_EN... OK. (0x0 == 0x0)
     Wait For Line On Uart     Testing the value of CONTROL.IBI_EN... OK. (0x1 == 0x1)

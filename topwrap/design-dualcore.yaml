@@ -183,7 +183,7 @@ extensions:
           name: "i3c_wrapper"
           vendor: vendor
           library: libdefault
-        renode_device: I3C.Caliptra_I3C
+        renode_device: I3C.Chipsalliance_I3C
       - target:
           name: "uart_wrapper"
           vendor: vendor

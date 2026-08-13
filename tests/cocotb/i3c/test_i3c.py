@@ -118,8 +118,8 @@ async def test_ccc_getbcr(dut: HierarchyObject):
 
     CCC_DIRECT_GETBCR = 0x8E
 
-    DEFAULT_BCR = bytes([0b00100110])
-    INVERSE_BCR = bytes([0b11011001])
+    DEFAULT_BCR = bytes([0b00110110])
+    INVERSE_BCR = bytes([0b11001001])
 
     resp = (await i3c_ctrl.i3c_ccc_read(
         ccc=CCC_DIRECT_GETBCR, addr=STATIC_ADDR, count=1
@@ -186,8 +186,8 @@ async def test_ccc_getstatus(dut: HierarchyObject):
 
     CCC_DIRECT_GETSTATUS = 0x90
 
-    DEFAULT_STATUS = bytes([0x00, 0x60])
-    PROTO_ERROR_STATUS = bytes([0x00, 0x70])
+    DEFAULT_STATUS = bytes([0x00, 0xC0])
+    PROTO_ERROR_STATUS = bytes([0x00, 0xE0])
 
     resp = (await i3c_ctrl.i3c_ccc_read(
         ccc=CCC_DIRECT_GETSTATUS, addr=STATIC_ADDR, count=2

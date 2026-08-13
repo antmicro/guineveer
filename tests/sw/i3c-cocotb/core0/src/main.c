@@ -8,6 +8,11 @@
 #include "utils.h"
 #include "uart.h"
 
+
+#define NEW_PID 0xabccef012345
+#define NEW_BCR 0b11001001
+#define NEW_DCR 0x42
+
 /* ---------- Tests ---------- */
 
 void test_i3c_setdasa()
@@ -47,13 +52,22 @@ void test_i3c_getpid()
 	(void)getchar();
 
 	/* Write PID abccef012345. */
+	uint32_t val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	uint32_t STBY_CR_ENABLE_INIT_value = I3C_FIELD_GET(val, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_FIELD_SET(val, 0x00, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, val);
 
-	uint32_t val = read32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR);
-	val &= ~ I3C_STBY_CR_DEVICE_CHAR_PID_HI_MASK;
-	val |= 0xabcc;
-	write32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR, val);
+	val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_CHAR);
+	val &= ~I3C_FIELD(STDBYCTRLMODE, STBY_CR_DEVICE_CHAR, PID_HI, bm);
+	val |= NEW_PID >> 32;
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_CHAR, val);
 
-	write32(I3C_BASE + I3C_STBY_CR_DEVICE_PID_LO, 0xef012345);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_PID_LO,
+		(uint32_t)(NEW_PID & 0xFFFFFFFF));
+
+	val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	I3C_FIELD_SET(val, STBY_CR_ENABLE_INIT_value, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, val);
 
 	printf("ok\r\n");
 }
@@ -62,10 +76,19 @@ void test_i3c_getbcr()
 {
 	(void)getchar();
 
-	uint32_t val = read32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR);
-	val &= ~(I3C_STBY_CR_DEVICE_CHAR_BCR_MASK << I3C_STBY_CR_DEVICE_CHAR_BCR_SHIFT);
-	val |= 0xd9 << I3C_STBY_CR_DEVICE_CHAR_BCR_SHIFT; /* Bitwise inverse of reset value. */
-	write32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR, val);
+	uint32_t val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	uint32_t STBY_CR_ENABLE_INIT_value = I3C_FIELD_GET(val, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_FIELD_SET(val, 0x00, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, val);
+
+	val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_CHAR);
+	I3C_FIELD_SET(val, NEW_BCR & 0x1f, STDBYCTRLMODE, STBY_CR_DEVICE_CHAR, BCR_VAR);
+	I3C_FIELD_SET(val, NEW_BCR >> 5, STDBYCTRLMODE, STBY_CR_DEVICE_CHAR, BCR_FIXED);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_CHAR, val);
+
+	val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	I3C_FIELD_SET(val, STBY_CR_ENABLE_INIT_value, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, val);
 
 	printf("ok\r\n");
 }
@@ -74,10 +97,18 @@ void test_i3c_getdcr()
 {
 	(void)getchar();
 
-	uint32_t val = read32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR);
-	val &= ~(I3C_STBY_CR_DEVICE_CHAR_DCR_MASK << I3C_STBY_CR_DEVICE_CHAR_DCR_SHIFT);
-	val |= 0x42 << I3C_STBY_CR_DEVICE_CHAR_DCR_SHIFT; /* Bitwise inverse of reset value. */
-	write32(I3C_BASE + I3C_STBY_CR_DEVICE_CHAR, val);
+	uint32_t val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	uint32_t STBY_CR_ENABLE_INIT_value = I3C_FIELD_GET(val, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_FIELD_SET(val, 0x00, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, val);
+
+	val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_CHAR);
+	I3C_FIELD_SET(val, NEW_DCR, STDBYCTRLMODE, STBY_CR_DEVICE_CHAR, DCR);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_CHAR, val);
+
+	val = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	I3C_FIELD_SET(val, STBY_CR_ENABLE_INIT_value, STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, val);
 
 	printf("ok\r\n");
 }
@@ -105,38 +136,37 @@ void test_i3c_streaming_boot()
 {
 	/* Wait for RA to request management interface reset. */
 	while (1) {
-		uint32_t val = read32(I3C_BASE + I3C_SECFW_DEVICE_RESET);
-		uint32_t reset = val & I3C_SECFW_DEVICE_RESET_CTRL_MASK;
+		uint32_t val = I3C_READ(I3C_EC.SecFwRecoveryIf.DEVICE_RESET);
+		uint32_t reset = I3C_FIELD_GET(val, SECFWRECOVERYIF, DEVICE_RESET, RESET_CTRL);
 
 		if (reset)
 			break;
 		yield();
 	}
 
-	uint32_t val = read32(I3C_BASE + I3C_SECFW_DEVICE_RESET);
-	uint32_t reset = val & I3C_SECFW_DEVICE_RESET_CTRL_MASK;
-	uint32_t forced = (val >> I3C_SECFW_DEVICE_RESET_FORCED_SHIFT) & I3C_SECFW_DEVICE_RESET_FORCED_MASK;
+	uint32_t val = I3C_READ(I3C_EC.SecFwRecoveryIf.DEVICE_RESET);
+	uint32_t forced = I3C_FIELD_GET(val, SECFWRECOVERYIF, DEVICE_RESET, FORCED_RECOVERY);
 
 	yield();
 
 	/* Enter streaming boot mode if requested. */
 	if (forced == I3C_SECFW_DEVICE_RESET_FORCED_STREAMING_BOOT) {
-		write32(I3C_BASE + I3C_SECFW_DEVICE_STATUS_0,
-			I3C_SECFW_DEV_STATUS_RECOVERY_READY | I3C_SECFW_REC_REASON_STREAMING_BOOT);
+		I3C_WRITE(I3C_EC.SecFwRecoveryIf.DEVICE_STATUS_0,
+			I3C_SECFW_DEV_STATUS_RECOVERY_READY | (I3C_SECFW_REC_REASON_STREAMING_BOOT << I3C_FIELD(SECFWRECOVERYIF, DEVICE_STATUS_0, REC_REASON_CODE, bp)));
 
-		write32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_AWAITING);
+		I3C_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_AWAITING);
 	}
 
 	yield();
 
 	/* Clear reset. */
-	write32(I3C_BASE + I3C_SECFW_DEVICE_RESET, val);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.DEVICE_RESET, val);
 
 	yield();
 
 	/* Wait for image size to be set. */
 	size_t image_size = 0;
-	while (!(image_size = read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_CTRL_1)))
+	while (!(image_size = I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_CTRL_1)))
 		yield();
 	image_size *= 4;  /* INDIRECT_FIFO_CTRL_1 is in 4B word units. */
 
@@ -144,7 +174,7 @@ void test_i3c_streaming_boot()
 
 	/* Bail out if the image is too large. */
 	if (image_size > MAX_STREAMING_BOOT_SIZE) {
-		write32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_FAILED);
+		I3C_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_FAILED);
 		return;
 	}
 
@@ -155,9 +185,9 @@ void test_i3c_streaming_boot()
 	while (progress < image_size) {
 		i3c_wait_for_payload_available();
 
-		while (!(read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_STATUS_0)
-			& I3C_SECFW_INDIRECT_FIFO_EMPTY)) {
-			uint32_t data = read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_DATA);
+		while (!(I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_STATUS_0)
+			& I3C_FIELD(SECFWRECOVERYIF, INDIRECT_FIFO_STATUS_0, EMPTY, bm))) {
+			uint32_t data = I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_DATA);
 
 			for (size_t i = 0; i < 4; i++) {
 				streaming_boot_buffer[progress++] = data & 0xFF;
@@ -173,18 +203,19 @@ void test_i3c_streaming_boot()
 
 	/* Wait for boot request. */
 	while (1) {
-		uint32_t val = read32(I3C_BASE + I3C_SECFW_RECOVERY_CONTROL);
-		if (val & I3C_SECFW_RECOVERY_CONTROL_ACTIVATE)
+		uint32_t val = I3C_READ(I3C_EC.SecFwRecoveryIf.RECOVERY_CTRL);
+		if (val & I3C_FIELD(SECFWRECOVERYIF, RECOVERY_CTRL, ACTIVATE_REC_IMG, bm))
 			break;
 
 		yield();
 	}
 
 	/* Clear image activation. */
-	write32(I3C_BASE + I3C_SECFW_RECOVERY_CONTROL, I3C_SECFW_RECOVERY_CONTROL_ACTIVATE);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_CTRL,
+		I3C_SECFW_RECOVERY_CONTROL_ACTIVATE << I3C_FIELD(SECFWRECOVERYIF, RECOVERY_CTRL, ACTIVATE_REC_IMG, bp));
 
 	/* Notify sender of success. */
-	write32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL);
 
 	yield();
 
@@ -241,48 +272,49 @@ void axi_streaming_boot_writer()
 	yield();
 
 	/* Enable AXI bypass. */
-	uint32_t val = read32(I3C_BASE + I3C_SOCMGMT_REC_INTF_CFG);
-	val |= I3C_SOCMGMT_REC_INTF_CFG_BYPASS;
-	write32(I3C_BASE + I3C_SOCMGMT_REC_INTF_CFG, val);
+	uint32_t val = I3C_READ(I3C_EC.SoCMgmtIf.REC_INTF_CFG);
+	val |= I3C_FIELD(SOCMGMTIF, REC_INTF_CFG, REC_INTF_BYPASS, bm);
+	I3C_WRITE(I3C_EC.SoCMgmtIf.REC_INTF_CFG, val);
 
 	yield();
 
 	/* Enter streaming boot on next reset. */
-	write32(I3C_BASE + I3C_SECFW_DEVICE_RESET,
-		I3C_SECFW_DEVICE_RESET_FORCED_STREAMING_BOOT << I3C_SECFW_DEVICE_RESET_FORCED_SHIFT);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.DEVICE_RESET,
+		I3C_SECFW_DEVICE_RESET_FORCED_STREAMING_BOOT << I3C_FIELD(SECFWRECOVERYIF, DEVICE_RESET, FORCED_RECOVERY, bp));
 
 	yield();
 
 	/* Perform a management reset. */
-	write32(I3C_BASE + I3C_SOCMGMT_REC_INTF_REG_W1C_ACCESS,
-		I3C_SOCMGMT_REC_INTF_REG_DEVICE_MGMT_RESET);
+	I3C_WRITE(I3C_EC.SoCMgmtIf.REC_INTF_REG_W1C_ACCESS,
+		I3C_SECFW_MGMT_RESET << I3C_FIELD(SOCMGMTIF, REC_INTF_REG_W1C_ACCESS, DEVICE_RESET_CTRL, bp));
 
 	yield();
 
 	/* Wait for device to enter recovery mode. */
 	while (1) {
-		uint32_t val = read32(I3C_BASE + I3C_SECFW_DEVICE_STATUS_0);
+		uint32_t val = I3C_READ(I3C_EC.SecFwRecoveryIf.DEVICE_STATUS_0);
 
-		if (val == I3C_SECFW_DEV_STATUS_RECOVERY_READY | I3C_SECFW_REC_REASON_STREAMING_BOOT)
+		if (I3C_FIELD_GET(val, SECFWRECOVERYIF, DEVICE_STATUS_0, DEV_STATUS) == I3C_SECFW_DEV_STATUS_RECOVERY_READY &&
+			I3C_FIELD_GET(val, SECFWRECOVERYIF, DEVICE_STATUS_0, REC_REASON_CODE) == I3C_SECFW_REC_REASON_STREAMING_BOOT)
 			break;
 		yield();
 	}
 
 	yield();
 
-	write32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_CTRL_1, (len + 3) / 4);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_CTRL_1, (len + 3) / 4);
 
 	yield();
 
 	/* Send the image. */
 	size_t progress = 0;
 	while (progress < len) {
-		while (!(read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_STATUS_0)
-			& I3C_SECFW_INDIRECT_FIFO_EMPTY))
+		while (!(I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_STATUS_0)
+			& I3C_FIELD(SECFWRECOVERYIF, INDIRECT_FIFO_STATUS_0, EMPTY, bm)))
 			yield();
 
-		while (progress < len && !(read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_STATUS_0)
-				& I3C_SECFW_INDIRECT_FIFO_FULL)) {
+		while (progress < len && !(I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_STATUS_0)
+				& I3C_FIELD(SECFWRECOVERYIF, INDIRECT_FIFO_STATUS_0, FULL, bm))) {
 			size_t chunk = len - progress > 4 ? 4 : len - progress;
 
 			uint32_t data = 0;
@@ -290,26 +322,27 @@ void axi_streaming_boot_writer()
 				data |= (uint32_t)(axi_recovery_image[progress++]) << (i * 8);
 			}
 
-			write32(I3C_BASE + I3C_TTI_TX_DATA_PORT, data);
+			I3C_WRITE(I3C_EC.TTI.TX_DATA_PORT, data);
 		}
 	}
 
 	yield();
 
 	/* Boot the written image. */
-	write32(I3C_BASE + I3C_SOCMGMT_REC_INTF_REG_W1C_ACCESS,
-		I3C_SOCMGMT_REC_INTF_REG_ACTIVATE_IMAGE);
+	I3C_WRITE(I3C_EC.SoCMgmtIf.REC_INTF_REG_W1C_ACCESS,
+		I3C_SECFW_RECOVERY_CONTROL_ACTIVATE << I3C_FIELD(SOCMGMTIF, REC_INTF_REG_W1C_ACCESS,
+		RECOVERY_CTRL_ACTIVATE_REC_IMG, bp));
 
 	yield();
 
 	/* Wait for the image to be booted. */
 	while (1) {
-		uint32_t val = read32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS);
+		uint32_t val = I3C_READ(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS);
 
-		if (val == I3C_SECFW_RECOVERY_STATUS_FAILED) {
+		if (I3C_FIELD_GET(val, SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS) == I3C_SECFW_RECOVERY_STATUS_FAILED) {
 			printf("Boot failed!\r\n");
 			break;
-		} else if (val == I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL) {
+		} else if (I3C_FIELD_GET(val, SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS) == I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL) {
 			break;
 		}
 

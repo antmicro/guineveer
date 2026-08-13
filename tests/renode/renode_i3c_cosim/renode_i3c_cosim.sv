@@ -23,12 +23,15 @@ module sim;
   parameter int AXISubIdWidth = 4;
   parameter int ClockPeriod = 100;
 
+  parameter int unsigned RenodeToCosimCount = 1;
+  parameter int unsigned CosimToRenodeCount = 0;
+
   logic clk = 1;
 
   logic [4:0] renode_inputs;
   logic [0:0] renode_outputs;
 
-  renode_runtime runtime = new();
+  renode_runtime runtime = new(RenodeToCosimCount, CosimToRenodeCount);
   renode #(
       .RenodeInputsCount(5),
       .RenodeOutputsCount(1),

@@ -100,6 +100,7 @@ $(RENODE_TEST_SRC) &: $(TW_DIR)/design-dualcore.yaml
 
 $(HW_DIR)/guineveer.sv: $(SOC_WRAPPER_DEPS) $(VERILOG_CORE_SOURCES) $(VERILOG_INCLUDE_DIRS)
 # Input sync FFs are needed on FPGAs, as the option to disable them is only intended to be used on ASICs.
+	sed -i.bak "/DISABLE_LOOPBACK/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
 	sed -i.bak "/DISABLE_INPUT_FF/d" $(I3C_ROOT_DIR)/src/i3c_defines.svh
 
 	topwrap build -d $(TW_DIR)/design-$(DESIGN).yaml --build-dir $(HW_DIR)

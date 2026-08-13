@@ -1,19 +1,141 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
 
+
 #include <stdint.h>
-#include <setjmp.h>
+#include <stddef.h>
 #include "i3c.h"
-#include "utils.h"
 #include "uart.h"
 #include "printf.h"
+
+static uint8_t recovery_buffer[MAX_STREAMING_BOOT_SIZE] __attribute__((aligned(0x1000)));
+
+static void i3c_target_init(void)
+{
+	uint32_t v;
+
+	v = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	v &= ~I3C_FIELD(STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT, bm);
+	v |= 2u << I3C_FIELD(STDBYCTRLMODE, STBY_CR_CONTROL, STBY_CR_ENABLE_INIT, bp);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, v);
+
+	v = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_ADDR);
+	v &= ~I3C_FIELD(STDBYCTRLMODE, STBY_CR_DEVICE_ADDR, STATIC_ADDR, bm);
+	v |= (uint32_t)STATIC_ADDR << I3C_FIELD(STDBYCTRLMODE, STBY_CR_DEVICE_ADDR, STATIC_ADDR, bp);
+	v |= I3C_FIELD(STDBYCTRLMODE, STBY_CR_DEVICE_ADDR, STATIC_ADDR_VALID, bm);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_DEVICE_ADDR, v);
+
+	v = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_VIRT_DEVICE_ADDR);
+	v &= ~I3C_FIELD(STDBYCTRLMODE, STBY_CR_VIRT_DEVICE_ADDR, VIRT_STATIC_ADDR, bm);
+	v |= (uint32_t)VIRT_STATIC_ADDR << I3C_FIELD(STDBYCTRLMODE, STBY_CR_VIRT_DEVICE_ADDR, VIRT_STATIC_ADDR, bp);
+	v |= I3C_FIELD(STDBYCTRLMODE, STBY_CR_VIRT_DEVICE_ADDR, VIRT_STATIC_ADDR_VALID, bm);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_VIRT_DEVICE_ADDR, v);
+
+	v = I3C_READ(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL);
+	v |= I3C_FIELD(STDBYCTRLMODE, STBY_CR_CONTROL, TARGET_XACT_ENABLE, bm);
+	v |= I3C_FIELD(STDBYCTRLMODE, STBY_CR_CONTROL, DAA_SETDASA_ENABLE, bm);
+	I3C_WRITE(I3C_EC.StdbyCtrlMode.STBY_CR_CONTROL, v);
+
+	v = I3C_READ(I3C_EC.TTI.QUEUE_THLD_CTRL);
+	v &= ~I3C_FIELD(TTI, QUEUE_THLD_CTRL, RX_DESC_THLD, bm);
+	v |= 1u << I3C_FIELD(TTI, QUEUE_THLD_CTRL, RX_DESC_THLD, bp);
+	I3C_WRITE(I3C_EC.TTI.QUEUE_THLD_CTRL, v);
+
+	v = I3C_READ(I3C_EC.TTI.DATA_BUFFER_THLD_CTRL);
+	v &= ~I3C_FIELD(TTI, DATA_BUFFER_THLD_CTRL, RX_DATA_THLD, bm);
+	I3C_WRITE(I3C_EC.TTI.DATA_BUFFER_THLD_CTRL, v);
+
+	v = I3C_READ(I3C_EC.TTI.INTERRUPT_ENABLE);
+	v |= I3C_FIELD(TTI, INTERRUPT_ENABLE, RX_DESC_STAT_EN, bm);
+	v |= I3C_FIELD(TTI, INTERRUPT_ENABLE, TX_DESC_STAT_EN, bm);
+	I3C_WRITE(I3C_EC.TTI.INTERRUPT_ENABLE, v);
+
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.PROT_CAP_2,
+	       I3C_SECFW_PROT_CAP_FLASHLESS_BOOT >> 16,
+	       SECFWRECOVERYIF, PROT_CAP_2, AGENT_CAPS);
+}
+
+static int payload_available(void)
+{
+	if (I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_STATUS_0)
+	    & I3C_FIELD(SECFWRECOVERYIF, INDIRECT_FIFO_STATUS_0, FULL, bm))
+		return 1;
+	if (I3C_READ(I3C_EC.SoCMgmtIf.REC_INTF_CFG)
+	    & I3C_FIELD(SOCMGMTIF, REC_INTF_CFG, REC_PAYLOAD_DONE, bm))
+		return 1;
+	if (I3C_READ(I3C_EC.SecFwRecoveryIf.RECOVERY_CTRL)
+	    & I3C_FIELD(SECFWRECOVERYIF, RECOVERY_CTRL, ACTIVATE_REC_IMG, bm))
+		return 1;
+	return 0;
+}
+
+static void recovery_receiver(void)
+{
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.DEVICE_STATUS_0,
+	       I3C_SECFW_REC_REASON_STREAMING_BOOT,
+	       SECFWRECOVERYIF, DEVICE_STATUS_0, REC_REASON_CODE);
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.DEVICE_STATUS_0,
+	       I3C_SECFW_DEV_STATUS_RECOVERY_READY,
+	       SECFWRECOVERYIF, DEVICE_STATUS_0, DEV_STATUS);
+
+	uint32_t v = I3C_READ(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS);
+	v &= ~I3C_FIELD(SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS, bm);
+	v |= (uint32_t)I3C_SECFW_RECOVERY_STATUS_AWAITING << I3C_FIELD(SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS, bp);
+	v &= ~I3C_FIELD(SECFWRECOVERYIF, RECOVERY_STATUS, REC_IMG_INDEX, bm);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS, v);
+
+	uint32_t image_size_bytes;
+	while (!(image_size_bytes = I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_CTRL_1)))
+		;
+
+	if (image_size_bytes > MAX_STREAMING_BOOT_SIZE) {
+		I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS, 0xCu,
+		       SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS);
+		return;
+	}
+
+	size_t total_dwords = ((size_t)image_size_bytes + 3u) / 4u;
+
+	uint32_t max_xfer = I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_STATUS_4);
+	if (max_xfer == 0)
+		max_xfer = 0x40;
+
+	uint8_t *p = recovery_buffer;
+	for (size_t data_ptr = 0; data_ptr < total_dwords; data_ptr += max_xfer) {
+		while (!payload_available())
+			;
+
+		size_t dwords_left = total_dwords - data_ptr;
+		size_t chunk = max_xfer < dwords_left ? max_xfer : dwords_left;
+		for (size_t i = 0; i < chunk; i++) {
+			uint32_t data = I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_DATA);
+			*p++ = data & 0xFF;
+			*p++ = (data >> 8) & 0xFF;
+			*p++ = (data >> 16) & 0xFF;
+			*p++ = (data >> 24) & 0xFF;
+		}
+	}
+
+	while (!I3C_FIELD_EQ(I3C_EC.SecFwRecoveryIf.RECOVERY_CTRL, I3C_SECFW_RECOVERY_CONTROL_ACTIVATE,
+		      SECFWRECOVERYIF, RECOVERY_CTRL, ACTIVATE_REC_IMG))
+		;
+
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_PROCESSING,
+	       SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS);
+
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS, I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL,
+	       SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS);
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.DEVICE_STATUS_0,
+	       I3C_SECFW_DEV_STATUS_DEVICE_HEALTHY,
+	       SECFWRECOVERYIF, DEVICE_STATUS_0, DEV_STATUS);
+
+	((void(*)(void))recovery_buffer)();
+}
 
 int main(void)
 {
 	uart_init(UART_BAUD_RATE);
-	i3c_init();
-	
-	start_streaming_boot_reciver();
-
+	i3c_target_init();
+	recovery_receiver();
 	return 0;
 }

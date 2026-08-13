@@ -57,6 +57,10 @@ echo "import_files -fileset sources_1 $SCRIPT_DIR/top.sv"
 # Manually import el2_mem_if because it's not loaded (all files from the el2_mem_if are imported though)
 echo "import_files -fileset sources_1 ${RV_ROOT}/design/lib/el2_mem_if.sv"
 
+# Import i3c_sva.svh so all i3c-core files (e.g. bus_rx_flow.sv, recovery_receiver.sv)
+# can resolve the `I3C_ASSERT macros without per-file includes.
+echo "import_files -fileset sources_1 $(realpath $SCRIPT_DIR/../../third_party/i3c-core/src/libs/i3c_sva.svh)"
+
 # 6. Import constraints
 echo "import_files -fileset constrs_1 $SCRIPT_DIR/constrs/$CONSTR"
 
@@ -64,6 +68,8 @@ echo "import_files -fileset constrs_1 $SCRIPT_DIR/constrs/$CONSTR"
 echo "set_property is_global_include true [get_files -filter {NAME =~ *common_defines.vh}]"
 echo "set_property is_global_include true  [get_files -filter {NAME =~ *el2_pdef.vh}]"
 echo "set_property file_type SystemVerilog  [get_files -filter {NAME =~ *el2_pdef.vh}]"
+echo "set_property is_global_include true [get_files -filter {NAME =~ *i3c_sva.svh}]"
+echo "set_property file_type SystemVerilog [get_files -filter {NAME =~ *i3c_sva.svh}]"
 
 echo "# Set specific Verilog files explicitly to SystemVerilog type"
 echo "set_property file_type SystemVerilog [get_files dmi_jtag_to_core_sync.v]"

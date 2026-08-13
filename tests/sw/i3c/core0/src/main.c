@@ -7,13 +7,13 @@
 #include "uart.h"
 #include "i3c.h"
 
-volatile I3CCSR_t *i3c0 = (I3CCSR_t *)I3C_BASE;
+volatile TARGET_I3CCSR_t *i3c0 = (TARGET_I3CCSR_t *)I3C_BASE;
 
 #define TTI_STRUCT_FIELD(a) i3c0->I3C_EC.TTI.a
-#define RDL_GET_TTI_PROP(REG, FIELD, PROP) TARGETTRANSACTIONINTERFACEREGISTERS_RX_DESC_FIFO_SIZE_5_TX_DESC_FIFO_SIZE_5_RX_FIFO_SIZE_5_TX_FIFO_SIZE_5_IBI_FIFO_SIZE_5__##REG##__##FIELD##_##PROP
+#define RDL_GET_TTI_PROP(REG, FIELD, PROP) TARGET_I3CCSR__I3C_EC__TTI__##REG##__##FIELD##_##PROP
 #define TTI_REG_FIELD_EXPECT(REG, FIELD, VAL) \
 	reg_field_expect_value(#REG, #FIELD,\
-			*(uint32_t *)(&TTI_STRUCT_FIELD(REG)),\
+			(uint32_t *)(&TTI_STRUCT_FIELD(REG)),\
 			RDL_GET_TTI_PROP(REG, FIELD, bm),\
 			RDL_GET_TTI_PROP(REG, FIELD, bp),\
 			RDL_GET_TTI_PROP(REG, FIELD, bw),\
@@ -21,7 +21,7 @@ volatile I3CCSR_t *i3c0 = (I3CCSR_t *)I3C_BASE;
 	)
 #define TTI_REG_FIELD_RESET_EXPECT(REG, FIELD) \
 	reg_field_expect_value(#REG, #FIELD,\
-			*(uint32_t *)(&TTI_STRUCT_FIELD(REG)),\
+			(uint32_t *)(&TTI_STRUCT_FIELD(REG)),\
 			RDL_GET_TTI_PROP(REG, FIELD, bm),\
 			RDL_GET_TTI_PROP(REG, FIELD, bp),\
 			RDL_GET_TTI_PROP(REG, FIELD, bw),\
@@ -42,10 +42,10 @@ volatile I3CCSR_t *i3c0 = (I3CCSR_t *)I3C_BASE;
 	)
 
 int reg_field_expect_value(const char *reg_name, const char *field_name,
-		uint32_t reg, uint32_t bm, uint32_t bp, uint32_t bw,
+		uint32_t *reg, uint32_t bm, uint32_t bp, uint32_t bw,
 		uint32_t reset)
 {
-	uint32_t val = (reg & bm) >> bp;
+	uint32_t val = (*reg & bm) >> bp;
 
 	printf("Testing the value of %s.%s... ", reg_name, field_name);
 
@@ -196,12 +196,12 @@ int test_intr_force(void)
 	ret += TTI_REG_FIELD_EXPECT(INTERRUPT_ENABLE, RX_DESC_STAT_EN, 0x1);
 
 	printf("Checking status...\r\n");
-	ret += reg_field_expect_value("INTR_STATUS", "ALL", *(uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_STATUS), 0xffffffff, 0, 32, 0x0);
+	ret += reg_field_expect_value("INTR_STATUS", "ALL", (uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_STATUS), 0xffffffff, 0, 32, 0x0);
 
 	printf("Forcing interrupts and verifying status...\r\n");
 	*(uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_FORCE) = 0x82003f0f;
 	// Only a subset of TTI interrupts are supported
-	ret += reg_field_expect_value("INTR_STATUS", "ALL", *(uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_STATUS), 0xffffffff, 0, 32, 0x00002a03);
+	ret += reg_field_expect_value("INTR_STATUS", "ALL", (uint32_t *)&TTI_STRUCT_FIELD(INTERRUPT_STATUS), 0xffffffff, 0, 32, 0x00002a03);
 
 	return ret;
 }

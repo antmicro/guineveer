@@ -1,96 +1,100 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2025-2026 Antmicro <www.antmicro.com>
 
+
+#include <stdint.h>
+#include <stddef.h>
+#include "i3c.h"
+#include "uart.h"
 #include "printf.h"
 #include "payload.h"
-#include <stdint.h>
-#include <setjmp.h>
-#include "i3c.h"
 
-#include "utils.h"
-#include "uart.h"
-
-void axi_streaming_boot_writer()
+static void image_provider(const uint8_t *image, size_t len)
 {
-	const size_t len = sizeof(payload);
+	I3C_FIELD_WRITE(I3C_EC.SoCMgmtIf.REC_INTF_CFG, 0x1u, SOCMGMTIF, REC_INTF_CFG,
+	       REC_INTF_BYPASS);
 
-	/* Enable AXI bypass. */
-	// i3c-core docs: (1) - Set the I3C block to the "direct AXI" mode
-	uint32_t val = read32(I3C_BASE + I3C_SOCMGMT_REC_INTF_CFG);
-	val |= I3C_SOCMGMT_REC_INTF_CFG_BYPASS;
-	write32(I3C_BASE + I3C_SOCMGMT_REC_INTF_CFG, val);
+	while (!I3C_FIELD_EQ(I3C_EC.SecFwRecoveryIf.DEVICE_STATUS_0,
+		      I3C_SECFW_DEV_STATUS_RECOVERY_READY,
+		      SECFWRECOVERYIF, DEVICE_STATUS_0, DEV_STATUS))
+		;
 
-	/* Enter streaming boot on next reset. */
-	// i3c-core docs: Cant find
-	write32(I3C_BASE + I3C_SECFW_DEVICE_RESET,
-		I3C_SECFW_DEVICE_RESET_FORCED_STREAMING_BOOT << I3C_SECFW_DEVICE_RESET_FORCED_SHIFT);
+	while (!I3C_FIELD_EQ(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS,
+		      I3C_SECFW_RECOVERY_STATUS_AWAITING,
+		      SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS))
+		;
 
-	/* Perform a management reset. */
-	// i3c-core docs: Cant find
-	write32(I3C_BASE + I3C_SOCMGMT_REC_INTF_REG_W1C_ACCESS,
-		I3C_SOCMGMT_REC_INTF_REG_DEVICE_MGMT_RESET);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_CTRL_0, 0);
+	I3C_WRITE(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_CTRL_1, 0);
 
-	/* Wait for device to enter recovery mode. */
-	// i3c-core docs: (2) - Pool the DEVICE_STATUS_0 register
-	while (1) {
-		uint32_t val = read32(I3C_BASE + I3C_SECFW_DEVICE_STATUS_0);
+	I3C_FIELD_WRITE(I3C_EC.SoCMgmtIf.REC_INTF_REG_W1C_ACCESS, 0x1u, SOCMGMTIF,
+	       REC_INTF_REG_W1C_ACCESS, INDIRECT_FIFO_CTRL_RESET);
 
-		if (val == (I3C_SECFW_DEV_STATUS_RECOVERY_READY | I3C_SECFW_REC_REASON_STREAMING_BOOT))
-			break;
-	}
-	
-	// i3c-core docs: (3) - read RECOVERY_STATUS register and check if recovery flow stared
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_CTRL_1, len, SECFWRECOVERYIF,
+	       INDIRECT_FIFO_CTRL_1, IMAGE_SIZE);
 
-	// i3c-core docs: (4) - Write to the RECOVERY_CTRL register to set the recovery image configuration
-	// it is 0 as default, so there is no need to write to it
+	I3C_FIELD_WRITE(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_CTRL_0, 0xFFu, SECFWRECOVERYIF,
+	       INDIRECT_FIFO_CTRL_0, RESET);
 
-	// i3c-core docs: (5) - Write to the INDIRECT_FIFO_CTRL_0 register to reset the FIFO
-	// it is 0 as default, so there is no need to write to it
-	
-	// i3c-core docs: (6) - Write to the INDIRECT_FIFO_CTRL_1 register to set the recovery image size
-	write32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_CTRL_1, (len + 3) / 4);
-	
-	/* Send the image. */
-	size_t progress = 0;
-	while (progress < len) {
-		while (!(read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_STATUS_0)
-			& I3C_SECFW_INDIRECT_FIFO_EMPTY))
-			;
+	uint32_t max_xfer = I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_STATUS_4);
+	if (max_xfer == 0)
+		max_xfer = 0x40;
 
-		while (progress < len && !(read32(I3C_BASE + I3C_SECFW_INDIRECT_FIFO_STATUS_0)
-				& I3C_SECFW_INDIRECT_FIFO_FULL)) {
-			size_t chunk = len - progress > 4 ? 4 : len - progress;
+	size_t total_dwords = (len + 3u) / 4u;
 
+	for (size_t data_ptr = 0; data_ptr < total_dwords; data_ptr += max_xfer) {
+		size_t dwords_left = total_dwords - data_ptr;
+		size_t chunk = max_xfer < dwords_left ? max_xfer : dwords_left;
+
+		for (size_t i = 0; i < chunk; i++) {
+			size_t off = (data_ptr + i) * 4u;
 			uint32_t data = 0;
-			for (size_t i = 0; i < chunk; i++) {
-				data |= (uint32_t)(payload[progress++]) << (i * 8);
+			for (size_t b = 0; b < 4u; b++) {
+				size_t byte_idx = off + b;
+				if (byte_idx < len)
+					data |= (uint32_t)image[byte_idx] << (b * 8u);
 			}
-
-			write32(I3C_BASE + I3C_TTI_TX_DATA_PORT, data);
+			I3C_WRITE(I3C_EC.TTI.TX_DATA_PORT, data);
 		}
+
+		if (data_ptr + chunk >= total_dwords)
+			I3C_FIELD_WRITE(I3C_EC.SoCMgmtIf.REC_INTF_CFG, 0x1u, SOCMGMTIF,
+			       REC_INTF_CFG, REC_PAYLOAD_DONE);
+
+		while (!(I3C_READ(I3C_EC.SecFwRecoveryIf.INDIRECT_FIFO_STATUS_0)
+			 & I3C_FIELD(SECFWRECOVERYIF, INDIRECT_FIFO_STATUS_0, EMPTY, bm)))
+			;
 	}
 
-	/* Boot the written image. */
-	write32(I3C_BASE + I3C_SOCMGMT_REC_INTF_REG_W1C_ACCESS,
-		I3C_SOCMGMT_REC_INTF_REG_ACTIVATE_IMAGE);
+	I3C_FIELD_WRITE(I3C_EC.SoCMgmtIf.REC_INTF_REG_W1C_ACCESS,
+	       I3C_SECFW_RECOVERY_CONTROL_ACTIVATE,
+	       SOCMGMTIF, REC_INTF_REG_W1C_ACCESS, RECOVERY_CTRL_ACTIVATE_REC_IMG);
 
-	/* Wait for the image to be booted. */
-	while (1) {
-		uint32_t val = read32(I3C_BASE + I3C_SECFW_RECOVERY_STATUS);
+	while (!I3C_FIELD_EQ(I3C_EC.SecFwRecoveryIf.RECOVERY_STATUS,
+		      I3C_SECFW_RECOVERY_STATUS_PROCESSING,
+		      SECFWRECOVERYIF, RECOVERY_STATUS, DEV_REC_STATUS))
+		;
 
-		if (val == I3C_SECFW_RECOVERY_STATUS_FAILED) {
-			printf("Boot failed!\r\n");
+	for (;;) {
+		uint32_t st;
+		st = I3C_READ(I3C_EC.SecFwRecoveryIf.DEVICE_STATUS_0);
+		st &= I3C_FIELD(SECFWRECOVERYIF, DEVICE_STATUS_0, DEV_STATUS, bm);
+		if (st == ((uint32_t)I3C_SECFW_DEV_STATUS_DEVICE_HEALTHY
+			   << I3C_FIELD(SECFWRECOVERYIF, DEVICE_STATUS_0, DEV_STATUS, bp))) {
+			//Boot successful
 			break;
-		} else if (val == I3C_SECFW_RECOVERY_STATUS_SUCCESSFUL) {
+		}
+		if (st == ((uint32_t)I3C_SECFW_DEV_STATUS_ERROR
+			   << I3C_FIELD(SECFWRECOVERYIF, DEVICE_STATUS_0, DEV_STATUS, bp))) {
+			printf("Boot failed!\r\n");
 			break;
 		}
 	}
 }
 
-
 int main(void)
 {
 	uart_init(UART_BAUD_RATE);
-	axi_streaming_boot_writer();
+	image_provider(payload, payload_len);
 	return 0;
 }
