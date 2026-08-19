@@ -1,0 +1,29 @@
+// Copyright (c) 2026 Antmicro <www.antmicro.com>
+// SPDX-License-Identifier: Apache-2.0
+
+`ifndef I3C_CONFIG
+`define I3C_CONFIG
+
+  `define CMD_FIFO_DEPTH         64
+  `define RX_FIFO_DEPTH          64
+  `define TX_FIFO_DEPTH          64
+  `define RESP_FIFO_DEPTH        64
+  `define IBI_FIFO_DEPTH         64
+  `define IBI_BUFFER_DEPTH       8
+  `define DAT_DEPTH              32
+  `define DCT_DEPTH              32
+  `define I3C_USE_AXI            1
+  `define AXI_ADDR_WIDTH         12
+  `define AXI_DATA_WIDTH         32
+  `define AXI_USER_WIDTH         32
+  `define AXI_ID_WIDTH           8
+  `define AXI_ID_FILTERING       1
+  `define NUM_PRIV_IDS           4
+  `define CONTROLLER_SUPPORT     0
+  `define TARGET_SUPPORT         1
+  `define TTI_TX_DESC_FIFO_DEPTH 64
+  `define TTI_RX_DESC_FIFO_DEPTH 64
+  `define TTI_RX_FIFO_DEPTH      64
+  `define TTI_TX_FIFO_DEPTH      64
+
+`endif  // I3C_CONFIG

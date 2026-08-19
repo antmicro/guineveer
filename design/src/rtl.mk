@@ -44,7 +44,7 @@ define uniq =
 endef
 
 VERILOG_CORE_SOURCES_RAW=\
-    $(CALIPTRA_ROOT)/src/caliptra_prim/rtl/caliptra_prim_count_pkg.sv \
+	$(CALIPTRA_ROOT)/src/caliptra_prim/rtl/caliptra_prim_count_pkg.sv \
 	$(filter-out +incdir+%,$(I3C_FLIST)) \
 	$(filter-out +incdir+%,$(UART_FLIST)) \
 	$(filter-out +incdir+%,$(VEER_FLIST)) \
@@ -59,7 +59,8 @@ VERILOG_CORE_SOURCES=$(strip $(call uniq,$(VERILOG_CORE_SOURCES_RAW)))
 VERILOG_SOURCES=$(VERILOG_CORE_SOURCES) $(HW_DIR)/guineveer.sv
 
 VERILOG_INCLUDE_DIRS_RAW=\
-    $(subst +incdir+,,$(filter +incdir+%,$(UART_FLIST))) \
+	$(HW_DIR) \
+  $(subst +incdir+,,$(filter +incdir+%,$(UART_FLIST))) \
 	$(subst +incdir+,,$(filter +incdir+%,$(I3C_FLIST))) \
 	$(subst +incdir+,,$(filter +incdir+%,$(VEER_FLIST))) \
 	$(COMMON_CELLS_INCLUDE_PATH) \
