@@ -1,2 +1,2 @@
 topwrap @ git+https://github.com/antmicro/topwrap@ccebedba9102446ac741ab7b96af0d4edf57dc7f
-renode_plugin @ git+https://github.com/antmicro/topwrap-utils@96b92fe6563bcd0d71a449b355db662d8564f696#subdirectory=topwrap-renode-plugin
+renode_plugin @ git+https://github.com/antmicro/topwrap-utils@201ae847e0b272077115603369fe4797623ef54e#subdirectory=topwrap-renode-plugin
