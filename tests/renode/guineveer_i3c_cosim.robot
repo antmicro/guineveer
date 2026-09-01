@@ -61,3 +61,14 @@ Should Read Reset Values
      Wait For Line On Uart     Testing whether DATA_BUFFER_THLD_CTRL.RX_DATA_THLD is writable... OK.
      Wait For Line On Uart     Testing whether DATA_BUFFER_THLD_CTRL.TX_START_THLD is writable... OK.
      Wait For Line On Uart     Testing whether DATA_BUFFER_THLD_CTRL.RX_START_THLD is writable... OK.
+
+Should Force Interrupts
+    Execute Command	      $elf0=@${CURDIR}/../sw/build/core0/i3c.elf
+    Execute Command	      $elf1=@${CURDIR}/../sw/build/core1/i3c.elf
+    Execute Command           include "${CURDIR}/guineveer_i3c_cosim.resc"
+    Create Terminal Tester    sysbus.uart_core
+    Execute Command           start
+
+    Wait For Line On Uart     Testing the value of INTR_STATUS.ALL... OK. (0x0 == 0x0)
+    Wait For Line On Uart     Testing the value of INTR_STATUS.ALL... OK. (0x2a03 == 0x2a03)
+
