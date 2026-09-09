@@ -22,7 +22,7 @@ fi
 pushd "$THIRD_PARTY_DIR"
 
 echo "Updating the AXI submodule..."
-git submodule update --init --recursive --remote "$AXI_DIR"
+git submodule update --init --recursive "$AXI_DIR"
 
 pushd "$AXI_DIR"
 
